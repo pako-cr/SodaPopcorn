@@ -1,0 +1,761 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D941AC8226E2787100018E57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8126E2787100018E57 /* AppDelegate.swift */; };
+		D941AC8426E2787100018E57 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8326E2787100018E57 /* SceneDelegate.swift */; };
+		D941AC8926E2787100018E57 /* SodaPopcorn.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */; };
+		D941AC8B26E2787300018E57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D941AC8A26E2787300018E57 /* Assets.xcassets */; };
+		D941AC8E26E2787300018E57 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D941AC8D26E2787300018E57 /* Preview Assets.xcassets */; };
+		D941AC9126E2787300018E57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D941AC8F26E2787300018E57 /* LaunchScreen.storyboard */; };
+		D941AC9C26E2787400018E57 /* SodaPopcornTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941AC9B26E2787400018E57 /* SodaPopcornTests.swift */; };
+		D941ACA726E2787400018E57 /* SodaPopcornUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACA626E2787400018E57 /* SodaPopcornUITests.swift */; };
+		D941ACC526E278EF00018E57 /* ParameterEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACB826E278EF00018E57 /* ParameterEncoding.swift */; };
+		D941ACC626E278EF00018E57 /* URLParameterEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACB926E278EF00018E57 /* URLParameterEncoder.swift */; };
+		D941ACC726E278EF00018E57 /* JSONParameterEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACBA26E278EF00018E57 /* JSONParameterEncoder.swift */; };
+		D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACBC26E278EF00018E57 /* NetworkManager.swift */; };
+		D941ACC926E278EF00018E57 /* MovieEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACBE26E278EF00018E57 /* MovieEndpoint.swift */; };
+		D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC026E278EF00018E57 /* HTTPTask.swift */; };
+		D941ACCB26E278EF00018E57 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC126E278EF00018E57 /* HTTPMethod.swift */; };
+		D941ACCC26E278EF00018E57 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC226E278EF00018E57 /* Router.swift */; };
+		D941ACCD26E278EF00018E57 /* EndPointType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC326E278EF00018E57 /* EndPointType.swift */; };
+		D941ACE526E27A8900018E57 /* MovieListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE226E27A8900018E57 /* MovieListViewModel.swift */; };
+		D941ACE626E27A8900018E57 /* MovieListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE326E27A8900018E57 /* MovieListViewController.swift */; };
+		D941ACE726E27A8900018E57 /* MovieListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE426E27A8900018E57 /* MovieListView.swift */; };
+		D941ACE926E27AA800018E57 /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE826E27AA800018E57 /* Movie.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D941AC9826E2787400018E57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D941AC7626E2787100018E57 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D941AC7D26E2787100018E57;
+			remoteInfo = SodaPopcorn;
+		};
+		D941ACA326E2787400018E57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D941AC7626E2787100018E57 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D941AC7D26E2787100018E57;
+			remoteInfo = SodaPopcorn;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D941AC7E26E2787100018E57 /* SodaPopcorn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SodaPopcorn.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D941AC8126E2787100018E57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D941AC8326E2787100018E57 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D941AC8826E2787100018E57 /* SodaPopcorn.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SodaPopcorn.xcdatamodel; sourceTree = "<group>"; };
+		D941AC8A26E2787300018E57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D941AC8D26E2787300018E57 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D941AC9026E2787300018E57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D941AC9226E2787300018E57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D941AC9726E2787400018E57 /* SodaPopcornTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SodaPopcornTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D941AC9B26E2787400018E57 /* SodaPopcornTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SodaPopcornTests.swift; sourceTree = "<group>"; };
+		D941AC9D26E2787400018E57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D941ACA226E2787400018E57 /* SodaPopcornUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SodaPopcornUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D941ACA626E2787400018E57 /* SodaPopcornUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SodaPopcornUITests.swift; sourceTree = "<group>"; };
+		D941ACA826E2787400018E57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D941ACB826E278EF00018E57 /* ParameterEncoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParameterEncoding.swift; sourceTree = "<group>"; };
+		D941ACB926E278EF00018E57 /* URLParameterEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLParameterEncoder.swift; sourceTree = "<group>"; };
+		D941ACBA26E278EF00018E57 /* JSONParameterEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONParameterEncoder.swift; sourceTree = "<group>"; };
+		D941ACBC26E278EF00018E57 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		D941ACBE26E278EF00018E57 /* MovieEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieEndpoint.swift; sourceTree = "<group>"; };
+		D941ACC026E278EF00018E57 /* HTTPTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPTask.swift; sourceTree = "<group>"; };
+		D941ACC126E278EF00018E57 /* HTTPMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		D941ACC226E278EF00018E57 /* Router.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		D941ACC326E278EF00018E57 /* EndPointType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EndPointType.swift; sourceTree = "<group>"; };
+		D941ACE226E27A8900018E57 /* MovieListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListViewModel.swift; sourceTree = "<group>"; };
+		D941ACE326E27A8900018E57 /* MovieListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListViewController.swift; sourceTree = "<group>"; };
+		D941ACE426E27A8900018E57 /* MovieListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListView.swift; sourceTree = "<group>"; };
+		D941ACE826E27AA800018E57 /* Movie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D941AC7B26E2787100018E57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941AC9426E2787400018E57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941AC9F26E2787400018E57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D941AC7526E2787100018E57 = {
+			isa = PBXGroup;
+			children = (
+				D941AC8026E2787100018E57 /* SodaPopcorn */,
+				D941AC9A26E2787400018E57 /* SodaPopcornTests */,
+				D941ACA526E2787400018E57 /* SodaPopcornUITests */,
+				D941AC7F26E2787100018E57 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D941AC7F26E2787100018E57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D941AC7E26E2787100018E57 /* SodaPopcorn.app */,
+				D941AC9726E2787400018E57 /* SodaPopcornTests.xctest */,
+				D941ACA226E2787400018E57 /* SodaPopcornUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D941AC8026E2787100018E57 /* SodaPopcorn */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACD326E27A1100018E57 /* Model */,
+				D941ACD226E27A0100018E57 /* UI */,
+				D941ACD126E279EB00018E57 /* Storage */,
+				D941ACB626E278EF00018E57 /* Networking */,
+				D941AC8126E2787100018E57 /* AppDelegate.swift */,
+				D941AC8326E2787100018E57 /* SceneDelegate.swift */,
+				D941AC8A26E2787300018E57 /* Assets.xcassets */,
+				D941AC8F26E2787300018E57 /* LaunchScreen.storyboard */,
+				D941AC9226E2787300018E57 /* Info.plist */,
+				D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */,
+				D941AC8C26E2787300018E57 /* Preview Content */,
+			);
+			path = SodaPopcorn;
+			sourceTree = "<group>";
+		};
+		D941AC8C26E2787300018E57 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				D941AC8D26E2787300018E57 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		D941AC9A26E2787400018E57 /* SodaPopcornTests */ = {
+			isa = PBXGroup;
+			children = (
+				D941AC9B26E2787400018E57 /* SodaPopcornTests.swift */,
+				D941AC9D26E2787400018E57 /* Info.plist */,
+			);
+			path = SodaPopcornTests;
+			sourceTree = "<group>";
+		};
+		D941ACA526E2787400018E57 /* SodaPopcornUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACA626E2787400018E57 /* SodaPopcornUITests.swift */,
+				D941ACA826E2787400018E57 /* Info.plist */,
+			);
+			path = SodaPopcornUITests;
+			sourceTree = "<group>";
+		};
+		D941ACB626E278EF00018E57 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACB726E278EF00018E57 /* Encoding */,
+				D941ACBB26E278EF00018E57 /* Manager */,
+				D941ACBD26E278EF00018E57 /* EndPoint */,
+				D941ACBF26E278EF00018E57 /* Service */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		D941ACB726E278EF00018E57 /* Encoding */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACB826E278EF00018E57 /* ParameterEncoding.swift */,
+				D941ACB926E278EF00018E57 /* URLParameterEncoder.swift */,
+				D941ACBA26E278EF00018E57 /* JSONParameterEncoder.swift */,
+			);
+			path = Encoding;
+			sourceTree = "<group>";
+		};
+		D941ACBB26E278EF00018E57 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACBC26E278EF00018E57 /* NetworkManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
+		D941ACBD26E278EF00018E57 /* EndPoint */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACBE26E278EF00018E57 /* MovieEndpoint.swift */,
+			);
+			path = EndPoint;
+			sourceTree = "<group>";
+		};
+		D941ACBF26E278EF00018E57 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACC026E278EF00018E57 /* HTTPTask.swift */,
+				D941ACC126E278EF00018E57 /* HTTPMethod.swift */,
+				D941ACC226E278EF00018E57 /* Router.swift */,
+				D941ACC326E278EF00018E57 /* EndPointType.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		D941ACD126E279EB00018E57 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		D941ACD226E27A0100018E57 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACE126E27A8900018E57 /* MovieList */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		D941ACD326E27A1100018E57 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACE826E27AA800018E57 /* Movie.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		D941ACE126E27A8900018E57 /* MovieList */ = {
+			isa = PBXGroup;
+			children = (
+				D941ACE226E27A8900018E57 /* MovieListViewModel.swift */,
+				D941ACE326E27A8900018E57 /* MovieListViewController.swift */,
+				D941ACE426E27A8900018E57 /* MovieListView.swift */,
+			);
+			path = MovieList;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D941AC7D26E2787100018E57 /* SodaPopcorn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D941ACAB26E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcorn" */;
+			buildPhases = (
+				D941AC7A26E2787100018E57 /* Sources */,
+				D941ACEA26E27B6B00018E57 /* Swiftlint Script */,
+				D941AC7B26E2787100018E57 /* Frameworks */,
+				D941AC7C26E2787100018E57 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SodaPopcorn;
+			productName = SodaPopcorn;
+			productReference = D941AC7E26E2787100018E57 /* SodaPopcorn.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D941AC9626E2787400018E57 /* SodaPopcornTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D941ACAE26E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcornTests" */;
+			buildPhases = (
+				D941AC9326E2787400018E57 /* Sources */,
+				D941AC9426E2787400018E57 /* Frameworks */,
+				D941AC9526E2787400018E57 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D941AC9926E2787400018E57 /* PBXTargetDependency */,
+			);
+			name = SodaPopcornTests;
+			productName = SodaPopcornTests;
+			productReference = D941AC9726E2787400018E57 /* SodaPopcornTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D941ACA126E2787400018E57 /* SodaPopcornUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D941ACB126E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcornUITests" */;
+			buildPhases = (
+				D941AC9E26E2787400018E57 /* Sources */,
+				D941AC9F26E2787400018E57 /* Frameworks */,
+				D941ACA026E2787400018E57 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D941ACA426E2787400018E57 /* PBXTargetDependency */,
+			);
+			name = SodaPopcornUITests;
+			productName = SodaPopcornUITests;
+			productReference = D941ACA226E2787400018E57 /* SodaPopcornUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D941AC7626E2787100018E57 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				TargetAttributes = {
+					D941AC7D26E2787100018E57 = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
+					D941AC9626E2787400018E57 = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = D941AC7D26E2787100018E57;
+					};
+					D941ACA126E2787400018E57 = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = D941AC7D26E2787100018E57;
+					};
+				};
+			};
+			buildConfigurationList = D941AC7926E2787100018E57 /* Build configuration list for PBXProject "SodaPopcorn" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D941AC7526E2787100018E57;
+			productRefGroup = D941AC7F26E2787100018E57 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D941AC7D26E2787100018E57 /* SodaPopcorn */,
+				D941AC9626E2787400018E57 /* SodaPopcornTests */,
+				D941ACA126E2787400018E57 /* SodaPopcornUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D941AC7C26E2787100018E57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D941AC9126E2787300018E57 /* LaunchScreen.storyboard in Resources */,
+				D941AC8E26E2787300018E57 /* Preview Assets.xcassets in Resources */,
+				D941AC8B26E2787300018E57 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941AC9526E2787400018E57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941ACA026E2787400018E57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D941ACEA26E27B6B00018E57 /* Swiftlint Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Swiftlint Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D941AC7A26E2787100018E57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D941ACE626E27A8900018E57 /* MovieListViewController.swift in Sources */,
+				D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */,
+				D941ACC726E278EF00018E57 /* JSONParameterEncoder.swift in Sources */,
+				D941ACC526E278EF00018E57 /* ParameterEncoding.swift in Sources */,
+				D941AC8926E2787100018E57 /* SodaPopcorn.xcdatamodeld in Sources */,
+				D941AC8226E2787100018E57 /* AppDelegate.swift in Sources */,
+				D941ACE926E27AA800018E57 /* Movie.swift in Sources */,
+				D941AC8426E2787100018E57 /* SceneDelegate.swift in Sources */,
+				D941ACCD26E278EF00018E57 /* EndPointType.swift in Sources */,
+				D941ACE726E27A8900018E57 /* MovieListView.swift in Sources */,
+				D941ACC626E278EF00018E57 /* URLParameterEncoder.swift in Sources */,
+				D941ACE526E27A8900018E57 /* MovieListViewModel.swift in Sources */,
+				D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */,
+				D941ACCB26E278EF00018E57 /* HTTPMethod.swift in Sources */,
+				D941ACC926E278EF00018E57 /* MovieEndpoint.swift in Sources */,
+				D941ACCC26E278EF00018E57 /* Router.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941AC9326E2787400018E57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D941AC9C26E2787400018E57 /* SodaPopcornTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D941AC9E26E2787400018E57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D941ACA726E2787400018E57 /* SodaPopcornUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D941AC9926E2787400018E57 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D941AC7D26E2787100018E57 /* SodaPopcorn */;
+			targetProxy = D941AC9826E2787400018E57 /* PBXContainerItemProxy */;
+		};
+		D941ACA426E2787400018E57 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D941AC7D26E2787100018E57 /* SodaPopcorn */;
+			targetProxy = D941ACA326E2787400018E57 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D941AC8F26E2787300018E57 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D941AC9026E2787300018E57 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D941ACA926E2787400018E57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D941ACAA26E2787400018E57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D941ACAC26E2787400018E57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SodaPopcorn/Preview Content\"";
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = SodaPopcorn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcorn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D941ACAD26E2787400018E57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SodaPopcorn/Preview Content\"";
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = SodaPopcorn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcorn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D941ACAF26E2787400018E57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				INFOPLIST_FILE = SodaPopcornTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcornTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SodaPopcorn.app/SodaPopcorn";
+			};
+			name = Debug;
+		};
+		D941ACB026E2787400018E57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				INFOPLIST_FILE = SodaPopcornTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcornTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SodaPopcorn.app/SodaPopcorn";
+			};
+			name = Release;
+		};
+		D941ACB226E2787400018E57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				INFOPLIST_FILE = SodaPopcornUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcornUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SodaPopcorn;
+			};
+			name = Debug;
+		};
+		D941ACB326E2787400018E57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GFG4A69RG7;
+				INFOPLIST_FILE = SodaPopcornUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcornUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SodaPopcorn;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D941AC7926E2787100018E57 /* Build configuration list for PBXProject "SodaPopcorn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D941ACA926E2787400018E57 /* Debug */,
+				D941ACAA26E2787400018E57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D941ACAB26E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcorn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D941ACAC26E2787400018E57 /* Debug */,
+				D941ACAD26E2787400018E57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D941ACAE26E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcornTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D941ACAF26E2787400018E57 /* Debug */,
+				D941ACB026E2787400018E57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D941ACB126E2787400018E57 /* Build configuration list for PBXNativeTarget "SodaPopcornUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D941ACB226E2787400018E57 /* Debug */,
+				D941ACB326E2787400018E57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D941AC8826E2787100018E57 /* SodaPopcorn.xcdatamodel */,
+			);
+			currentVersion = D941AC8826E2787100018E57 /* SodaPopcorn.xcdatamodel */;
+			path = SodaPopcorn.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = D941AC7626E2787100018E57 /* Project object */;
+}
