@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D9323E2C26E30F7E00DE497B /* MovieApiResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9323E2B26E30F7E00DE497B /* MovieApiResponse.swift */; };
 		D941AC8226E2787100018E57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8126E2787100018E57 /* AppDelegate.swift */; };
 		D941AC8426E2787100018E57 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8326E2787100018E57 /* SceneDelegate.swift */; };
 		D941AC8926E2787100018E57 /* SodaPopcorn.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */; };
@@ -25,7 +26,6 @@
 		D941ACCC26E278EF00018E57 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC226E278EF00018E57 /* Router.swift */; };
 		D941ACCD26E278EF00018E57 /* EndPointType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACC326E278EF00018E57 /* EndPointType.swift */; };
 		D941ACE526E27A8900018E57 /* MovieListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE226E27A8900018E57 /* MovieListViewModel.swift */; };
-		D941ACE626E27A8900018E57 /* MovieListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE326E27A8900018E57 /* MovieListViewController.swift */; };
 		D941ACE726E27A8900018E57 /* MovieListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE426E27A8900018E57 /* MovieListView.swift */; };
 		D941ACE926E27AA800018E57 /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941ACE826E27AA800018E57 /* Movie.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D9323E2B26E30F7E00DE497B /* MovieApiResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieApiResponse.swift; sourceTree = "<group>"; };
 		D941AC7E26E2787100018E57 /* SodaPopcorn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SodaPopcorn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D941AC8126E2787100018E57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D941AC8326E2787100018E57 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -72,7 +73,6 @@
 		D941ACC226E278EF00018E57 /* Router.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		D941ACC326E278EF00018E57 /* EndPointType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EndPointType.swift; sourceTree = "<group>"; };
 		D941ACE226E27A8900018E57 /* MovieListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListViewModel.swift; sourceTree = "<group>"; };
-		D941ACE326E27A8900018E57 /* MovieListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListViewController.swift; sourceTree = "<group>"; };
 		D941ACE426E27A8900018E57 /* MovieListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieListView.swift; sourceTree = "<group>"; };
 		D941ACE826E27AA800018E57 /* Movie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -233,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				D941ACE826E27AA800018E57 /* Movie.swift */,
+				D9323E2B26E30F7E00DE497B /* MovieApiResponse.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -241,7 +242,6 @@
 			isa = PBXGroup;
 			children = (
 				D941ACE226E27A8900018E57 /* MovieListViewModel.swift */,
-				D941ACE326E27A8900018E57 /* MovieListViewController.swift */,
 				D941ACE426E27A8900018E57 /* MovieListView.swift */,
 			);
 			path = MovieList;
@@ -399,8 +399,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D941ACE626E27A8900018E57 /* MovieListViewController.swift in Sources */,
 				D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */,
+				D9323E2C26E30F7E00DE497B /* MovieApiResponse.swift in Sources */,
 				D941ACC726E278EF00018E57 /* JSONParameterEncoder.swift in Sources */,
 				D941ACC526E278EF00018E57 /* ParameterEncoding.swift in Sources */,
 				D941AC8926E2787100018E57 /* SodaPopcorn.xcdatamodeld in Sources */,

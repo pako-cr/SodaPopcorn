@@ -54,7 +54,7 @@ struct NetworkManager {
 							return
 						}
 						do {
-							print(responseData)
+							print("🔸 [NetworkManager] [getMovies] ResponseData: \(responseData).")
 							let jsonData = try JSONSerialization.jsonObject(with: responseData, options: .mutableContainers)
 							print(jsonData)
 							let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)

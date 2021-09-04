@@ -6,24 +6,41 @@
 //
 
 import Foundation
+import Combine
 
-class MovieListViewModel {
-	let networkManager: NetworkManager
+public final class MovieListViewModel: ObservableObject, Identifiable {
+	// MARK: Constants
+	private let networkManager: NetworkManager
+
+	// MARK: Variables
+	private var disposables = Set<AnyCancellable>()
+	@Published private (set) var datasource: [Movie] = []
+//	@Published private (set) var datasource: [Movie] = [
+//		Movie(id: 1, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
+//		Movie(id: 2, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
+//		Movie(id: 3, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
+//		Movie(id: 4, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045)
+//	]
 
 	init(networkManager: NetworkManager) {
-		print("🟡 [MovieListViewModel] [init]")
 		self.networkManager = networkManager
-
-		_ = self.getNewMovies()
+		self.getNewMovies(page: 1)
 	}
 
-	func getNewMovies() -> [Movie]? {
-		var movies: [Movie]?
-		networkManager.getNewMovies(page: 1) { newMovies, _ in
-			print("New movies count: \(newMovies?.count ?? 0)")
-			movies = newMovies
+	// MARK: - ⚙️ Helpers
+	func getNewMovies(page: Int) {
+		networkManager.getNewMovies(page: page) { [weak self] responseMovies, _ in
+			guard let `self` = self, let newMovies = responseMovies else { return }
+			DispatchQueue.main.async { [weak self] in
+				guard let `self` = self else { return }
+				self.datasource = newMovies
+			}
 		}
-
-		return movies
 	}
+
+	// MARK: - 🗑 Deinit
+	deinit {
+		print("🗑", "MovieListViewModel deinit.")
+	}
+
 }
