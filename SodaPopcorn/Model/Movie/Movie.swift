@@ -7,16 +7,17 @@
 
 import Foundation
 
-struct Movie: Identifiable {
-	let id: Int
-	let posterPath: String
-	let backdrop: String
-	let title: String
-	let releaseDate: String
-	let rating: Double
-	let overview: String
-	let popularity: Double
-	let voteCount: Int
+public struct Movie: Identifiable {
+	public let id: Int
+	public let posterPath: String
+	public let backdrop: String
+	public let title: String
+	public let releaseDate: String
+	public let rating: Double
+	public let overview: String
+	public let popularity: Double
+	public let voteCount: Int
+	public var posterImageData: Data?
 }
 
 extension Movie: Decodable {
@@ -32,7 +33,7 @@ extension Movie: Decodable {
 		case voteCount   = "vote_count"
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let movieContainer = try decoder.container(keyedBy: MovieCodingKeys.self)
 
 		id = try movieContainer.decode(Int.self, forKey: .id)

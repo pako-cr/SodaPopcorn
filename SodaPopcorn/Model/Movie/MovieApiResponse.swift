@@ -11,7 +11,7 @@ struct MovieApiResponse {
 	let page: Int
 	let numberOfResults: Int
 	let numberOfPages: Int
-	let movies: [Movie]
+	var movies: [Movie]
 }
 
 extension MovieApiResponse: Decodable {

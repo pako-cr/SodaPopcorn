@@ -21,13 +21,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
 			// Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
 			// Add `@Environment(\.managedObjectContext)` in the views that will need the context.
-			let viewModel = MovieListViewModel(networkManager: NetworkManager())
-			let contentView = MovieListView(viewModel: viewModel).environment(\.managedObjectContext, context)
+
+			let movieListViewModel = MovieListViewModel()
+			let movieListView = MovieListView(viewModel: movieListViewModel).environment(\.managedObjectContext, context)
+			let uiHostingController = UIHostingController(rootView: movieListView)
+
+			let navigationController = UINavigationController(rootViewController: uiHostingController)
 
 			// Use a UIHostingController as window root view controller.
 			if let windowScene = scene as? UIWindowScene {
 				let window = UIWindow(windowScene: windowScene)
-				window.rootViewController = UIHostingController(rootView: contentView)
+				window.rootViewController = navigationController
 				self.window = window
 				window.makeKeyAndVisible()
 			}
@@ -65,4 +69,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		(UIApplication.shared.delegate as? AppDelegate)?.saveContext()
 	}
 }
-

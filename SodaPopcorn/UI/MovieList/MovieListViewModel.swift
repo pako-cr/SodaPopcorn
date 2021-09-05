@@ -7,33 +7,42 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
-public final class MovieListViewModel: ObservableObject, Identifiable {
+public final class MovieListViewModel: ObservableObject {
 	// MARK: Constants
-	private let networkManager: NetworkManager
+	@ObservedObject var posterImageViewModel = PosterImageViewModel()
 
 	// MARK: Variables
-	private var disposables = Set<AnyCancellable>()
-	@Published private (set) var datasource: [Movie] = []
-//	@Published private (set) var datasource: [Movie] = [
-//		Movie(id: 1, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
-//		Movie(id: 2, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
-//		Movie(id: 3, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045),
-//		Movie(id: 4, posterPath: "path 1", backdrop: "backdrop", title: "Jiu Jitsu", releaseDate: "18/10/2022", rating: 10.0, overview: "Test Overview", popularity: 200.0, voteCount: 3045)
-//	]
+	@Published private (set) var dataSource: [Movie] = []
+	private var cancellables = Set<AnyCancellable>()
 
-	init(networkManager: NetworkManager) {
-		self.networkManager = networkManager
+	init() {
 		self.getNewMovies(page: 1)
+
+		_ = self.posterImageViewModel.$posterInfo
+			.subscribe(on: DispatchQueue.main)
+			.sink(receiveValue: { [weak self] movieInfo in
+				guard let `self` = self, let movieId = movieInfo?.0, let imageData = movieInfo?.1 else { return }
+				self.setPosterImageData(movieId: movieId, imageData: imageData)
+			})
 	}
 
 	// MARK: - ⚙️ Helpers
-	func getNewMovies(page: Int) {
-		networkManager.getNewMovies(page: page) { [weak self] responseMovies, _ in
+	private func getNewMovies(page: Int) {
+		MovieService.shared().getNewMovies(page: page) { [weak self] responseMovies, _ in
 			guard let `self` = self, let newMovies = responseMovies else { return }
 			DispatchQueue.main.async { [weak self] in
+				self?.dataSource = newMovies
+			}
+		}
+	}
+
+	func setPosterImageData(movieId: Int, imageData: Data) {
+		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
+			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self else { return }
-				self.datasource = newMovies
+				self.dataSource[index].posterImageData = imageData
 			}
 		}
 	}
@@ -42,5 +51,4 @@ public final class MovieListViewModel: ObservableObject, Identifiable {
 	deinit {
 		print("🗑", "MovieListViewModel deinit.")
 	}
-
 }

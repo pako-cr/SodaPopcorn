@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum NetworkEnvironment {
-	case production
-	case staging
-}
-
 public enum MovieApi {
 	case recommended(id: Int)
 	case popular(page: Int)
@@ -19,10 +14,10 @@ public enum MovieApi {
 	case video(id: Int)
 }
 
+// Example url: https://api.themoviedb.org/3/movie/550?page=1&api_key=ae3f83170dac3764098efb70c9dd7cdf
 extension MovieApi: EndPointType {
-
-	var environmentBaseURL: String {
-		switch NetworkManager.environment {
+	private var environmentBaseURL: String {
+		switch environment {
 			case .production: return "https://api.themoviedb.org/3/movie/"
 			case .staging: return "https://staging.themoviedb.org/3/movie/"
 		}
@@ -31,6 +26,10 @@ extension MovieApi: EndPointType {
 	var baseURL: URL {
 		guard let url = URL(string: environmentBaseURL) else { fatalError("baseURL could not be configured.")}
 		return url
+	}
+
+	var cachePolicy: URLRequest.CachePolicy {
+		return .reloadIgnoringLocalAndRemoteCacheData
 	}
 
 	var path: String {
@@ -56,7 +55,7 @@ extension MovieApi: EndPointType {
 				return .requestParameters(bodyParameters: nil,
 										  bodyEncoding: .urlEncoding,
 										  urlParameters: ["page": page,
-														  "api_key": NetworkManager.MovieAPIKey])
+														  "api_key": publicApiKey])
 			default:
 				return .request
 		}
