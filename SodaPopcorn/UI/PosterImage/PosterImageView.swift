@@ -5,37 +5,16 @@
 //  Created by Zimplifica Macbook Pro on 4/9/21.
 //
 
+import Combine
 import SwiftUI
 
 struct PosterImageView: View {
 	private enum LoadState { case loading, success, failure }
+
 	private var viewModel: PosterImageViewModel
-
-	private class Loader: ObservableObject {
-		var viewModel: PosterImageViewModel
-		var data = Data()
-		var state = LoadState.loading
-
-		init(viewModel: PosterImageViewModel, movieId: Int, posterPath: String) {
-			self.viewModel = viewModel
-
-			viewModel.getPosterImage(movieId: movieId, posterPath: posterPath) { data, _ in
-				if let data = data, !data.isEmpty {
-					self.data = data
-					self.state = .success
-				} else {
-					self.state = .failure
-				}
-
-				DispatchQueue.main.async {
-					self.objectWillChange.send()
-				}
-			}
-		}
-	}
+	private var loading: Image
 
 	@StateObject private var loader: Loader
-	var loading: Image
 
 	var body: some View {
 		selectImage()
@@ -59,6 +38,31 @@ struct PosterImageView: View {
 				} else {
 					return loading
 				}
+		}
+	}
+
+	private class Loader: ObservableObject {
+		var viewModel: PosterImageViewModel
+
+		var data = Data()
+		var state = LoadState.loading
+
+		@State private var cancellable = Set<AnyCancellable>()
+
+		init(viewModel: PosterImageViewModel, movieId: Int, posterPath: String) {
+			self.viewModel = viewModel
+			self.viewModel.getPosterImage(movieId: movieId, posterPath: posterPath) { data, _ in
+				if let data = data, !data.isEmpty {
+					self.data = data
+					self.state = .success
+				} else {
+					self.state = .failure
+				}
+
+				DispatchQueue.main.async {
+					self.objectWillChange.send()
+				}
+			}
 		}
 	}
 }

@@ -9,36 +9,75 @@ import Foundation
 import Combine
 import SwiftUI
 
-public final class MovieListViewModel: ObservableObject {
+public protocol MovieListViewModelInputs: AnyObject {
+	/// Call to get the new movies.
+	func fetchNewMovies()
+}
+
+public protocol MovieListViewModelOutputs: AnyObject {
+}
+
+public protocol MovieListViewModelTypes: AnyObject {
+	var inputs: MovieListViewModelInputs { get }
+	var outputs: MovieListViewModelOutputs { get }
+}
+
+public final class MovieListViewModel: ObservableObject, Identifiable, MovieListViewModelInputs, MovieListViewModelOutputs, MovieListViewModelTypes {
 	// MARK: Constants
-	@ObservedObject var posterImageViewModel = PosterImageViewModel()
+	let posterImageViewModel: PosterImageViewModel
 
 	// MARK: Variables
+	public var inputs: MovieListViewModelInputs { return self }
+	public var outputs: MovieListViewModelOutputs { return self }
+
+	// MARK: Variables
+	private var cancellable = Set<AnyCancellable>()
+
 	@Published private (set) var dataSource: [Movie] = []
-	private var cancellables = Set<AnyCancellable>()
 
-	init() {
-		self.getNewMovies(page: 1)
+	init(posterImageViewModel: PosterImageViewModel) {
+		self.posterImageViewModel = posterImageViewModel
 
-		_ = self.posterImageViewModel.$posterInfo
-			.subscribe(on: DispatchQueue.main)
-			.sink(receiveValue: { [weak self] movieInfo in
-				guard let `self` = self, let movieId = movieInfo?.0, let imageData = movieInfo?.1 else { return }
-				self.setPosterImageData(movieId: movieId, imageData: imageData)
+		self.posterImageViewModel.outputs.fetchPosterImageSignal()
+			.sink(receiveValue: { [weak self] (movieInfo) in
+				guard let `self` = self else { return }
+				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
+			}).store(in: &cancellable)
+
+		self.fetchNewMoviesProperty
+			.flatMap({ [weak self] _ -> AnyPublisher<[Movie]?, Error> in
+				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
+				return self.getNewMovies(page: 1)
 			})
+			.sink(receiveCompletion: { completion in
+				switch completion {
+					case .failure(let error):
+						print("🔴 [MovieListViewModel] [init] Received completion error. Error: \(error.localizedDescription)")
+					default: break
+				}
+			}, receiveValue: { movies in
+				if let movies = movies {
+					DispatchQueue.main.async {
+						self.dataSource = movies
+					}
+				}
+			}).store(in: &cancellable)
 	}
+
+	// MARK: - ⬇️ INPUTS Definition
+	private let fetchNewMoviesProperty = PassthroughSubject<Void, Never>()
+	public func fetchNewMovies() {
+		fetchNewMoviesProperty.send(())
+	}
+
+	// MARK: - ⬆️ OUTPUTS Definition
 
 	// MARK: - ⚙️ Helpers
-	private func getNewMovies(page: Int) {
-		MovieService.shared().getNewMovies(page: page) { [weak self] responseMovies, _ in
-			guard let `self` = self, let newMovies = responseMovies else { return }
-			DispatchQueue.main.async { [weak self] in
-				self?.dataSource = newMovies
-			}
-		}
+	private func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
+		return MovieService.shared().getNewMovies(page: page)
 	}
 
-	func setPosterImageData(movieId: Int, imageData: Data) {
+	private func setPosterImageData(movieId: Int, imageData: Data) {
 		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
 			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self else { return }

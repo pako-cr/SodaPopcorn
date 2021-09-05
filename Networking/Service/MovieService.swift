@@ -5,10 +5,11 @@
 //  Created by Zimplifica Macbook Pro on 4/9/21.
 //
 
+import Combine
 import Foundation
 
 public protocol MovieServiceProtocol {
-	func getNewMovies(page: Int, completion: @escaping (_ movies: [Movie]?, _ error: String?) -> Void)
+	func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error>
 }
 
 final class MovieService: MovieServiceProtocol {
@@ -26,36 +27,40 @@ final class MovieService: MovieServiceProtocol {
 		return sharedMovieService
 	}
 
-	func getNewMovies(page: Int, completion: @escaping (_ movies: [Movie]?, _ error: String?) -> Void) {
-		networkManager.request(.newMovies(page: page)) { [weak self] data, response, error in
-			guard let `self` = self else { return }
+	func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
+		return AnyPublisher<[Movie]?, Error>.create { [weak self] single in
+			guard let `self` = self else { return Disposable {} }
 
-			if error != nil {
-				completion(nil, "Please check your network connection.")
-			}
+			self.networkManager.request(.newMovies(page: page), completion: { [weak self] data, response, error in
+				guard let `self` = self else { return }
 
-			if let response = response as? HTTPURLResponse {
-				let result = self.networkManager.handleNetworkResponse(response)
-				switch result {
-					case .success:
-						guard let responseData = data else {
-							completion(nil, NetworkResponse.noData.rawValue)
-							return
-						}
-						do {
-//							let jsonData = try JSONSerialization.jsonObject(with: responseData, options: .mutableContainers)
-//							print("🔸 [MovieService] [getMovies] Json data: \n\(jsonData)")
-							let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
-							completion(apiResponse.movies, nil)
-
-						} catch {
-							print("🔴 [MovieService] [getMovies] An error occurred: \(error)")
-							completion(nil, NetworkResponse.unableToDecode.rawValue)
-						}
-					case .failure(let networkFailureError):
-						completion(nil, networkFailureError)
+				if error != nil {
+					single.onError(NSError(domain: "Please check your network connection.", code: 1, userInfo: [:]))
 				}
-			}
+
+				if let response = response as? HTTPURLResponse {
+					let result = self.networkManager.handleNetworkResponse(response)
+					switch result {
+						case .success:
+							guard let responseData = data else {
+								single.onError(NSError(domain: NetworkResponse.noData.rawValue, code: 1, userInfo: [:]))
+								return
+							}
+							do {
+								let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
+								single.onNext(apiResponse.movies)
+								single.onComplete()
+
+							} catch let exepction {
+								print("🔴 [MovieService] [getMovies] An error occurred: \(exepction.localizedDescription)")
+								single.onError(NSError(domain: NetworkResponse.unableToDecode.rawValue, code: 1, userInfo: [:]))
+							}
+						case .failure(let networkFailureError):
+							single.onError(NSError(domain: networkFailureError, code: 1, userInfo: [:]))
+					}
+				}
+			})
+			return Disposable {}
 		}
 	}
 }

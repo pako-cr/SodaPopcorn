@@ -5,6 +5,7 @@
 //  Created by Zimplifica Macbook Pro on 3/9/21.
 //
 
+import Combine
 import SwiftUI
 
 struct MovieListView: View {
@@ -12,13 +13,16 @@ struct MovieListView: View {
 
 	var body: some View {
 		List {
-			if viewModel.dataSource.isEmpty {
+			if self.viewModel.dataSource.isEmpty {
 				emptySection
 			} else {
 				moviesSection
 			}
 		}
 		.navigationBarTitle(Text("Soda Popcorn 🍿"), displayMode: NavigationBarItem.TitleDisplayMode.large)
+		.onAppear(perform: {
+			viewModel.inputs.fetchNewMovies()
+		})
 	}
 }
 
@@ -78,7 +82,7 @@ private extension MovieListView {
 
 struct MovieListView_Previews: PreviewProvider {
 	static var previews: some View {
-		MovieListView(viewModel: MovieListViewModel())
+		MovieListView(viewModel: MovieListViewModel(posterImageViewModel: PosterImageViewModel()))
 			.preferredColorScheme(.light)
 	}
 }
