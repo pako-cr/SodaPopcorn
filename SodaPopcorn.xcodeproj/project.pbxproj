@@ -354,8 +354,8 @@
 		D941ACE126E27A8900018E57 /* MovieList */ = {
 			isa = PBXGroup;
 			children = (
-				D941ACE226E27A8900018E57 /* MovieListViewModel.swift */,
 				D941ACE426E27A8900018E57 /* MovieListView.swift */,
+				D941ACE226E27A8900018E57 /* MovieListViewModel.swift */,
 			);
 			path = MovieList;
 			sourceTree = "<group>";

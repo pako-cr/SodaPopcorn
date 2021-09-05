@@ -8,18 +8,18 @@
 import Combine
 import Foundation
 
-struct AnyObserver<Output, Failure: Error> {
+public struct AnyObserver<Output, Failure: Error> {
 	let onNext: ((Output) -> Void)
 	let onError: ((Failure) -> Void)
 	let onComplete: (() -> Void)
 }
 
-struct Disposable {
+public struct Disposable {
 	let dispose: () -> Void
 }
 
 extension AnyPublisher {
-	static func create(subscribe: @escaping (AnyObserver<Output, Failure>) -> Disposable) -> Self {
+	public static func create(subscribe: @escaping (AnyObserver<Output, Failure>) -> Disposable) -> Self {
 		let subject = PassthroughSubject<Output, Failure>()
 		var disposable: Disposable?
 		return subject

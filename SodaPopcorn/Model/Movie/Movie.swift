@@ -47,3 +47,9 @@ extension Movie: Decodable {
 		voteCount = try movieContainer.decode(Int.self, forKey: .voteCount)
 	}
 }
+
+extension Movie: Equatable {
+	public static func == (lhs: Movie, rhs: Movie) -> Bool {
+		return lhs.id == rhs.id
+	}
+}

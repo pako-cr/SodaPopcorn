@@ -8,25 +8,44 @@
 import Combine
 import Foundation
 
-final class PosterImageViewModel: ObservableObject, Identifiable {
+public protocol PosterImageViewModelInputs: AnyObject {
+}
+
+public protocol PosterImageViewModelOutputs: AnyObject {
+	/// Emits to return the poster image data.
+	func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never>
+}
+
+public protocol PosterImageViewModelTypes: AnyObject {
+	var inputs: PosterImageViewModelInputs { get }
+	var outputs: PosterImageViewModelOutputs { get }
+}
+
+final class PosterImageViewModel: PosterImageViewModelInputs, PosterImageViewModelOutputs, PosterImageViewModelTypes {
 	// MARK: Constants
-	private let posterInfoSubject: PassthroughSubject<(Int, Data)?, Never>
 
 	// MARK: Variables
-	@Published private (set) var posterInfo: (Int, Data)?
+	public var inputs: PosterImageViewModelInputs { return self }
+	public var outputs: PosterImageViewModelOutputs { return self }
 
 	init() {
-		posterInfoSubject = PassthroughSubject<(Int, Data)?, Never>()
+	}
+
+	// MARK: - ⬇️ INPUTS Definition
+
+	// MARK: - ⬆️ OUTPUTS Definition
+	private var fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
+	public func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never> {
+		return fetchPosterImageSignalProperty
 	}
 
 	// MARK: - ⚙️ Helpers
-	func getPosterImage(movieId: Int, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+	public func getPosterImage(movieId: Int, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
 		PosterImageService.shared().getPosterImage(posterPath: posterPath) { [weak self] data, error in
 			completion(data, error)
 
 			guard let `self` = self, let data = data, !data.isEmpty else { return }
-			self.posterInfo = (movieId, data)
-//			self.posterInfo?.append((movieId, data))
+			self.fetchPosterImageSignalProperty.send((movieId, data))
 		}
 	}
 
