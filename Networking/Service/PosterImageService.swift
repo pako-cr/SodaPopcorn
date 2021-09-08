@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol PosterImageServiceProtocol {
-	func getPosterImage(posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void)
+	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void)
 }
 
 final class PosterImageService: PosterImageServiceProtocol {
@@ -26,8 +26,8 @@ final class PosterImageService: PosterImageServiceProtocol {
 		return sharedPosterImageService
 	}
 
-	func getPosterImage(posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
-		networkManager.request(.posterImage(posterPath: posterPath)) { [weak self] data, response, error in
+	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+		networkManager.request(.posterImage((posterPath: posterPath, posterSize: posterSize.rawValue))) { [weak self] data, response, error in
 			guard let `self` = self else { return }
 
 			if error != nil {

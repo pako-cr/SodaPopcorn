@@ -8,15 +8,19 @@
 import Foundation
 
 public enum PosterImageApi {
-	case posterImage(posterPath: String)
+	case posterImage((posterPath: String, posterSize: String))
 }
 
 // Example image url: https://image.tmdb.org/t/p/w500/iXbWpCkIauBMStSTUT9v4GXvdgH.jpg
 extension PosterImageApi: EndPointType {
 	private var environmentBaseURL: String {
-		switch environment {
-			case .production: return "https://image.tmdb.org/t/p/w92"
-			case .staging: return "https://image.tmdb.org/t/p/w92"
+		do {
+			let environment = try PlistReaderManager.shared.read(fromOptionName: "Environment") as? String
+			return try PlistReaderManager.shared.read(fromContainer: ConfigKeys.imageBaseUrl.rawValue, with: environment ?? "staging") as? String ?? ""
+
+		} catch let error {
+			print("❌ [Networking] [MovieApi] Error reading base url from configuration file. Error description: \(error)")
+			return ""
 		}
 	}
 
@@ -31,8 +35,8 @@ extension PosterImageApi: EndPointType {
 
 	var path: String {
 		switch self {
-			case .posterImage(let posterPath):
-				return posterPath
+			case .posterImage(let imageRequestData):
+				return "\(imageRequestData.posterSize)\(imageRequestData.posterPath )"
 		}
 	}
 
@@ -45,7 +49,7 @@ extension PosterImageApi: EndPointType {
 			case .posterImage:
 				return .requestParameters(bodyParameters: nil,
 										  bodyEncoding: .urlEncoding,
-										  urlParameters: [ "api_key": publicApiKey])
+										  urlParameters: ["api_key": publicApiKey])
 		}
 	}
 

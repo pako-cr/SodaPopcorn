@@ -17,9 +17,13 @@ public enum MovieApi {
 // Example url: https://api.themoviedb.org/3/movie/550?page=1&api_key=ae3f83170dac3764098efb70c9dd7cdf
 extension MovieApi: EndPointType {
 	private var environmentBaseURL: String {
-		switch environment {
-			case .production: return "https://api.themoviedb.org/3/movie/"
-			case .staging: return "https://staging.themoviedb.org/3/movie/"
+		do {
+			let environment = try PlistReaderManager.shared.read(fromOptionName: "Environment") as? String
+			return try PlistReaderManager.shared.read(fromContainer: ConfigKeys.baseUrl.rawValue, with: environment ?? "staging") as? String ?? ""
+
+		} catch let error {
+			print("❌ [Networking] [MovieApi] Error reading base url from configuration file. Error description: \(error)")
+			return ""
 		}
 	}
 

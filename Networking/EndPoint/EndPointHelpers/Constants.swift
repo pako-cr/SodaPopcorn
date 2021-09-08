@@ -7,5 +7,9 @@
 
 import Foundation
 
-let environment: NetworkEnvironment = NetworkEnvironment.production
 let publicApiKey: String = "ae3f83170dac3764098efb70c9dd7cdf"
+
+enum ConfigKeys: String {
+	case baseUrl 		= "BaseURL"
+	case imageBaseUrl 	= "ImageBaseURL"
+}

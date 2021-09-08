@@ -10,11 +10,19 @@ import Combine
 import SwiftUI
 
 public protocol MovieListViewModelInputs: AnyObject {
+	/// Call when view did load.
+	func viewDidLoad()
+
 	/// Call to get the new movies.
 	func fetchNewMovies()
 }
 
 public protocol MovieListViewModelOutputs: AnyObject {
+	/// Emits to get the new movies.
+	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
+
+	/// Emits to get return the image.
+	func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never>
 }
 
 public protocol MovieListViewModelTypes: AnyObject {
@@ -44,7 +52,7 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
 			}).store(in: &cancellable)
 
-		self.fetchNewMoviesProperty
+		Publishers.Merge(self.viewDidLoadProperty, self.fetchNewMoviesProperty)
 			.flatMap({ [weak self] _ -> AnyPublisher<[Movie]?, Error> in
 				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
 				return self.getNewMovies(page: 1)
@@ -58,6 +66,7 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 			}, receiveValue: { movies in
 				if let movies = movies {
 					DispatchQueue.main.async {
+						self.fetchNewMoviesActionProperty.value = movies
 						self.dataSource = movies
 					}
 				}
@@ -70,7 +79,21 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 		fetchNewMoviesProperty.send(())
 	}
 
+	private let viewDidLoadProperty = PassthroughSubject<Void, Never>()
+	public func viewDidLoad() {
+		viewDidLoadProperty.send(())
+	}
+
 	// MARK: - ⬆️ OUTPUTS Definition
+	private let fetchNewMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
+	public func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
+		return fetchNewMoviesActionProperty
+	}
+
+	private var fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
+	public func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never> {
+		return fetchPosterImageSignalProperty
+	}
 
 	// MARK: - ⚙️ Helpers
 	private func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {

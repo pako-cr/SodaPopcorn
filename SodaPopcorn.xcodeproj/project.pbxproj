@@ -42,6 +42,10 @@
 		D9449B3F26E4E9E3006B3856 /* Networking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9449B2926E4E9E2006B3856 /* Networking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D9449B4826E4EA5F006B3856 /* PosterImageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9449B4726E4EA5F006B3856 /* PosterImageViewModel.swift */; };
 		D9449B4B26E4EFA2006B3856 /* AnyPublisher+Create.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */; };
+		D985656926E59B5300457264 /* MovieListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D985656826E59B5300457264 /* MovieListViewController.swift */; };
+		D9BBD68A26E71F6900A2C24D /* UIFont+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */; };
+		D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */; };
+		D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38326E9242B000292D4 /* PosterSize.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +143,10 @@
 		D9449B3A26E4E9E2006B3856 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9449B4726E4EA5F006B3856 /* PosterImageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterImageViewModel.swift; sourceTree = "<group>"; };
 		D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnyPublisher+Create.swift"; sourceTree = "<group>"; };
+		D985656826E59B5300457264 /* MovieListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListViewController.swift; sourceTree = "<group>"; };
+		D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Style.swift"; sourceTree = "<group>"; };
+		D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlistReaderManager.swift; sourceTree = "<group>"; };
+		D9E6D38326E9242B000292D4 /* PosterSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterSize.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +193,7 @@
 		D9322E7F26E3AFDC00522AFB /* ServiceHelpers */ = {
 			isa = PBXGroup;
 			children = (
+				D9E6D38326E9242B000292D4 /* PosterSize.swift */,
 				D941ACC026E278EF00018E57 /* HTTPTask.swift */,
 				D941ACC126E278EF00018E57 /* HTTPMethod.swift */,
 				D941ACC326E278EF00018E57 /* EndPointType.swift */,
@@ -330,6 +339,7 @@
 		D941ACD126E279EB00018E57 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -354,8 +364,10 @@
 		D941ACE126E27A8900018E57 /* MovieList */ = {
 			isa = PBXGroup;
 			children = (
+				D9EFEA1F26E6ECAA006D9ACA /* CollectionViewCells */,
 				D941ACE426E27A8900018E57 /* MovieListView.swift */,
 				D941ACE226E27A8900018E57 /* MovieListViewModel.swift */,
+				D985656826E59B5300457264 /* MovieListViewController.swift */,
 			);
 			path = MovieList;
 			sourceTree = "<group>";
@@ -386,8 +398,16 @@
 			isa = PBXGroup;
 			children = (
 				D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */,
+				D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D9EFEA1F26E6ECAA006D9ACA /* CollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = CollectionViewCells;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -519,6 +539,7 @@
 					};
 					D9449B2826E4E9E2006B3856 = {
 						CreatedOnToolsVersion = 12.5.1;
+						LastSwiftMigration = 1250;
 					};
 					D9449B3026E4E9E2006B3856 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -616,8 +637,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9322E8326E3B41D00522AFB /* Result.swift in Sources */,
+				D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */,
 				D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */,
 				D9323E2C26E30F7E00DE497B /* MovieApiResponse.swift in Sources */,
+				D9BBD68A26E71F6900A2C24D /* UIFont+Style.swift in Sources */,
+				D985656926E59B5300457264 /* MovieListViewController.swift in Sources */,
 				D941ACC726E278EF00018E57 /* JSONParameterEncoder.swift in Sources */,
 				D941ACC526E278EF00018E57 /* ParameterEncoding.swift in Sources */,
 				D941AC8926E2787100018E57 /* SodaPopcorn.xcdatamodeld in Sources */,
@@ -636,6 +660,7 @@
 				D9449B4826E4EA5F006B3856 /* PosterImageViewModel.swift in Sources */,
 				D9322E8126E3B00900522AFB /* MovieService.swift in Sources */,
 				D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */,
+				D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */,
 				D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */,
 				D9322E9126E3D5BE00522AFB /* PosterImageService.swift in Sources */,
 				D941ACCB26E278EF00018E57 /* HTTPMethod.swift in Sources */,
@@ -846,7 +871,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcorn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -867,7 +892,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.SodaPopcorn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -961,6 +986,7 @@
 		D9449B4126E4E9E3006B3856 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -978,6 +1004,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice.Networking;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -988,6 +1015,7 @@
 		D9449B4226E4E9E3006B3856 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -1015,7 +1043,6 @@
 		D9449B4526E4E9E3006B3856 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GFG4A69RG7;
 				INFOPLIST_FILE = NetworkingTests/Info.plist;
@@ -1035,7 +1062,6 @@
 		D9449B4626E4E9E3006B3856 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GFG4A69RG7;
 				INFOPLIST_FILE = NetworkingTests/Info.plist;

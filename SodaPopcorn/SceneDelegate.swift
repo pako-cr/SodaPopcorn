@@ -10,33 +10,33 @@ import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
-	var window: UIWindow?
+		var window: UIWindow?
 
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 		// Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
 		// If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
 		// This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
+		let posterImageViewModel = PosterImageViewModel()
+		let movieListViewModel = MovieListViewModel(posterImageViewModel: posterImageViewModel)
+
+		// SwiftUI
 		// Get the managed object context from the shared persistent container.
-		if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
-			// Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
-			// Add `@Environment(\.managedObjectContext)` in the views that will need the context.
+		// Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
+		// Add `@Environment(\.managedObjectContext)` in the views that will need the context.
+		//		guard let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext else { return }
+		//		let movieListView = MovieListView(viewModel: movieListViewModel).environment(\.managedObjectContext, context)
+		//		let uiHostingController = UIHostingController(rootView: movieListView)
+		//		let navigationController = UINavigationController(rootViewController: uiHostingController)
 
-			let posterImageViewModel = PosterImageViewModel()
-			let movieListViewModel = MovieListViewModel(posterImageViewModel: posterImageViewModel)
-			let movieListView = MovieListView(viewModel: movieListViewModel).environment(\.managedObjectContext, context)
-			let uiHostingController = UIHostingController(rootView: movieListView)
+		// Swift
+		let movieListViewController = MovieListViewController(viewModel: movieListViewModel)
+		let navigationController = UINavigationController(rootViewController: movieListViewController)
 
-			let navigationController = UINavigationController(rootViewController: uiHostingController)
-
-			// Use a UIHostingController as window root view controller.
-			if let windowScene = scene as? UIWindowScene {
-				let window = UIWindow(windowScene: windowScene)
-				window.rootViewController = navigationController
-				self.window = window
-				window.makeKeyAndVisible()
-			}
-		}
+		guard let windowScene = scene as? UIWindowScene else { return }
+		self.window = UIWindow(windowScene: windowScene)
+		self.window?.rootViewController = navigationController
+		self.window?.makeKeyAndVisible()
 	}
 
 	func sceneDidDisconnect(_ scene: UIScene) {

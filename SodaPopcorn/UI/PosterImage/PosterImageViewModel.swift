@@ -41,7 +41,7 @@ final class PosterImageViewModel: PosterImageViewModelInputs, PosterImageViewMod
 
 	// MARK: - ⚙️ Helpers
 	public func getPosterImage(movieId: Int, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
-		PosterImageService.shared().getPosterImage(posterPath: posterPath) { [weak self] data, error in
+		PosterImageService.shared().getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { [weak self] data, error in
 			completion(data, error)
 
 			guard let `self` = self, let data = data, !data.isEmpty else { return }

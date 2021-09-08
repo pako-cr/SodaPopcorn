@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkEnvironment {
-	case production
-	case staging
+enum NetworkEnvironment: String {
+	case production = "production"
+	case staging 	= "staging"
 }
