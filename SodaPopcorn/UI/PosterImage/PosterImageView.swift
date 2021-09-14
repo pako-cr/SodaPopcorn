@@ -2,7 +2,7 @@
 //  PosterImage.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 4/9/21.
+//  Created by Francisco Cordoba on 4/9/21.
 //
 
 import Combine
@@ -21,8 +21,8 @@ struct PosterImageView: View {
 			.resizable()
 	}
 
-	init(viewModel: PosterImageViewModel, movieId: Int, posterPath: String, loading: Image = Image(uiImage: UIImage(named: "no_poster")!)) {
-		_loader = StateObject(wrappedValue: Loader(viewModel: viewModel, movieId: movieId, posterPath: posterPath))
+	init(viewModel: PosterImageViewModel, movie: Movie, posterPath: String, loading: Image = Image(uiImage: UIImage(named: "no_poster")!)) {
+		_loader = StateObject(wrappedValue: Loader(viewModel: viewModel, movie: movie, posterPath: posterPath))
 		self.viewModel = viewModel
 		self.loading = loading
 	}
@@ -49,9 +49,9 @@ struct PosterImageView: View {
 
 		@State private var cancellable = Set<AnyCancellable>()
 
-		init(viewModel: PosterImageViewModel, movieId: Int, posterPath: String) {
+		init(viewModel: PosterImageViewModel, movie: Movie, posterPath: String) {
 			self.viewModel = viewModel
-			self.viewModel.getPosterImage(movieId: movieId, posterPath: posterPath) { data, _ in
+			self.viewModel.getPosterImage(movie: movie, posterPath: posterPath) { data, _ in
 				if let data = data, !data.isEmpty {
 					self.data = data
 					self.state = .success
@@ -69,7 +69,7 @@ struct PosterImageView: View {
 
 struct PosterImageView_Previews: PreviewProvider {
 	static var previews: some View {
-		PosterImageView(viewModel: PosterImageViewModel(), movieId: 1, posterPath: "oOZITZodAja6optBgLh8ZZrgzbb.jpg")
+		PosterImageView(viewModel: PosterImageViewModel(), movie: Movie(movieEntity: MovieEntity()), posterPath: "oOZITZodAja6optBgLh8ZZrgzbb.jpg")
 			.preferredColorScheme(.light)
 	}
 }

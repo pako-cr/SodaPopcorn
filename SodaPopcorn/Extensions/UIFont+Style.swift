@@ -2,7 +2,7 @@
 //  UIFont+Style.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 6/9/21.
+//  Created by Francisco Cordoba on 6/9/21.
 //
 
 import UIKit

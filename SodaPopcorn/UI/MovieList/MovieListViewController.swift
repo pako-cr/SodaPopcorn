@@ -2,77 +2,95 @@
 //  MovieListViewController.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 5/9/21.
+//  Created by Francisco Cordoba on 5/9/21.
 //
 
 import Combine
 import UIKit
 
-final class MovieListViewController: UIViewController {
+final class MovieListViewController: BaseViewController {
 	// MARK: - Consts
-	private let viewModel: MovieListViewModel
+	private var viewModel: MovieListViewModel?
 	private let posterImageViewModel = PosterImageViewModel()
 
 	// MARK: - Variables
 	private var cancellable = Set<AnyCancellable>()
+	private var loading = false {
+		didSet {
+			DispatchQueue.main.async { [weak self] in
+				self?.refreshControl.endRefreshing()
+			}
+		}
+	}
+
 	private var dataSource: [Movie] = [] {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
-				print("🔸 Reloading datasource!")
-				self?.collectionView.reloadData()
+				self?.movieCollectionView.reloadData()
 			}
 		}
 	}
 
 	// MARK: - UI Elements
-	private var collectionView: UICollectionView = {
+	private let refreshControl: UIRefreshControl = {
+		let refreshControl = UIRefreshControl()
+		refreshControl.addTarget(self, action: #selector(reloadCollectionView), for: .valueChanged)
+		return refreshControl
+	}()
+
+	private var movieCollectionView: UICollectionView = {
 		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 		collectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
 		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
 		collectionView.translatesAutoresizingMaskIntoConstraints = false
 		collectionView.isScrollEnabled = true
 		collectionView.allowsSelection = true
+		collectionView.isPrefetchingEnabled = true
 		return collectionView
 	}()
 
-	init(viewModel: MovieListViewModel) {
+	convenience init(viewModel: MovieListViewModel) {
+		self.init(nibName: nil, bundle: nil)
 		self.viewModel = viewModel
-		super.init(nibName: nil, bundle: nil)
-	}
-
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
 	}
 
     override func viewDidLoad() {
         super.viewDidLoad()
-		setupUI()
-		bindViewModel()
-		viewModel.inputs.viewDidLoad()
+		viewModel?.inputs.viewDidLoad()
     }
 
 	override func viewWillLayoutSubviews() {
-		collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .clear
+		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .clear
+		navigationController?.navigationBar.isTranslucent = traitCollection.userInterfaceStyle == .light ? false : true
+
 	}
 
-	private func setupUI() {
-		navigationItem.title = "SodaPopcorn 🍿"
-		view.addSubview(collectionView)
+	override func setupUI() {
+		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
+		view.addSubview(movieCollectionView)
 
-		collectionView.dataSource = self
-		collectionView.delegate = self
+		movieCollectionView.dataSource = self
+		movieCollectionView.prefetchDataSource = self
+		movieCollectionView.delegate = self
+		movieCollectionView.refreshControl = refreshControl
 
-		collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-		collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-		collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-		collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+		movieCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+		movieCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+		movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 	}
 
-	private func bindViewModel() {
-		viewModel.outputs.fetchNewMoviesAction()
+	override func bindViewModel() {
+		viewModel?.outputs.fetchNewMoviesAction()
 			.sink(receiveValue: { [weak self] (movies) in
 				guard let `self` = self, let movies = movies else { return }
-				self.dataSource = movies
+				self.dataSource.insert(contentsOf: movies, at: self.dataSource.count)
+			}).store(in: &cancellable)
+
+		viewModel?.outputs.loading()
+			.sink(receiveValue: { [weak self] (loading) in
+				guard let `self` = self else { return }
+				self.loading = loading
 			}).store(in: &cancellable)
 
 		posterImageViewModel.outputs.fetchPosterImageSignal()
@@ -92,6 +110,11 @@ final class MovieListViewController: UIViewController {
 		}
 	}
 
+	@objc
+	private func reloadCollectionView() {
+		viewModel?.inputs.pullToRefresh()
+	}
+
 	// MARK: - 🗑 Deinit
 	deinit {
 		print("🗑 MovieListViewController deinit.")
@@ -100,6 +123,20 @@ final class MovieListViewController: UIViewController {
 
 extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+		if self.dataSource.count < 1 {
+			let title = loading ?
+				NSLocalizedString("movie_list_view_controller_loading_movies_title_label", comment: "Loading title") :
+			NSLocalizedString("movie_list_view_controller_no_movies_to_show_title_label", comment: "No results title")
+
+			let description = loading  ?
+				NSLocalizedString("movie_list_view_controller_loading_movies_description_label", comment: "Loading description") :
+				NSLocalizedString("movie_list_view_controller_no_movies_to_show_description_label", comment: "No results description")
+
+			collectionView.setEmptyView(title: title, message: description)
+		} else {
+			collectionView.restore()
+		}
+
 		return self.dataSource.count
 	}
 
@@ -130,137 +167,15 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
 	}
 }
 
-final class MovieListCollectionViewCell: UICollectionViewCell {
-	// MARK: Constants
-	static let reuseIdentifier = "MovieListCollectionViewCellId"
-	var viewModel: PosterImageViewModel?
+extension MovieListViewController: UICollectionViewDataSourcePrefetching {
+	func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
 
-	// MARK: Variables
-	var movie: Movie? {
-		didSet {
-			guard let movie = movie else { return }
-
-			DispatchQueue.main.async { [weak self] in
-				guard let `self` = self else { return }
-
-				if let posterImage = movie.posterImageData {
-					self.posterImage.image = UIImage(data: posterImage)
-				} else {
-					self.viewModel?.getPosterImage(movieId: movie.id, posterPath: movie.posterPath, completion: { [weak self] imageData, _ in
-						guard let data = imageData else { return }
-						DispatchQueue.main.async { [weak self] in
-							guard let `self` = self else { return }
-							self.posterImage.image = UIImage(data: data)
-						}
-					})
-				}
-
-				self.movieTitle.text = movie.title
-				self.ratingLabel.text = movie.rating.description
-				self.movieOverview.text = movie.overview
-
-				self.sizeToFit()
-			}
+//		for indexPath in indexPaths {
+		if indexPaths.last?.row == self.dataSource.count - 5 {
+			self.viewModel?.inputs.fetchNewMovies()
 		}
-	}
-
-	// MARK: UI Elements
-	private let separatorView: UIView = {
-		let view = UIView()
-		view.backgroundColor = UIColor.gray
-		view.alpha = 0.4
-		view.translatesAutoresizingMaskIntoConstraints = false
-		return view
-	}()
-
-	private let posterImage: UIImageView = {
-		let image = UIImage(named: "no_poster")
-
-		let imageView = UIImageView(image: image)
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.contentMode = .scaleToFill
-
-		return imageView
-	}()
-
-	private let stackView: UIStackView = {
-		let stackView = UIStackView()
-		stackView.translatesAutoresizingMaskIntoConstraints = false
-		stackView.alignment = .leading
-		stackView.distribution = .fillProportionally
-		stackView.axis = .horizontal
-		stackView.spacing = 5
-		return stackView
-	}()
-
-	private let movieTitle: UILabel = {
-		let label = UILabel()
-		label.translatesAutoresizingMaskIntoConstraints = false
-		label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-		label.adjustsFontSizeToFitWidth = true
-		label.numberOfLines = 2
-		label.setContentCompressionResistancePriority(UILayoutPriority.fittingSizeLevel, for: .horizontal)
-		return label
-	}()
-
-	private let ratingLabel: UILabel = {
-		let label = UILabel()
-		label.translatesAutoresizingMaskIntoConstraints = false
-		label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-		label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
-		return label
-	}()
-
-	private let movieOverview: UILabel = {
-		let label = UILabel()
-		label.translatesAutoresizingMaskIntoConstraints = false
-		label.numberOfLines = 6
-		label.font = UIFont.preferredFont(forTextStyle: .caption1)
-		label.textAlignment = .justified
-		return label
-	}()
-
-	override init(frame: CGRect) {
-		super.init(frame: frame)
-		setupCellView()
-	}
-
-	required init?(coder aDecoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-
-	func setupCellView() {
-		stackView.addArrangedSubview(movieTitle)
-		stackView.addArrangedSubview(ratingLabel)
-
-		addSubview(separatorView)
-		addSubview(posterImage)
-		addSubview(stackView)
-		addSubview(movieOverview)
-
-		separatorView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-		separatorView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-		separatorView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-		separatorView.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-
-		posterImage.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-		posterImage.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
-		posterImage.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.25).isActive = true
-		posterImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
-
-		stackView.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-		stackView.leadingAnchor.constraint(equalTo: posterImage.trailingAnchor, constant: 10).isActive = true
-		stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-		stackView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.3).isActive = true
-
-		movieOverview.topAnchor.constraint(equalTo: movieTitle.bottomAnchor, constant: 5).isActive = true
-		movieOverview.leadingAnchor.constraint(equalTo: posterImage.trailingAnchor, constant: 10).isActive = true
-		movieOverview.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-		movieOverview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
-	}
-
-	// MARK: - 🗑 Deinit
-	deinit {
-		print("🗑 MovieListCollectionViewCell deinit.")
+//			let model = models[indexPath.row]
+//			asyncFetcher.fetchAsync(model.identifier)
+//		}
 	}
 }

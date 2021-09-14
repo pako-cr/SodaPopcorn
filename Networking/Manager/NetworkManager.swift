@@ -2,7 +2,7 @@
 //  NetworkingManager.swift
 //  StarWarsWorld
 //
-//  Created by Zimplifica Macbook Pro on 3/9/21.
+//  Created by Francisco Cordoba on 3/9/21.
 //
 
 import Foundation
@@ -32,7 +32,7 @@ final class NetworkManager<EndPoint: EndPointType>: NetworkManagerProtocol {
     func request(_ route: EndPoint, completion: @escaping NetworkManagerCompletion) {
         do {
             let request = try self.buildRequest(from: route)
-			print("🔸 Request: \(request)")
+//			print("🔸 Request: \(request)")
 			task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
                 completion(data, response, error)
             })

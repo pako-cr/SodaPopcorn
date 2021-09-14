@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 3/9/21.
+//  Created by Francisco Cordoba on 3/9/21.
 //
 
 import CoreData
@@ -14,35 +14,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
-
-//		let center = UNUserNotificationCenter.current()
-//
-//		center.requestAuthorization(options: [.alert, .badge, .sound, .provisional, .announcement]) { granted, error in
-//			if let error = error {
-//				print("🔸 On UNUserNotificationCenter.requestAuthorization. Error: \(error.localizedDescription)")
-//			}
-//
-//			if granted {
-//				print("🔸 Notifications enabled.")
-//				DispatchQueue.main.async {
-//					application.registerForRemoteNotifications()
-//				}
-//			} else {
-//				print("🔸 Notifications disabled.")
-//			}
-//		}
-//
-//		center.getNotificationSettings { settings in
-//			guard (settings.authorizationStatus == .authorized) ||
-//					(settings.authorizationStatus == .provisional) else { return }
-//
-//			if settings.alertSetting == .enabled {
-//				// Schedule an alert-only notification.
-//			} else {
-//				// Schedule a notification with a badge and sound.
-//			}
-//		}
-
 		return true
 	}
 
@@ -72,7 +43,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	// MARK: - Core Data stack
-
 	lazy var persistentContainer: NSPersistentContainer = {
 		/*
 		The persistent container for the application. This implementation

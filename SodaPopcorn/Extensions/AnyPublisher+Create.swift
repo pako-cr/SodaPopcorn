@@ -2,7 +2,7 @@
 //  AnyPublisher+Create.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 5/9/21.
+//  Created by Francisco Cordoba on 5/9/21.
 //
 
 import Combine

@@ -2,7 +2,7 @@
 //  MovieListViewModel.swift
 //  StarWarsWorld
 //
-//  Created by Zimplifica Macbook Pro on 3/9/21.
+//  Created by Francisco Cordoba on 3/9/21.
 //
 
 import Foundation
@@ -15,6 +15,9 @@ public protocol MovieListViewModelInputs: AnyObject {
 
 	/// Call to get the new movies.
 	func fetchNewMovies()
+
+	/// Cal to pull to refresh.
+	func pullToRefresh()
 }
 
 public protocol MovieListViewModelOutputs: AnyObject {
@@ -23,6 +26,9 @@ public protocol MovieListViewModelOutputs: AnyObject {
 
 	/// Emits to get return the image.
 	func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never>
+
+	/// Emits when loading.
+	func loading() -> CurrentValueSubject<Bool, Never>
 }
 
 public protocol MovieListViewModelTypes: AnyObject {
@@ -40,6 +46,7 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
+	private var page = 0
 
 	@Published private (set) var dataSource: [Movie] = []
 
@@ -52,10 +59,11 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
 			}).store(in: &cancellable)
 
-		Publishers.Merge(self.viewDidLoadProperty, self.fetchNewMoviesProperty)
+		Publishers.Merge3(self.viewDidLoadProperty, self.fetchNewMoviesProperty, self.pullToRefreshProperty)
 			.flatMap({ [weak self] _ -> AnyPublisher<[Movie]?, Error> in
 				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
-				return self.getNewMovies(page: 1)
+				self.page += 1
+				return self.getNewMovies(page: self.page)
 			})
 			.sink(receiveCompletion: { completion in
 				switch completion {
@@ -65,10 +73,8 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 				}
 			}, receiveValue: { movies in
 				if let movies = movies {
-					DispatchQueue.main.async {
-						self.fetchNewMoviesActionProperty.value = movies
-						self.dataSource = movies
-					}
+					self.fetchNewMoviesActionProperty.value = movies
+					self.dataSource = movies
 				}
 			}).store(in: &cancellable)
 	}
@@ -84,6 +90,12 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 		viewDidLoadProperty.send(())
 	}
 
+	private let pullToRefreshProperty = PassthroughSubject<Void, Never>()
+	public func pullToRefresh() {
+		self.page = 1
+		pullToRefreshProperty.send(())
+	}
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let fetchNewMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
 	public func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
@@ -95,9 +107,26 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 		return fetchPosterImageSignalProperty
 	}
 
+	private var loadingProperty = CurrentValueSubject<Bool, Never>(false)
+	public func loading() -> CurrentValueSubject<Bool, Never> {
+		return loadingProperty
+	}
+
 	// MARK: - ⚙️ Helpers
 	private func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
-		return MovieService.shared().getNewMovies(page: page)
+		self.loadingProperty.value = true
+
+		let event = MovieService.shared().getNewMovies(page: page)
+
+		event
+			.subscribe(on: DispatchQueue.main)
+			.sink(receiveCompletion: { _ in
+				self.loadingProperty.value = false
+			}, receiveValue: { _ in
+
+			}).store(in: &cancellable)
+
+		return event
 	}
 
 	private func setPosterImageData(movieId: Int, imageData: Data) {

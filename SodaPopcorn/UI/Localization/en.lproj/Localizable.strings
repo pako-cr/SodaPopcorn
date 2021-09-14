@@ -1,0 +1,15 @@
+/* 
+  Localizable.strings
+  SodaPopcorn
+
+  Created by Francisco Cordoba on 13/9/21.
+  
+*/
+//"You have sold 1000 apps in %d months" = "You have sold 1000 apps in %d months";
+"app_name" = "SodaPopcorn";
+"app_name_with_icon" = "SodaPopcorn 🍿";
+"movie_list_view_controller_no_movies_to_show_title_label" = "No movies to show 🙁";
+"movie_list_view_controller_no_movies_to_show_description_label" = "Check your network connection \n and pull to refresh ↕️";
+"movie_list_view_controller_loading_movies_title_label" = "Loading movies... ⏰";
+"movie_list_view_controller_loading_movies_description_label" = "Please wait while we get the latest movies for you 🎬";
+"movie_list_collection_view_cell_poster_image_label" = "Movie poster of %s";

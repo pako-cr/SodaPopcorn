@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  StarWarsWorld
 //
-//  Created by Zimplifica Macbook Pro on 3/9/21.
+//  Created by Francisco Cordoba on 3/9/21.
 //
 
 import Combine
@@ -19,7 +19,7 @@ struct MovieListView: View {
 				moviesSection
 			}
 		}
-		.navigationBarTitle(Text("Soda Popcorn 🍿"), displayMode: NavigationBarItem.TitleDisplayMode.large)
+		.navigationBarTitle(Text(NSLocalizedString("app_name_with_icon", comment: "App name")), displayMode: NavigationBarItem.TitleDisplayMode.large)
 		.onAppear(perform: {
 			viewModel.inputs.fetchNewMovies()
 		})
@@ -32,7 +32,7 @@ private extension MovieListView {
 			ForEach(viewModel.dataSource, content: { movie in
 				HStack(alignment: .center, spacing: 10) {
 					if movie.posterImageData?.isEmpty ?? true {
-						PosterImageView(viewModel: viewModel.posterImageViewModel, movieId: movie.id, posterPath: movie.posterPath)
+						PosterImageView(viewModel: viewModel.posterImageViewModel, movie: movie, posterPath: movie.posterPath)
 							.aspectRatio(contentMode: .fit)
 							.frame(width: 80, height: 130, alignment: .center)
 							.accessibility(hint: Text("The movie poster"))
@@ -74,8 +74,8 @@ private extension MovieListView {
 	var emptySection: some View {
 		Section {
 			Text("No results")
-				.accessibility(hint: Text("There are no movies to show"))
-				.accessibility(value: Text("The result of the movies"))
+				.accessibility(hint: Text(NSLocalizedString("movie_list_view_controller_no_movies_to_show_title_label", comment: "No results title")))
+				.accessibility(value: Text(NSLocalizedString("movie_list_view_controller_no_movies_to_show_description_label", comment: "No results description")))
 		}
 	}
 }

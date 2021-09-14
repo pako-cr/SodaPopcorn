@@ -2,7 +2,7 @@
 //  PosterImageViewModel.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 5/9/21.
+//  Created by Francisco Cordoba on 5/9/21.
 //
 
 import Combine
@@ -40,12 +40,19 @@ final class PosterImageViewModel: PosterImageViewModelInputs, PosterImageViewMod
 	}
 
 	// MARK: - ⚙️ Helpers
-	public func getPosterImage(movieId: Int, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+	public func getPosterImage(movie: Movie, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
 		PosterImageService.shared().getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { [weak self] data, error in
 			completion(data, error)
 
 			guard let `self` = self, let data = data, !data.isEmpty else { return }
-			self.fetchPosterImageSignalProperty.send((movieId, data))
+			self.fetchPosterImageSignalProperty.send((movie.id, data))
+
+//			movie.posterImageData = data
+//			do {
+//				try MovieService.shared().update(movie: movie)
+//			} catch {
+//
+//			}
 		}
 	}
 
