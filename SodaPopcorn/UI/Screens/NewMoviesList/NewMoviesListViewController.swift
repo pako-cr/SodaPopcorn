@@ -1,5 +1,5 @@
 //
-//  MovieListViewController.swift
+//  NewMoviesListViewController.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/9/21.
@@ -8,9 +8,9 @@
 import Combine
 import UIKit
 
-final class MovieListViewController: BaseViewController {
+final class NewMoviesListViewController: BaseViewController {
 	// MARK: - Consts
-	private var viewModel: MovieListViewModel?
+	private var viewModel: NewMoviesListViewModel?
 	private let posterImageViewModel = PosterImageViewModel()
 
 	// MARK: - Variables
@@ -23,9 +23,12 @@ final class MovieListViewController: BaseViewController {
 		}
 	}
 
+//	private let loadingQueue = OperationQueue()
+//	private var loadingOperations = [IndexPath: DataLoadOperation]	
 	private var dataSource: [Movie] = [] {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
+				print("🔸 Reloading data source!")
 				self?.movieCollectionView.reloadData()
 			}
 		}
@@ -49,7 +52,7 @@ final class MovieListViewController: BaseViewController {
 		return collectionView
 	}()
 
-	convenience init(viewModel: MovieListViewModel) {
+	convenience init(viewModel: NewMoviesListViewModel) {
 		self.init(nibName: nil, bundle: nil)
 		self.viewModel = viewModel
 	}
@@ -60,13 +63,24 @@ final class MovieListViewController: BaseViewController {
     }
 
 	override func viewWillLayoutSubviews() {
-		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .clear
+		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
 		navigationController?.navigationBar.isTranslucent = traitCollection.userInterfaceStyle == .light ? false : true
 
+		let appearance = UINavigationBarAppearance()
+		appearance.configureWithDefaultBackground()
+		appearance.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+		navigationController?.navigationBar.standardAppearance = appearance
+		navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
+
+//		let appearance = navigationController?.navigationBar.standardAppearance.copy()
+			// Configure appearance
+		navigationItem.standardAppearance = appearance
 	}
 
 	override func setupUI() {
+		navigationController?.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
+
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.dataSource = self
@@ -117,11 +131,11 @@ final class MovieListViewController: BaseViewController {
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑 MovieListViewController deinit.")
+		print("🗑 NewMoviesListViewController deinit.")
 	}
 }
 
-extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension NewMoviesListViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 		if self.dataSource.count < 1 {
 			let title = loading ?
@@ -142,8 +156,7 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
 
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier, for: indexPath) as? MovieListCollectionViewCell {
-			cell.movie = dataSource[indexPath.item]
-			cell.viewModel = posterImageViewModel
+			cell.configure(with: dataSource[indexPath.item], and: posterImageViewModel)
 			return cell
 		}
 
@@ -167,9 +180,10 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
 	}
 }
 
-extension MovieListViewController: UICollectionViewDataSourcePrefetching {
+extension NewMoviesListViewController: UICollectionViewDataSourcePrefetching {
 	func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
 
+		print("🔸 Prefetching: \(indexPaths)")
 //		for indexPath in indexPaths {
 		if indexPaths.last?.row == self.dataSource.count - 5 {
 			self.viewModel?.inputs.fetchNewMovies()

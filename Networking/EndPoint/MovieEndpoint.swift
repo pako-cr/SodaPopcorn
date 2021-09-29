@@ -32,6 +32,10 @@ extension MovieApi: EndPointType {
 		return url
 	}
 
+	var locale: String {
+		return NSLocale.current.languageCode ?? "en"
+	}
+
 	var cachePolicy: URLRequest.CachePolicy {
 		return .reloadIgnoringLocalAndRemoteCacheData
 	}
@@ -56,10 +60,12 @@ extension MovieApi: EndPointType {
 	var task: HTTPTask {
 		switch self {
 			case .newMovies(let page):
+
 				return .requestParameters(bodyParameters: nil,
 										  bodyEncoding: .urlEncoding,
 										  urlParameters: ["page": page,
-														  "api_key": publicApiKey])
+														  "api_key": publicApiKey,
+														  "language": locale])
 			default:
 				return .request
 		}

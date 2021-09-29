@@ -32,7 +32,11 @@ final class NetworkManager<EndPoint: EndPointType>: NetworkManagerProtocol {
     func request(_ route: EndPoint, completion: @escaping NetworkManagerCompletion) {
         do {
             let request = try self.buildRequest(from: route)
-//			print("🔸 Request: \(request)")
+
+			if route is MovieApi {
+				print("🔸 Request: \(request)")
+			}
+
 			task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
                 completion(data, response, error)
             })

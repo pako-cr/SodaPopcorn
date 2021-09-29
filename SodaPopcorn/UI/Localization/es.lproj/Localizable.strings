@@ -13,3 +13,4 @@
 "movie_list_view_controller_loading_movies_title_label" = "Cargando películas... ⏰";
 "movie_list_view_controller_loading_movies_description_label" = "Por favor espera mientras cargamos las últimas películas para ti 🎬";
 "movie_list_collection_view_cell_poster_image_label" = "Poster de la película %s";
+"movie_list_collection_view_cell_no_overview_found" = "Sin descripción.";

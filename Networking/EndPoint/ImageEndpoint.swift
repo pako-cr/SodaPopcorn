@@ -29,6 +29,10 @@ extension PosterImageApi: EndPointType {
 		return url
 	}
 
+	var locale: String {
+		return NSLocale.current.languageCode ?? "en"
+	}
+
 	var cachePolicy: URLRequest.CachePolicy {
 		return .reloadIgnoringLocalAndRemoteCacheData
 	}
@@ -49,7 +53,8 @@ extension PosterImageApi: EndPointType {
 			case .posterImage:
 				return .requestParameters(bodyParameters: nil,
 										  bodyEncoding: .urlEncoding,
-										  urlParameters: ["api_key": publicApiKey])
+										  urlParameters: ["api_key": publicApiKey,
+														  "language": locale])
 		}
 	}
 

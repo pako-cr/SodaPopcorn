@@ -9,7 +9,7 @@ import Combine
 import Foundation
 
 public protocol MovieNetworkServiceProtocol {
-	func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error>
+	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
@@ -19,8 +19,8 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 		self.networkManager = NetworkManager<MovieApi>()
 	}
 	
-	func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
-		return AnyPublisher<[Movie]?, Error>.create { [weak self] single in
+	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error> {
+		return AnyPublisher<MovieApiResponse?, Error>.create { [weak self] single in
 			guard let `self` = self else { return Disposable {} }
 
 			print("🔸 Request getNewMovies. Page: \(page)")
@@ -44,7 +44,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 							do {
 								let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
 
-								single.onNext(apiResponse.movies)
+								single.onNext(apiResponse)
 								single.onComplete()
 
 							} catch let exepction {

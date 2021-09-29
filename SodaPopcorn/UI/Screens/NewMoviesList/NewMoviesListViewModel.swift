@@ -1,5 +1,5 @@
 //
-//  MovieListViewModel.swift
+//  NewMoviesListViewModel.swift
 //  StarWarsWorld
 //
 //  Created by Francisco Cordoba on 3/9/21.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-public protocol MovieListViewModelInputs: AnyObject {
+public protocol NewMoviesListViewModelInputs: AnyObject {
 	/// Call when view did load.
 	func viewDidLoad()
 
@@ -20,7 +20,7 @@ public protocol MovieListViewModelInputs: AnyObject {
 	func pullToRefresh()
 }
 
-public protocol MovieListViewModelOutputs: AnyObject {
+public protocol NewMoviesListViewModelOutputs: AnyObject {
 	/// Emits to get the new movies.
 	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
@@ -31,18 +31,18 @@ public protocol MovieListViewModelOutputs: AnyObject {
 	func loading() -> CurrentValueSubject<Bool, Never>
 }
 
-public protocol MovieListViewModelTypes: AnyObject {
-	var inputs: MovieListViewModelInputs { get }
-	var outputs: MovieListViewModelOutputs { get }
+public protocol NewMoviesListViewModelTypes: AnyObject {
+	var inputs: NewMoviesListViewModelInputs { get }
+	var outputs: NewMoviesListViewModelOutputs { get }
 }
 
-public final class MovieListViewModel: ObservableObject, Identifiable, MovieListViewModelInputs, MovieListViewModelOutputs, MovieListViewModelTypes {
+public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMoviesListViewModelInputs, NewMoviesListViewModelOutputs, NewMoviesListViewModelTypes {
 	// MARK: Constants
 	let posterImageViewModel: PosterImageViewModel
 
 	// MARK: Variables
-	public var inputs: MovieListViewModelInputs { return self }
-	public var outputs: MovieListViewModelOutputs { return self }
+	public var inputs: NewMoviesListViewModelInputs { return self }
+	public var outputs: NewMoviesListViewModelOutputs { return self }
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
@@ -60,7 +60,7 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 			}).store(in: &cancellable)
 
 		Publishers.Merge3(self.viewDidLoadProperty, self.fetchNewMoviesProperty, self.pullToRefreshProperty)
-			.flatMap({ [weak self] _ -> AnyPublisher<[Movie]?, Error> in
+			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Error> in
 				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
 				self.page += 1
 				return self.getNewMovies(page: self.page)
@@ -68,13 +68,14 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 			.sink(receiveCompletion: { completion in
 				switch completion {
 					case .failure(let error):
-						print("🔴 [MovieListViewModel] [init] Received completion error. Error: \(error.localizedDescription)")
+						print("🔴 [NewMoviesListViewModel] [init] Received completion error. Error: \(error.localizedDescription)")
 					default: break
 				}
-			}, receiveValue: { movies in
-				if let movies = movies {
-					self.fetchNewMoviesActionProperty.value = movies
-					self.dataSource = movies
+			}, receiveValue: { movieApiResponse in
+				if let movieApiResponse = movieApiResponse {
+					print("🔸 Movies response[numberOfResults: \(movieApiResponse.numberOfResults), page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages)]")
+					self.fetchNewMoviesActionProperty.value = movieApiResponse.movies
+					self.dataSource = movieApiResponse.movies
 				}
 			}).store(in: &cancellable)
 	}
@@ -113,7 +114,7 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
+	private func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error> {
 		self.loadingProperty.value = true
 
 		let event = MovieService.shared().getNewMovies(page: page)
@@ -140,6 +141,6 @@ public final class MovieListViewModel: ObservableObject, Identifiable, MovieList
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑", "MovieListViewModel deinit.")
+		print("🗑", "NewMoviesListViewModel deinit.")
 	}
 }

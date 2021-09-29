@@ -29,7 +29,7 @@ public final class MovieService: MovieNetworkServiceProtocol, StorageContext {
 	}
 
 	// MARK: - Network Service
-	public func getNewMovies(page: Int) -> AnyPublisher<[Movie]?, Error> {
+	public func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error> {
 		return movieNetworkService.getNewMovies(page: page)
 	}
 

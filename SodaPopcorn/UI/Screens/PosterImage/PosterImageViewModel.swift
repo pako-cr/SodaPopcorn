@@ -46,13 +46,6 @@ final class PosterImageViewModel: PosterImageViewModelInputs, PosterImageViewMod
 
 			guard let `self` = self, let data = data, !data.isEmpty else { return }
 			self.fetchPosterImageSignalProperty.send((movie.id, data))
-
-//			movie.posterImageData = data
-//			do {
-//				try MovieService.shared().update(movie: movie)
-//			} catch {
-//
-//			}
 		}
 	}
 
