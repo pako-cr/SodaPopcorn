@@ -14,14 +14,10 @@ extension MovieEntity {
 		return NSFetchRequest<MovieEntity>(entityName: "MovieEntity")
 	}
 
-	@NSManaged public var id: Int
+	@NSManaged public var id: String
 	@NSManaged public var posterPath: String
-	@NSManaged public var backdrop: String
 	@NSManaged public var title: String
-	@NSManaged public var releaseDate: String
 	@NSManaged public var rating: Double
 	@NSManaged public var overview: String
-	@NSManaged public var popularity: Double
-	@NSManaged public var voteCount: Int
 	@NSManaged public var posterImageData: Data?
 }

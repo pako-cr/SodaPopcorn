@@ -23,7 +23,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 				if let posterImage = movie.posterImageData {
 					self.posterImage.image = UIImage(data: posterImage)
 				} else {
-					self.viewModel?.getPosterImage(movie: movie, posterPath: movie.posterPath, completion: { [weak self] imageData, error in
+					self.viewModel?.getPosterImage(movie: movie, posterPath: movie.posterPath ?? "", completion: { [weak self] imageData, error in
 						if error != nil {
 							DispatchQueue.main.async { [weak self] in
 								guard let `self` = self else { return }
@@ -45,7 +45,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 				}
 
 				self.movieTitle.text = movie.title
-				self.ratingLabel.text = movie.rating.description
+				self.ratingLabel.text = movie.rating?.description ?? "0.0"
 				self.movieOverview.text = movie.overview != "" ? movie.overview : NSLocalizedString("movie_list_collection_view_cell_no_overview_found", comment: "")
 
 				self.sizeToFit()

@@ -14,6 +14,7 @@ final class HomeCoordinator: Coordinator {
 	var window: UIWindow
 
 	private let parentViewController: HomeViewController
+	private let movieService = MovieService.shared()
 //	var homeTabController: HomeViewController?
 
 	init(window: UIWindow) {
@@ -28,7 +29,7 @@ final class HomeCoordinator: Coordinator {
 //		homeTabController = HomeViewController()
 
 		let posterImageViewModel = PosterImageViewModel()
-		let newMoviesListViewModel = NewMoviesListViewModel(posterImageViewModel: posterImageViewModel)
+		let newMoviesListViewModel = NewMoviesListViewModel(movieService: movieService, posterImageViewModel: posterImageViewModel)
 		let newMoviesListViewController = NewMoviesListViewController(viewModel: newMoviesListViewModel)
 		newMoviesListViewController.tabBarItem = UITabBarItem(title: "News", image: UIImage(systemName: "film.fill"), tag: 0)
 

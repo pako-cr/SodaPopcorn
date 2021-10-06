@@ -13,7 +13,7 @@ public protocol PosterImageViewModelInputs: AnyObject {
 
 public protocol PosterImageViewModelOutputs: AnyObject {
 	/// Emits to return the poster image data.
-	func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never>
+	func fetchPosterImageSignal() -> PassthroughSubject<(String, Data), Never>
 }
 
 public protocol PosterImageViewModelTypes: AnyObject {
@@ -34,8 +34,8 @@ final class PosterImageViewModel: PosterImageViewModelInputs, PosterImageViewMod
 	// MARK: - ⬇️ INPUTS Definition
 
 	// MARK: - ⬆️ OUTPUTS Definition
-	private var fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
-	public func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never> {
+	private var fetchPosterImageSignalProperty = PassthroughSubject<(String, Data), Never>()
+	public func fetchPosterImageSignal() -> PassthroughSubject<(String, Data), Never> {
 		return fetchPosterImageSignalProperty
 	}
 

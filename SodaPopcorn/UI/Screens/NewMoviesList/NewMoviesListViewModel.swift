@@ -10,9 +10,6 @@ import Combine
 import SwiftUI
 
 public protocol NewMoviesListViewModelInputs: AnyObject {
-	/// Call when view did load.
-	func viewDidLoad()
-
 	/// Call to get the new movies.
 	func fetchNewMovies()
 
@@ -39,6 +36,7 @@ public protocol NewMoviesListViewModelTypes: AnyObject {
 public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMoviesListViewModelInputs, NewMoviesListViewModelOutputs, NewMoviesListViewModelTypes {
 	// MARK: Constants
 	let posterImageViewModel: PosterImageViewModel
+	let movieService: MovieService
 
 	// MARK: Variables
 	public var inputs: NewMoviesListViewModelInputs { return self }
@@ -48,34 +46,33 @@ public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMo
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
 
-	@Published private (set) var dataSource: [Movie] = []
-
-	init(posterImageViewModel: PosterImageViewModel) {
+	init(movieService: MovieService, posterImageViewModel: PosterImageViewModel) {
+		self.movieService = movieService
 		self.posterImageViewModel = posterImageViewModel
 
-		self.posterImageViewModel.outputs.fetchPosterImageSignal()
-			.sink(receiveValue: { [weak self] (movieInfo) in
-				guard let `self` = self else { return }
-				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
-			}).store(in: &cancellable)
+//		self.posterImageViewModel.outputs.fetchPosterImageSignal()
+//			.sink(receiveValue: { [weak self] (movieInfo) in
+//				guard let `self` = self else { return }
+//				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
+//			}).store(in: &cancellable)
 
-		Publishers.Merge3(self.viewDidLoadProperty, self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+		Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
 			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Error> in
 				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
-				self.page += 1
-				return self.getNewMovies(page: self.page)
+				return self.getNewMovies()
 			})
 			.sink(receiveCompletion: { completion in
+				self.loadingProperty.value = false
 				switch completion {
 					case .failure(let error):
 						print("🔴 [NewMoviesListViewModel] [init] Received completion error. Error: \(error.localizedDescription)")
 					default: break
 				}
 			}, receiveValue: { movieApiResponse in
+				self.loadingProperty.value = false
 				if let movieApiResponse = movieApiResponse {
-					print("🔸 Movies response[numberOfResults: \(movieApiResponse.numberOfResults), page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages)]")
+					print("🔸 MoviesApiResponse [page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages), numberOfResults: \(movieApiResponse.numberOfResults)]")
 					self.fetchNewMoviesActionProperty.value = movieApiResponse.movies
-					self.dataSource = movieApiResponse.movies
 				}
 			}).store(in: &cancellable)
 	}
@@ -86,14 +83,9 @@ public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMo
 		fetchNewMoviesProperty.send(())
 	}
 
-	private let viewDidLoadProperty = PassthroughSubject<Void, Never>()
-	public func viewDidLoad() {
-		viewDidLoadProperty.send(())
-	}
-
 	private let pullToRefreshProperty = PassthroughSubject<Void, Never>()
 	public func pullToRefresh() {
-		self.page = 1
+		self.page = 0
 		pullToRefreshProperty.send(())
 	}
 
@@ -114,30 +106,20 @@ public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMo
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error> {
+	private func getNewMovies() -> AnyPublisher<MovieApiResponse?, Error> {
+		self.page += 1
 		self.loadingProperty.value = true
-
-		let event = MovieService.shared().getNewMovies(page: page)
-
-		event
-			.subscribe(on: DispatchQueue.main)
-			.sink(receiveCompletion: { _ in
-				self.loadingProperty.value = false
-			}, receiveValue: { _ in
-
-			}).store(in: &cancellable)
-
-		return event
+		return movieService.getNewMovies(page: page)
 	}
 
-	private func setPosterImageData(movieId: Int, imageData: Data) {
-		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
-			DispatchQueue.main.async { [weak self] in
-				guard let `self` = self else { return }
-				self.dataSource[index].posterImageData = imageData
-			}
-		}
-	}
+//	private func setPosterImageData(movieId: Int, imageData: Data) {
+//		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
+//			DispatchQueue.main.async { [weak self] in
+//				guard let `self` = self else { return }
+//				self.dataSource[index].posterImageData = imageData
+//			}
+//		}
+//	}
 
 	// MARK: - 🗑 Deinit
 	deinit {
