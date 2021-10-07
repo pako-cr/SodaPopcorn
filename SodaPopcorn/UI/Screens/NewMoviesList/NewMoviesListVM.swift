@@ -1,5 +1,5 @@
 //
-//  NewMoviesListViewModel.swift
+//  NewMoviesListVM.swift
 //  StarWarsWorld
 //
 //  Created by Francisco Cordoba on 3/9/21.
@@ -7,17 +7,19 @@
 
 import Foundation
 import Combine
-import SwiftUI
 
-public protocol NewMoviesListViewModelInputs: AnyObject {
+public protocol NewMoviesListVMInputs: AnyObject {
 	/// Call to get the new movies.
 	func fetchNewMovies()
 
-	/// Cal to pull to refresh.
+	/// Call to pull to refresh.
 	func pullToRefresh()
+
+	/// Call when a movie is selected.
+	func movieSelected(movie: Movie)
 }
 
-public protocol NewMoviesListViewModelOutputs: AnyObject {
+public protocol NewMoviesListVMOutputs: AnyObject {
 	/// Emits to get the new movies.
 	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
@@ -26,49 +28,56 @@ public protocol NewMoviesListViewModelOutputs: AnyObject {
 
 	/// Emits when loading.
 	func loading() -> CurrentValueSubject<Bool, Never>
+
+	/// Emits when a movie is selected.
+	func movieSelectedAction() -> PassthroughSubject<Movie, Never>
 }
 
-public protocol NewMoviesListViewModelTypes: AnyObject {
-	var inputs: NewMoviesListViewModelInputs { get }
-	var outputs: NewMoviesListViewModelOutputs { get }
+public protocol NewMoviesListVMTypes: AnyObject {
+	var inputs: NewMoviesListVMInputs { get }
+	var outputs: NewMoviesListVMOutputs { get }
 }
 
-public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMoviesListViewModelInputs, NewMoviesListViewModelOutputs, NewMoviesListViewModelTypes {
+public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesListVMInputs, NewMoviesListVMOutputs, NewMoviesListVMTypes {
 	// MARK: Constants
-	let posterImageViewModel: PosterImageViewModel
-	let movieService: MovieService
+	private let movieService: MovieService
+	private let imageService: PosterImageService
 
 	// MARK: Variables
-	public var inputs: NewMoviesListViewModelInputs { return self }
-	public var outputs: NewMoviesListViewModelOutputs { return self }
+	public var inputs: NewMoviesListVMInputs { return self }
+	public var outputs: NewMoviesListVMOutputs { return self }
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
 
-	init(movieService: MovieService, posterImageViewModel: PosterImageViewModel) {
+	init(movieService: MovieService, imageService: PosterImageService) {
 		self.movieService = movieService
-		self.posterImageViewModel = posterImageViewModel
+		self.imageService = imageService
 
-//		self.posterImageViewModel.outputs.fetchPosterImageSignal()
-//			.sink(receiveValue: { [weak self] (movieInfo) in
-//				guard let `self` = self else { return }
-//				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
-//			}).store(in: &cancellable)
+		self.movieSelectedProperty
+			.sink { [weak self] movie in
+				guard let `self` = self else { return }
+				self.movieSelectedActionProperty.send(movie)
+			}.store(in: &cancellable)
 
 		Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
 			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Error> in
 				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
 				return self.getNewMovies()
 			})
-			.sink(receiveCompletion: { completion in
+			.sink(receiveCompletion: { [weak self] completion in
+				guard let `self` = self else { return }
+
 				self.loadingProperty.value = false
 				switch completion {
 					case .failure(let error):
-						print("🔴 [NewMoviesListViewModel] [init] Received completion error. Error: \(error.localizedDescription)")
+						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(error.localizedDescription)")
 					default: break
 				}
-			}, receiveValue: { movieApiResponse in
+			}, receiveValue: { [weak self] movieApiResponse in
+				guard let `self` = self else { return }
+
 				self.loadingProperty.value = false
 				if let movieApiResponse = movieApiResponse {
 					print("🔸 MoviesApiResponse [page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages), numberOfResults: \(movieApiResponse.numberOfResults)]")
@@ -89,20 +98,30 @@ public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMo
 		pullToRefreshProperty.send(())
 	}
 
+	private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
+	public func movieSelected(movie: Movie) {
+		movieSelectedProperty.send(movie)
+	}
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let fetchNewMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
 	public func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
 		return fetchNewMoviesActionProperty
 	}
 
-	private var fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
+	private let fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
 	public func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never> {
 		return fetchPosterImageSignalProperty
 	}
 
-	private var loadingProperty = CurrentValueSubject<Bool, Never>(false)
+	private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
 	public func loading() -> CurrentValueSubject<Bool, Never> {
 		return loadingProperty
+	}
+
+	private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()
+	public func movieSelectedAction() -> PassthroughSubject<Movie, Never> {
+		return movieSelectedActionProperty
 	}
 
 	// MARK: - ⚙️ Helpers
@@ -112,17 +131,17 @@ public final class NewMoviesListViewModel: ObservableObject, Identifiable, NewMo
 		return movieService.getNewMovies(page: page)
 	}
 
-//	private func setPosterImageData(movieId: Int, imageData: Data) {
-//		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
-//			DispatchQueue.main.async { [weak self] in
-//				guard let `self` = self else { return }
-//				self.dataSource[index].posterImageData = imageData
-//			}
-//		}
-//	}
+	public func getPosterImage(movie: Movie, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+		imageService.getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { data, error in
+			completion(data, error)
+
+//			guard let `self` = self, let data = data, !data.isEmpty else { return }
+//			self.fetchPosterImageSignalProperty.send((movie.id, data))
+		}
+	}
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑", "NewMoviesListViewModel deinit.")
+		print("🗑", "NewMoviesListVM deinit.")
 	}
 }

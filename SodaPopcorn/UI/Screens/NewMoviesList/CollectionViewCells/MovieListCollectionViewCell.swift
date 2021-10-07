@@ -2,7 +2,7 @@
 //  MovieListCollectionViewCell.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 13/9/21.
+//  Created by Francisco Cordoba on 13/9/21.
 //
 
 import UIKit
@@ -10,9 +10,9 @@ import UIKit
 final class MovieListCollectionViewCell: UICollectionViewCell {
 	// MARK: Constants
 	static let reuseIdentifier = "movieListCollectionViewCellId"
-	private var viewModel: PosterImageViewModel?
 
 	// MARK: Variables
+	private var viewModel: NewMoviesListVM?
 	private var movie: Movie? {
 		didSet {
 			guard let movie = movie else { return }
@@ -23,7 +23,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 				if let posterImage = movie.posterImageData {
 					self.posterImage.image = UIImage(data: posterImage)
 				} else {
-					self.viewModel?.getPosterImage(movie: movie, posterPath: movie.posterPath ?? "", completion: { [weak self] imageData, error in
+					self.viewModel?.getPosterImage(movie: movie, posterPath: movie.posterPath ?? "") { [weak self] data, error in
 						if error != nil {
 							DispatchQueue.main.async { [weak self] in
 								guard let `self` = self else { return }
@@ -31,7 +31,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 							}
 						}
 
-						guard let data = imageData else { return }
+						guard let data = data else { return }
 
 						DispatchQueue.main.async { [weak self] in
 							guard let `self` = self else { return }
@@ -41,7 +41,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 //							let accessibilityLabelFormatString = NSLocalizedString("movie_list_collection_view_cell_poster_image_label", comment: "")
 //							self.posterImage.accessibilityLabel = String.localizedStringWithFormat(accessibilityLabelFormatString, self.movie?.title ?? "")
 						}
-					})
+					}
 				}
 
 				self.movieTitle.text = movie.title
@@ -174,7 +174,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		movieOverview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
 	}
 
-	func configure(with data: Movie?, and viewModel: PosterImageViewModel?) {
+	func configure(with data: Movie?, and viewModel: NewMoviesListVM) {
 		activityIndicatorView.stopAnimating()
 		self.movie = data
 		self.viewModel = viewModel

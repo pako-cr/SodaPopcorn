@@ -1,5 +1,5 @@
 //
-//  NewMoviesListViewController.swift
+//  NewMoviesListVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/9/21.
@@ -8,19 +8,18 @@
 import Combine
 import UIKit
 
-final class NewMoviesListViewController: BaseViewController {
+final class NewMoviesListVC: BaseViewController {
 
 	enum Section: CaseIterable {
 		case movies
 	}
 
-	// MARK: - Consts
-	private let posterImageViewModel = PosterImageViewModel()
-	private let viewModel: NewMoviesListViewModel
-
 	// MARK: - Types
 	typealias DataSource = UICollectionViewDiffableDataSource<Section, Movie>
 	typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
+
+	// MARK: - Consts
+	private let viewModel: NewMoviesListVM
 
 	// MARK: - Variables
 	private var fetchMoviesSubscription: Cancellable!
@@ -54,13 +53,13 @@ final class NewMoviesListViewController: BaseViewController {
 		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
 		collectionView.translatesAutoresizingMaskIntoConstraints = false
 		collectionView.isScrollEnabled = true
-//		collectionView.showsVerticalScrollIndicator = false
+		//		collectionView.showsVerticalScrollIndicator = false
 		collectionView.allowsSelection = true
 		collectionView.isPrefetchingEnabled = true
 		return collectionView
 	}()
 
-	init(viewModel: NewMoviesListViewModel) {
+	init(viewModel: NewMoviesListVM) {
 		self.viewModel = viewModel
 		super.init()
 		self.reloadDataSource()
@@ -70,17 +69,17 @@ final class NewMoviesListViewController: BaseViewController {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+	override func viewDidLoad() {
+		super.viewDidLoad()
 		setupUI()
 		configureCollectionViewLayout()
 		bindViewModel()
 		viewModel.inputs.fetchNewMovies()
-    }
+	}
 
 	override func viewWillLayoutSubviews() {
-		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-		navigationController?.navigationBar.isTranslucent = traitCollection.userInterfaceStyle == .light ? false : true
+		super.viewWillLayoutSubviews()
+		view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
 
 		let appearance = UINavigationBarAppearance()
 		appearance.configureWithDefaultBackground()
@@ -92,13 +91,13 @@ final class NewMoviesListViewController: BaseViewController {
 	}
 
 	override func setupUI() {
-		navigationController?.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.prefetchDataSource = self
 		movieCollectionView.refreshControl = refreshControl
+		movieCollectionView.delegate = self
 
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
 		movieCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
@@ -119,35 +118,39 @@ final class NewMoviesListViewController: BaseViewController {
 				guard let `self` = self else { return }
 				self.loading = loading
 			})
-
-//		subscription = posterImageViewModel.outputs.fetchPosterImageSignal()
-//			.sink(receiveValue: { [weak self] (movieInfo) in
-//				guard let `self` = self else { return }
-//				self.setPosterImageData(movieId: movieInfo.0, imageData: movieInfo.1)
-//			})
 	}
 
 	// MARK: - ⚙️ Helpers
-//	private func setPosterImageData(movieId: String, imageData: Data) {
-//		if let index = self.dataSource.firstIndex(where: { $0.id == movieId }) {
-//			DispatchQueue.main.async { [weak self] in
-//				guard let `self` = self else { return }
-//				self.dataSource[index].posterImageData = imageData
-//			}
-//		}
-//
-//		self.dataSource.itemIdentifier(for: indexPath)
-//	}
-
 	private func makeDataSource() -> UICollectionViewDiffableDataSource<Section, Movie> {
 		return UICollectionViewDiffableDataSource(
 			collectionView: movieCollectionView,
-			cellProvider: { collectionView, indexPath, movie in
+			cellProvider: { [weak self] collectionView, indexPath, movie in
+				guard let `self` = self else { return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath) }
+
 				let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier, for: indexPath) as? MovieListCollectionViewCell
-				cell?.configure(with: movie, and: self.posterImageViewModel)
+				cell?.configure(with: movie, and: self.viewModel)
 				return cell
 			}
 		)
+	}
+
+	private func configureCollectionViewLayout() {
+		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (_, layoutEnvironment) -> NSCollectionLayoutSection? in
+			let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
+			let size = NSCollectionLayoutSize(
+				widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
+				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5)
+			)
+
+			let itemCount = isPhone ? 1 : 3
+			let item = NSCollectionLayoutItem(layoutSize: size)
+			let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: itemCount)
+			let section = NSCollectionLayoutSection(group: group)
+			section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+			section.interGroupSpacing = 10
+
+			return section
+		})
 	}
 
 	private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
@@ -171,25 +174,6 @@ final class NewMoviesListViewController: BaseViewController {
 		self.dataSource.apply(self.snapshot, animatingDifferences: true)
 	}
 
-	private func configureCollectionViewLayout() {
-		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (_, layoutEnvironment) -> NSCollectionLayoutSection? in
-			let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
-			let size = NSCollectionLayoutSize(
-				widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
-				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5)
-			)
-
-			let itemCount = isPhone ? 1 : 3
-			let item = NSCollectionLayoutItem(layoutSize: size)
-			let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: itemCount)
-			let section = NSCollectionLayoutSection(group: group)
-			section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-			section.interGroupSpacing = 10
-
-			return section
-		})
-	}
-
 	@objc
 	private func reloadCollectionView() {
 		reloadingDataSource = true
@@ -198,14 +182,21 @@ final class NewMoviesListViewController: BaseViewController {
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑 NewMoviesListViewController deinit.")
+		print("🗑 NewMoviesListVC deinit.")
 	}
 }
 
-extension NewMoviesListViewController: UICollectionViewDataSourcePrefetching {
+extension NewMoviesListVC: UICollectionViewDataSourcePrefetching {
 	func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
 		if (indexPaths.last?.item ?? 0) >= (dataSource.snapshot().numberOfItems - 1) {
 			self.viewModel.inputs.fetchNewMovies()
 		}
+	}
+}
+
+extension NewMoviesListVC: UICollectionViewDelegate {
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
+		viewModel.inputs.movieSelected(movie: movie)
 	}
 }

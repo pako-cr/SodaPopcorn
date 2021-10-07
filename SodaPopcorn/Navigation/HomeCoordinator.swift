@@ -2,42 +2,67 @@
 //  HomeCoordinator.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 19/9/21.
+//  Created by Francisco Cordoba on 19/9/21.
 //
 
+import Combine
 import Foundation
 import UIKit
 
 final class HomeCoordinator: Coordinator {
-	var childCoordinators = [Coordinator]()
-	var navigationController: UINavigationController
-	var window: UIWindow
-
-	private let parentViewController: HomeViewController
+	// MARK: - Const
+	private let parentViewController: UIViewController
 	private let movieService = MovieService.shared()
-//	var homeTabController: HomeViewController?
+	private let imageService = PosterImageService.shared()
+
+	// MARK: - Vars
+	var childCoordinators = [Coordinator]()
+	private var homeVC: HomeVC?
+	private var window: UIWindow
+
+	private var cancellable = Set<AnyCancellable>()
 
 	init(window: UIWindow) {
-		self.parentViewController = HomeViewController()
-		self.navigationController = NavigationController(rootViewController: self.parentViewController)
+		self.parentViewController = BaseViewController()
+
 		self.window = window
-		self.window.rootViewController = navigationController
+		self.window.rootViewController = parentViewController
 		self.window.makeKeyAndVisible()
 	}
 
 	func start() {
-//		homeTabController = HomeViewController()
+		self.homeVC = HomeVC()
 
-		let posterImageViewModel = PosterImageViewModel()
-		let newMoviesListViewModel = NewMoviesListViewModel(movieService: movieService, posterImageViewModel: posterImageViewModel)
-		let newMoviesListViewController = NewMoviesListViewController(viewModel: newMoviesListViewModel)
-		newMoviesListViewController.tabBarItem = UITabBarItem(title: "News", image: UIImage(systemName: "film.fill"), tag: 0)
+		let newMoviesListVM = NewMoviesListVM(movieService: movieService, imageService: imageService)
+		let newMoviesListViewController = NavigationController(rootViewController: NewMoviesListVC(viewModel: newMoviesListVM))
+		newMoviesListViewController.tabBarItem = UITabBarItem(title: "New Movies", image: UIImage(systemName: "film.fill"), tag: 0)
 
-		parentViewController.viewControllers = [newMoviesListViewController]
-		parentViewController.selectedIndex = 0
+		homeVC?.viewControllers = [newMoviesListViewController]
+		homeVC?.selectedIndex = 0
 
-//		parentViewController.addChild(parentViewController)
-//		parentViewController.view.addSubview(parentViewController.view)
-//		homeTabController?.didMove(toParent: parentViewController)
+		parentViewController.addChild(homeVC!)
+		parentViewController.view.addSubview(homeVC!.view)
+		homeVC!.didMove(toParent: parentViewController)
+
+		newMoviesListVM.outputs.movieSelectedAction()
+			.sink { [weak self] movie in
+				guard let `self` = self else { return }
+				self.showMovieDetails(movie: movie)
+			}.store(in: &cancellable)
+	}
+
+	private func showMovieDetails(movie: Movie) {
+		print(movie.title ?? "")
+
+		let viewModel = MovieDetailsVM(movie: movie)
+		let viewController = MovieDetailsVC(viewModel: viewModel)
+
+		homeVC?.present(viewController, animated: true, completion: nil)
+
+		viewModel.outputs.closeButtonAction()
+			.sink { [weak self] _ in
+				guard let `self` = self else { return }
+				self.homeVC?.dismiss(animated: true, completion: nil)
+			}.store(in: &cancellable)
 	}
 }

@@ -1,9 +1,9 @@
-	//
-	//  Movie.swift
-	//  StarWarsWorld
-	//
-	//  Created by Francisco Cordoba on 3/9/21.
-	//
+//
+//  Movie.swift
+//  StarWarsWorld
+//
+//  Created by Francisco Cordoba on 3/9/21.
+//
 
 import Foundation
 
@@ -31,7 +31,6 @@ public class Movie: Codable, Hashable {
 		overview = try movieContainer.decodeIfPresent(String.self, forKey: .overview)
 		rating = try movieContainer.decodeIfPresent(Double.self, forKey: .rating)
 		posterPath = try movieContainer.decodeIfPresent(String.self, forKey: .posterPath)
-
 	}
 
 	private init(id: String, title: String, overview: String, rating: Double, posterPath: String, posterImageData: Data? = nil) {
