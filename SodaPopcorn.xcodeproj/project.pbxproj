@@ -42,6 +42,7 @@
 		D9449B3E26E4E9E3006B3856 /* Networking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9449B2926E4E9E2006B3856 /* Networking.framework */; };
 		D9449B3F26E4E9E3006B3856 /* Networking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D9449B2926E4E9E2006B3856 /* Networking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D9449B4B26E4EFA2006B3856 /* AnyPublisher+Create.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */; };
+		D9509087271096D7003E3D91 /* SectionFooterReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9509086271096D7003E3D91 /* SectionFooterReusableView.swift */; };
 		D97BCA6126EF9C8100A018EC /* UICollectionView+EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97BCA6026EF9C8100A018EC /* UICollectionView+EmptyView.swift */; };
 		D97BCA6726EFBE3F00A018EC /* MovieListCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97BCA6626EFBE3F00A018EC /* MovieListCollectionViewCell.swift */; };
 		D97BCA6B26EFDCA300A018EC /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97BCA6A26EFDCA300A018EC /* BaseViewController.swift */; };
@@ -155,6 +156,7 @@
 		D9449B3826E4E9E2006B3856 /* NetworkingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingTests.swift; sourceTree = "<group>"; };
 		D9449B3A26E4E9E2006B3856 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnyPublisher+Create.swift"; sourceTree = "<group>"; };
+		D9509086271096D7003E3D91 /* SectionFooterReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionFooterReusableView.swift; sourceTree = "<group>"; };
 		D97BCA6026EF9C8100A018EC /* UICollectionView+EmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+EmptyView.swift"; sourceTree = "<group>"; };
 		D97BCA6626EFBE3F00A018EC /* MovieListCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListCollectionViewCell.swift; sourceTree = "<group>"; };
 		D97BCA6A26EFDCA300A018EC /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -547,6 +549,7 @@
 			isa = PBXGroup;
 			children = (
 				D97BCA6626EFBE3F00A018EC /* MovieListCollectionViewCell.swift */,
+				D9509086271096D7003E3D91 /* SectionFooterReusableView.swift */,
 			);
 			path = CollectionViewCells;
 			sourceTree = "<group>";
@@ -796,6 +799,7 @@
 				D97BCA6126EF9C8100A018EC /* UICollectionView+EmptyView.swift in Sources */,
 				D97BCA7F26F03D1500A018EC /* MovieService.swift in Sources */,
 				D941AC8226E2787100018E57 /* AppDelegate.swift in Sources */,
+				D9509087271096D7003E3D91 /* SectionFooterReusableView.swift in Sources */,
 				D9B89D2F26F829C0006E7D5E /* Coordinator.swift in Sources */,
 				D941ACE926E27AA800018E57 /* Movie.swift in Sources */,
 				D9449B4B26E4EFA2006B3856 /* AnyPublisher+Create.swift in Sources */,

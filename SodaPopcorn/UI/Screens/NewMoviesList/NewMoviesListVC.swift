@@ -10,6 +10,10 @@ import UIKit
 
 final class NewMoviesListVC: BaseViewController {
 
+	enum CollectionLayout {
+		case list, icons, columns
+	}
+
 	enum Section: CaseIterable {
 		case movies
 	}
@@ -26,8 +30,30 @@ final class NewMoviesListVC: BaseViewController {
 	private var loadingSubscription: Cancellable!
 
 	private var reloadingDataSource = false
-	private var snapshot = Snapshot()
 	private lazy var dataSource = makeDataSource()
+
+	private var collectionLayout = CollectionLayout.list {
+		didSet {
+			DispatchQueue.main.async { [weak self] in
+				guard let `self` = self else { return }
+				// 􀭞 : square.fill.text.grid.1x2
+				// 􀮞 : squareshape.split.2x2
+				// 􀏟: rectangle.split.3x1
+
+				var barButtonImage: UIImage?
+				switch self.collectionLayout {
+					case .list:
+						barButtonImage = UIImage(systemName: "squareshape.split.2x2")
+					case .icons:
+						barButtonImage = UIImage(systemName: "rectangle.split.3x1")
+					case .columns:
+						barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
+				}
+
+				self.navigationItem.rightBarButtonItem?.image = barButtonImage
+			}
+		}
+	}
 
 	private var loading = false {
 		didSet {
@@ -47,9 +73,10 @@ final class NewMoviesListVC: BaseViewController {
 		return refreshControl
 	}()
 
-	private var movieCollectionView: UICollectionView = {
+	private let movieCollectionView: UICollectionView = {
 		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 		collectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
+		collectionView.register(SectionFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier)
 		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
 		collectionView.translatesAutoresizingMaskIntoConstraints = false
 		collectionView.isScrollEnabled = true
@@ -93,6 +120,9 @@ final class NewMoviesListVC: BaseViewController {
 	override func setupUI() {
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
+		let barButtonImage = UIImage(systemName: "squareshape.split.2x2")
+		navigationItem.rightBarButtonItem = UIBarButtonItem(image: barButtonImage, style: .plain, target: self, action: #selector(handleCollectionViewLayout))
+
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.prefetchDataSource = self
@@ -102,7 +132,7 @@ final class NewMoviesListVC: BaseViewController {
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
 		movieCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
 		movieCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-		movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		movieCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
 	}
 
 	override func bindViewModel() {
@@ -121,8 +151,8 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func makeDataSource() -> UICollectionViewDiffableDataSource<Section, Movie> {
-		return UICollectionViewDiffableDataSource(
+	private func makeDataSource() -> DataSource {
+		let dataSource = DataSource(
 			collectionView: movieCollectionView,
 			cellProvider: { [weak self] collectionView, indexPath, movie in
 				guard let `self` = self else { return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath) }
@@ -132,6 +162,15 @@ final class NewMoviesListVC: BaseViewController {
 				return cell
 			}
 		)
+
+		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
+
+			let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
+			return view
+		}
+
+		return dataSource
 	}
 
 	private func configureCollectionViewLayout() {
@@ -149,6 +188,18 @@ final class NewMoviesListVC: BaseViewController {
 			section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
 			section.interGroupSpacing = 10
 
+			// Supplementary footer view setup
+			let headerFooterSize = NSCollectionLayoutSize(
+				widthDimension: .fractionalWidth(1.0),
+				heightDimension: .estimated(20)
+			)
+			let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
+				layoutSize: headerFooterSize,
+				elementKind: UICollectionView.elementKindSectionFooter,
+				alignment: .bottom
+			)
+			section.boundarySupplementaryItems = [sectionFooter]
+
 			return section
 		})
 	}
@@ -161,23 +212,51 @@ final class NewMoviesListVC: BaseViewController {
 				self.reloadDataSource()
 			}
 
-			self.snapshot.appendItems(movies, toSection: .movies)
-			print("🔸 Snapshot items: \(self.snapshot.numberOfItems)")
-			self.dataSource.apply(self.snapshot, animatingDifferences: true)
+			var snapshot = self.dataSource.snapshot()
+			if let lastItem = snapshot.itemIdentifiers.last {
+				snapshot.insertItems(movies, afterItem: lastItem)
+			} else {
+				snapshot.appendItems(movies, toSection: .movies)
+			}
+
+			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
+			self.dataSource.apply(snapshot, animatingDifferences: true)
+
+//			if let lastItem = self.snapshot.itemIdentifiers.last {
+//				self.snapshot.insertItems(movies, afterItem: lastItem)
+//			} else {
+//				self.snapshot.appendItems(movies, toSection: .movies)
+//			}
+//
+//			print("🔸 Snapshot items: \(self.snapshot.numberOfItems)")
+//			self.dataSource.apply(self.snapshot, animatingDifferences: true)
 		}
 	}
 
 	private func reloadDataSource() {
 		self.reloadingDataSource = false
-		self.snapshot.deleteAllItems()
-		self.snapshot.appendSections(Section.allCases)
-		self.dataSource.apply(self.snapshot, animatingDifferences: true)
+		var snapshot = dataSource.snapshot()
+		snapshot.deleteAllItems()
+		snapshot.appendSections(Section.allCases)
+		dataSource.apply(snapshot, animatingDifferences: true)
 	}
 
 	@objc
 	private func reloadCollectionView() {
 		reloadingDataSource = true
 		viewModel.inputs.pullToRefresh()
+	}
+
+	@objc
+	private func handleCollectionViewLayout() {
+		switch collectionLayout {
+			case .list:
+				collectionLayout = .icons
+			case .icons:
+				collectionLayout = .columns
+			case .columns:
+				collectionLayout = .list
+		}
 	}
 
 	// MARK: - 🗑 Deinit
@@ -188,7 +267,10 @@ final class NewMoviesListVC: BaseViewController {
 
 extension NewMoviesListVC: UICollectionViewDataSourcePrefetching {
 	func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-		if (indexPaths.last?.item ?? 0) >= (dataSource.snapshot().numberOfItems - 1) {
+		let numberOfItems = dataSource.snapshot().numberOfItems
+		let lastItem = indexPaths.last?.item ?? 0
+
+		if lastItem >= numberOfItems - 1 || lastItem >= numberOfItems {
 			self.viewModel.inputs.fetchNewMovies()
 		}
 	}

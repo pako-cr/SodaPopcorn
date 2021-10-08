@@ -7,6 +7,8 @@
 
 import UIKit
 
+let imageCache = NSCache<NSString, UIImage>()
+
 final class MovieListCollectionViewCell: UICollectionViewCell {
 	// MARK: Constants
 	static let reuseIdentifier = "movieListCollectionViewCellId"
@@ -17,16 +19,29 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		didSet {
 			guard let movie = movie else { return }
 
+			if posterImageIndicatorView.isAnimating {
+				DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) { [weak self] in
+					guard let `self` = self else { return }
+					self.posterImageIndicatorView.stopAnimating()
+				}
+			}
+
 			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self else { return }
 
-				if let posterImage = movie.posterImageData {
-					self.posterImage.image = UIImage(data: posterImage)
+				self.posterImage.image = UIImage(named: "no_poster")
+
+				if let posterImage = imageCache.object(forKey: NSString(string: movie.posterPath ?? "")) {
+					self.posterImage.image = posterImage
+					self.posterImageIndicatorView.stopAnimating()
+
 				} else {
+					self.posterImageIndicatorView.startAnimating()
 					self.viewModel?.getPosterImage(movie: movie, posterPath: movie.posterPath ?? "") { [weak self] data, error in
 						if error != nil {
 							DispatchQueue.main.async { [weak self] in
 								guard let `self` = self else { return }
+								self.posterImageIndicatorView.stopAnimating()
 								self.posterImage.image = UIImage(named: "no_poster")
 							}
 						}
@@ -36,7 +51,9 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 						DispatchQueue.main.async { [weak self] in
 							guard let `self` = self else { return }
 							self.posterImageIndicatorView.stopAnimating()
-							self.posterImage.image = UIImage(data: data)
+							let image = UIImage(data: data)
+							self.posterImage.image = image
+							imageCache.setObject(image!, forKey: NSString(string: movie.posterPath ?? ""))
 
 //							let accessibilityLabelFormatString = NSLocalizedString("movie_list_collection_view_cell_poster_image_label", comment: "")
 //							self.posterImage.accessibilityLabel = String.localizedStringWithFormat(accessibilityLabelFormatString, self.movie?.title ?? "")
