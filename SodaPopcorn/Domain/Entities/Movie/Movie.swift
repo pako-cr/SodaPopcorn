@@ -13,14 +13,16 @@ public class Movie: Codable, Hashable {
 	public let overview: String?
 	public let rating: Double?
 	public let posterPath: String?
+	public let backdropPath: String?
 	public var posterImageData: Data?
 
 	private enum MovieCodingKeys: String, CodingKey {
 		case id
 		case title
 		case overview
-		case rating      = "vote_average"
-		case posterPath  = "poster_path"
+		case rating      	= "vote_average"
+		case posterPath  	= "poster_path"
+		case backdropPath	= "backdrop_path"
 	}
 
 	required public init(from decoder: Decoder) throws {
@@ -31,19 +33,21 @@ public class Movie: Codable, Hashable {
 		overview = try movieContainer.decodeIfPresent(String.self, forKey: .overview)
 		rating = try movieContainer.decodeIfPresent(Double.self, forKey: .rating)
 		posterPath = try movieContainer.decodeIfPresent(String.self, forKey: .posterPath)
+		backdropPath = try movieContainer.decodeIfPresent(String.self, forKey: .backdropPath)
 	}
 
-	private init(id: String, title: String, overview: String, rating: Double, posterPath: String, posterImageData: Data? = nil) {
+	private init(id: String, title: String, overview: String, rating: Double, posterPath: String, backdropPath: String, posterImageData: Data? = nil) {
 		self.id = id
 		self.title = title
 		self.overview = overview
 		self.rating = rating
 		self.posterPath = posterPath
 		self.posterImageData = posterImageData
+		self.backdropPath = backdropPath
 	}
 
 	convenience init(movieEntity: MovieEntity) {
-		self.init(id: movieEntity.id, title: movieEntity.title, overview: movieEntity.overview, rating: movieEntity.rating, posterPath: movieEntity.posterPath, posterImageData: movieEntity.posterImageData)
+		self.init(id: movieEntity.id, title: movieEntity.title, overview: movieEntity.overview, rating: movieEntity.rating, posterPath: movieEntity.posterPath, backdropPath: movieEntity.backdropPath, posterImageData: movieEntity.posterImageData)
 	}
 
 	public func hash(into hasher: inout Hasher) {

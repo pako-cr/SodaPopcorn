@@ -28,16 +28,14 @@ final class StorageManager: StorageContext {
 
 	public func create(movie: Movie) {
 		do {
-			let result = try managedObjectContext.fetch(MovieEntity.fetchRequest())
+			let movieEntitiesResult = try managedObjectContext.fetch(MovieEntity.fetchRequest())
 
-			if let movieEntitiesResult = result as? [MovieEntity] {
-				let movieExist = movieEntitiesResult.first(where: { $0.id == movie.id })
+			let movieExist = movieEntitiesResult.first(where: { $0.id == movie.id })
 
-				if movieExist == nil {
-					_ = MovieEntity(with: movie, and: managedObjectContext)
+			if movieExist == nil {
+				_ = MovieEntity(with: movie, and: managedObjectContext)
 
-					try managedObjectContext.save()
-				}
+				try managedObjectContext.save()
 			}
 
 		} catch let error as NSError {
@@ -49,12 +47,10 @@ final class StorageManager: StorageContext {
 		var movies = [Movie]()
 
 		do {
-			let result = try managedObjectContext.fetch(MovieEntity.fetchRequest())
+			let movieEntitiesResult = try managedObjectContext.fetch(MovieEntity.fetchRequest())
 
-			if let movieEntitiesResult = result as? [MovieEntity] {
-				for movieEntity in movieEntitiesResult {
-					movies.append(Movie(movieEntity: movieEntity))
-				}
+			for movieEntity in movieEntitiesResult {
+				movies.append(Movie(movieEntity: movieEntity))
 			}
 		} catch let error as NSError {
 			print("❌ [Storage] [CoreData] [DBManager] [fetch] An error occurred. \(error.localizedDescription)")
@@ -65,15 +61,12 @@ final class StorageManager: StorageContext {
 
 	public func delete(movie: Movie) throws {
 		do {
-			let result = try managedObjectContext.fetch(MovieEntity.fetchRequest())
+			let movieEntitiesResult = try managedObjectContext.fetch(MovieEntity.fetchRequest())
 
-			if let result = result as? [MovieEntity] {
+			if let objectToDelete = movieEntitiesResult.first(where: { $0.id == movie.id }) {
+				managedObjectContext.delete(objectToDelete)
 
-				if let objectToDelete = result.first(where: { $0.id == movie.id }) {
-					managedObjectContext.delete(objectToDelete)
-
-					try managedObjectContext.save()
-				}
+				try managedObjectContext.save()
 			}
 		} catch let error as NSError {
 			print("❌ [Storage] [CoreData] [DBManager] [delete] An error occurred. \(error.localizedDescription)")
@@ -82,16 +75,13 @@ final class StorageManager: StorageContext {
 
 	public func deleteAll() throws {
 		do {
-			let result = try managedObjectContext.fetch(MovieEntity.fetchRequest())
+			let movieEntitiesResult = try managedObjectContext.fetch(MovieEntity.fetchRequest())
 
-			if let result = result as? [MovieEntity] {
-
-				result.forEach { movieEntity in
-					managedObjectContext.delete(movieEntity)
-				}
-
-				try managedObjectContext.save()
+			movieEntitiesResult.forEach { movieEntity in
+				managedObjectContext.delete(movieEntity)
 			}
+
+			try managedObjectContext.save()
 		} catch let error as NSError {
 			print("❌ [Storage] [CoreData] [DBManager] [deleteAll] An error occurred. \(error.localizedDescription)")
 		}
@@ -99,14 +89,11 @@ final class StorageManager: StorageContext {
 
 	public func update(movie: Movie) throws {
 		do {
-			let result = try managedObjectContext.fetch(MovieEntity.fetchRequest())
+			let movieEntitiesResult = try managedObjectContext.fetch(MovieEntity.fetchRequest())
 
-			if let result = result as? [MovieEntity] {
-
-				if let movieToUpdate = result.first(where: { $0.id == movie.id }) {
-					movieToUpdate.update(with: movie)
-					try managedObjectContext.save()
-				}
+			if let movieToUpdate = movieEntitiesResult.first(where: { $0.id == movie.id }) {
+				movieToUpdate.update(with: movie)
+				try managedObjectContext.save()
 			}
 		} catch let error as NSError {
 			print("❌ [Storage] [CoreData] [DBManager] [update] An error occurred. \(error.localizedDescription)")

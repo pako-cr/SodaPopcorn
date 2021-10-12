@@ -14,6 +14,9 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 	static let reuseIdentifier = "movieListCollectionViewCellId"
 
 	// MARK: Variables
+	private var posterImageWidthAnchor: NSLayoutConstraint?
+	private var posterImageLeadingAnchor: NSLayoutConstraint?
+	private var posterImageCenterXAnchor: NSLayoutConstraint?
 	private var viewModel: NewMoviesListVM?
 	private var movie: Movie? {
 		didSet {
@@ -70,6 +73,39 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		}
 	}
 
+	override func layoutSubviews() {
+		print("W: \(UIScreen.main.bounds.width), w: \(frame.width)")
+		if 0...(UIScreen.main.bounds.width / 3) ~= frame.width {
+			print("columns...")
+			stackView.isHidden = true
+			movieOverview.isHidden = true
+			posterImageWidthAnchor?.constant = frame.width
+			posterImageCenterXAnchor?.isActive = true
+			posterImageLeadingAnchor?.isActive = false
+			posterImage.contentMode = .scaleAspectFill
+
+		} else if 0...(UIScreen.main.bounds.width / 2) ~= frame.width {
+			print("icons...")
+			stackView.isHidden = true
+			movieOverview.isHidden = true
+			posterImageWidthAnchor?.constant = frame.width
+			posterImageCenterXAnchor?.isActive = true
+			posterImageLeadingAnchor?.isActive = false
+			posterImage.contentMode = .scaleToFill
+
+		} else if 0...(UIScreen.main.bounds.width) ~= frame.width {
+			print("list")
+			stackView.isHidden = false
+			movieOverview.isHidden = false
+			posterImageWidthAnchor?.constant = frame.width * 0.25
+			posterImageCenterXAnchor?.isActive = false
+			posterImageLeadingAnchor?.isActive = true
+			posterImage.contentMode = .scaleAspectFit
+		}
+
+		super.layoutSubviews()
+	}
+
 	// MARK: UI Elements
 	private let activityIndicatorView: UIActivityIndicatorView = {
 		let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -96,7 +132,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 	private let posterImage: UIImageView = {
 		let imageView = UIImageView()
 		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.contentMode = .scaleToFill
+		imageView.contentMode = .scaleAspectFit
 
 		return imageView
 	}()
@@ -175,10 +211,15 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		separatorView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
 		separatorView.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
 
-		posterImage.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-		posterImage.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
-		posterImage.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.25).isActive = true
-		posterImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
+		posterImageWidthAnchor = posterImage.widthAnchor.constraint(equalToConstant: frame.width * 0.25)
+		posterImageCenterXAnchor = posterImage.centerXAnchor.constraint(equalTo: centerXAnchor)
+		posterImageLeadingAnchor = posterImage.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0)
+		posterImage.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
+		posterImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+
+		posterImageWidthAnchor?.isActive = true
+		posterImageLeadingAnchor?.isActive = true
+		posterImageCenterXAnchor?.isActive = false
 
 		stackView.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
 		stackView.leadingAnchor.constraint(equalTo: posterImage.trailingAnchor, constant: 10).isActive = true

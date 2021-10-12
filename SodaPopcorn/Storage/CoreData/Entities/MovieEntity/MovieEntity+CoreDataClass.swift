@@ -15,6 +15,7 @@ public class MovieEntity: NSManagedObject, Storable {
 		self.setValue(movie.id, forKey: "id")
 		self.setValue(movie.title, forKey: "title")
 		self.setValue(movie.posterPath, forKey: "posterPath")
+		self.setValue(movie.backdropPath, forKey: "backdropPath")
 		self.setValue(movie.rating, forKey: "rating")
 		self.setValue(movie.overview, forKey: "overview")
 		self.setValue(movie.posterImageData, forKey: "posterImageData")
@@ -23,6 +24,7 @@ public class MovieEntity: NSManagedObject, Storable {
 	func update(with movie: Movie) {
 		self.setValue(movie.title, forKey: "title")
 		self.setValue(movie.posterPath, forKey: "posterPath")
+		self.setValue(movie.backdropPath, forKey: "backdropPath")
 		self.setValue(movie.rating, forKey: "rating")
 		self.setValue(movie.overview, forKey: "overview")
 		self.setValue(movie.posterImageData, forKey: "posterImageData")

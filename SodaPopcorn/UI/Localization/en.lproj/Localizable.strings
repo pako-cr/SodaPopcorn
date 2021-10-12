@@ -15,3 +15,5 @@
 "movie_list_collection_view_cell_poster_image_label" = "Movie poster of %s";
 "movie_list_collection_view_cell_no_overview_found" = "No overview found.";
 "close" = "Close";
+"collection_view_set_layout_button_title" = "Set layout";
+"collection_view_set_size_menu_title" = "Select size";

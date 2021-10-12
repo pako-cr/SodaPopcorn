@@ -56,6 +56,7 @@
 		D9B89D3126F829F6006E7D5E /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B89D3026F829F6006E7D5E /* HomeCoordinator.swift */; };
 		D9B89D3526F82DF2006E7D5E /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B89D3426F82DF2006E7D5E /* HomeVC.swift */; };
 		D9BBD68A26E71F6900A2C24D /* UIFont+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */; };
+		D9BE6AB7271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */; };
 		D9C97C7E26EADF0100151E2D /* MovieEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C97C7D26EADF0100151E2D /* MovieEntity+CoreDataClass.swift */; };
 		D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */; };
 		D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38326E9242B000292D4 /* PosterSize.swift */; };
@@ -171,6 +172,7 @@
 		D9B89D3026F829F6006E7D5E /* HomeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
 		D9B89D3426F82DF2006E7D5E /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Style.swift"; sourceTree = "<group>"; };
+		D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSDirectionalEdgeInsets+Uniform.swift"; sourceTree = "<group>"; };
 		D9C97C7D26EADF0100151E2D /* MovieEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MovieEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlistReaderManager.swift; sourceTree = "<group>"; };
 		D9E6D38326E9242B000292D4 /* PosterSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterSize.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 			children = (
 				D9449B4A26E4EFA2006B3856 /* AnyPublisher+Create.swift */,
 				D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */,
+				D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -807,6 +810,7 @@
 				D941ACCD26E278EF00018E57 /* EndPointType.swift in Sources */,
 				D9322E8F26E3D2C100522AFB /* ImageEndpoint.swift in Sources */,
 				D9322E8C26E3C44000522AFB /* NetworkEnvironment.swift in Sources */,
+				D9BE6AB7271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift in Sources */,
 				D97BCA6726EFBE3F00A018EC /* MovieListCollectionViewCell.swift in Sources */,
 				D9322E8A26E3C21500522AFB /* Constants.swift in Sources */,
 				D941ACC626E278EF00018E57 /* URLParameterEncoder.swift in Sources */,

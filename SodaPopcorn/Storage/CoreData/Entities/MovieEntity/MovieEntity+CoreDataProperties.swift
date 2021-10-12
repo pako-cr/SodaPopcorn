@@ -16,6 +16,7 @@ extension MovieEntity {
 
 	@NSManaged public var id: String
 	@NSManaged public var posterPath: String
+	@NSManaged public var backdropPath: String
 	@NSManaged public var title: String
 	@NSManaged public var rating: Double
 	@NSManaged public var overview: String

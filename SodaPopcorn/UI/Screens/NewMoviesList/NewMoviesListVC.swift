@@ -10,8 +10,10 @@ import UIKit
 
 final class NewMoviesListVC: BaseViewController {
 
-	enum CollectionLayout {
-		case list, icons, columns
+	enum CollectionLayout: CGFloat {
+		case list 		= 1.0
+		case icons 		= 0.5
+		case columns 	= 0.33333
 	}
 
 	enum Section: CaseIterable {
@@ -32,7 +34,7 @@ final class NewMoviesListVC: BaseViewController {
 	private var reloadingDataSource = false
 	private lazy var dataSource = makeDataSource()
 
-	private var collectionLayout = CollectionLayout.list {
+	private var collectionLayout: CollectionLayout = .list {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self else { return }
@@ -40,17 +42,18 @@ final class NewMoviesListVC: BaseViewController {
 				// 􀮞 : squareshape.split.2x2
 				// 􀏟: rectangle.split.3x1
 
-				var barButtonImage: UIImage?
+				var buttonImage: UIImage?
 				switch self.collectionLayout {
 					case .list:
-						barButtonImage = UIImage(systemName: "squareshape.split.2x2")
+						buttonImage = UIImage(systemName: "square.fill.text.grid.1x2")
 					case .icons:
-						barButtonImage = UIImage(systemName: "rectangle.split.3x1")
+						buttonImage = UIImage(systemName: "squareshape.split.2x2")
 					case .columns:
-						barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
+						buttonImage = UIImage(systemName: "rectangle.split.3x1")
 				}
 
-				self.navigationItem.rightBarButtonItem?.image = barButtonImage
+				self.navigationItem.rightBarButtonItem?.image = buttonImage
+				self.movieCollectionView.setCollectionViewLayout(self.handleCollectionViewLayout(), animated: true)
 			}
 		}
 	}
@@ -67,6 +70,22 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	// MARK: - UI Elements
+	private lazy var sizeMenu: UIMenu = { [unowned self] in
+		let menu = UIMenu(title: NSLocalizedString("collection_view_set_size_menu_title", comment: "Select items size"), image: nil, identifier: nil, options: [.displayInline], children: [
+			UIAction(title: "List", image: UIImage(systemName: "square.fill.text.grid.1x2"), handler: { (_) in
+				self.collectionLayout = .list
+			}),
+			UIAction(title: "Icons", image: UIImage(systemName: "squareshape.split.2x2"), handler: { (_) in
+				self.collectionLayout = .icons
+			}),
+			UIAction(title: "Columns", image: UIImage(systemName: "rectangle.split.3x1"), handler: { (_) in
+				self.collectionLayout = .columns
+			})
+		])
+
+		return menu
+	}()
+
 	private let refreshControl: UIRefreshControl = {
 		let refreshControl = UIRefreshControl()
 		refreshControl.addTarget(self, action: #selector(reloadCollectionView), for: .valueChanged)
@@ -120,8 +139,8 @@ final class NewMoviesListVC: BaseViewController {
 	override func setupUI() {
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
-		let barButtonImage = UIImage(systemName: "squareshape.split.2x2")
-		navigationItem.rightBarButtonItem = UIBarButtonItem(image: barButtonImage, style: .plain, target: self, action: #selector(handleCollectionViewLayout))
+		let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
+		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: nil, menu: sizeMenu)
 
 		view.addSubview(movieCollectionView)
 
@@ -152,16 +171,14 @@ final class NewMoviesListVC: BaseViewController {
 
 	// MARK: - ⚙️ Helpers
 	private func makeDataSource() -> DataSource {
-		let dataSource = DataSource(
-			collectionView: movieCollectionView,
-			cellProvider: { [weak self] collectionView, indexPath, movie in
-				guard let `self` = self else { return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath) }
+		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { [weak self] cell, _, movie in
+			guard let self = self else { return }
+			cell.configure(with: movie, and: self.viewModel)
+		}
 
-				let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier, for: indexPath) as? MovieListCollectionViewCell
-				cell?.configure(with: movie, and: self.viewModel)
-				return cell
-			}
-		)
+		let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: movieCollectionView) { (collectionView, indexPath, movie) in
+			return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
+		}
 
 		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
 			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
@@ -174,19 +191,21 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	private func configureCollectionViewLayout() {
-		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (_, layoutEnvironment) -> NSCollectionLayoutSection? in
-			let isPhone = layoutEnvironment.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiom.phone
-			let size = NSCollectionLayoutSize(
+		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
+			let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), // CollectionLayout.list = 1.0 (initial size)
+												  heightDimension: .fractionalHeight(1.0))
+
+			let item = NSCollectionLayoutItem(layoutSize: itemSize)
+			item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 5)
+
+			let groupSize = NSCollectionLayoutSize(
 				widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
 				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5)
 			)
 
-			let itemCount = isPhone ? 1 : 3
-			let item = NSCollectionLayoutItem(layoutSize: size)
-			let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: itemCount)
+			let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
 			let section = NSCollectionLayoutSection(group: group)
-			section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-			section.interGroupSpacing = 10
 
 			// Supplementary footer view setup
 			let headerFooterSize = NSCollectionLayoutSize(
@@ -221,15 +240,6 @@ final class NewMoviesListVC: BaseViewController {
 
 			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
 			self.dataSource.apply(snapshot, animatingDifferences: true)
-
-//			if let lastItem = self.snapshot.itemIdentifiers.last {
-//				self.snapshot.insertItems(movies, afterItem: lastItem)
-//			} else {
-//				self.snapshot.appendItems(movies, toSection: .movies)
-//			}
-//
-//			print("🔸 Snapshot items: \(self.snapshot.numberOfItems)")
-//			self.dataSource.apply(self.snapshot, animatingDifferences: true)
 		}
 	}
 
@@ -248,15 +258,23 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	@objc
-	private func handleCollectionViewLayout() {
-		switch collectionLayout {
-			case .list:
-				collectionLayout = .icons
-			case .icons:
-				collectionLayout = .columns
-			case .columns:
-				collectionLayout = .list
-		}
+	private func handleCollectionViewLayout() -> UICollectionViewLayout {
+		let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(collectionLayout.rawValue),
+											  heightDimension: .fractionalHeight(1.0))
+
+		let item = NSCollectionLayoutItem(layoutSize: itemSize)
+		item.contentInsets = .uniform(size: 5)
+
+		let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+												  heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5))
+
+		let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
+		let section = NSCollectionLayoutSection(group: group)
+
+		let layout = UICollectionViewCompositionalLayout(section: section)
+
+		return layout
 	}
 
 	// MARK: - 🗑 Deinit
