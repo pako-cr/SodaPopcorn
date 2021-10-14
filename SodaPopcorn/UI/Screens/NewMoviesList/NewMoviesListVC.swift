@@ -8,14 +8,13 @@
 import Combine
 import UIKit
 
+enum CollectionLayout: CGFloat {
+	case list 		= 1.0
+//	case icons 		= 0.5
+	case columns 	= 0.33333
+}
+
 final class NewMoviesListVC: BaseViewController {
-
-	enum CollectionLayout: CGFloat {
-		case list 		= 1.0
-		case icons 		= 0.5
-		case columns 	= 0.33333
-	}
-
 	enum Section: CaseIterable {
 		case movies
 	}
@@ -34,7 +33,7 @@ final class NewMoviesListVC: BaseViewController {
 	private var reloadingDataSource = false
 	private lazy var dataSource = makeDataSource()
 
-	private var collectionLayout: CollectionLayout = .list {
+	private var collectionLayout: CollectionLayout = .columns {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self else { return }
@@ -45,11 +44,11 @@ final class NewMoviesListVC: BaseViewController {
 				var buttonImage: UIImage?
 				switch self.collectionLayout {
 					case .list:
-						buttonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-					case .icons:
-						buttonImage = UIImage(systemName: "squareshape.split.2x2")
-					case .columns:
 						buttonImage = UIImage(systemName: "rectangle.split.3x1")
+//					case .icons:
+//						buttonImage = UIImage(systemName: "squareshape.split.2x2")
+					case .columns:
+						buttonImage = UIImage(systemName: "square.fill.text.grid.1x2")
 				}
 
 				self.navigationItem.rightBarButtonItem?.image = buttonImage
@@ -72,14 +71,11 @@ final class NewMoviesListVC: BaseViewController {
 	// MARK: - UI Elements
 	private lazy var sizeMenu: UIMenu = { [unowned self] in
 		let menu = UIMenu(title: NSLocalizedString("collection_view_set_size_menu_title", comment: "Select items size"), image: nil, identifier: nil, options: [.displayInline], children: [
-			UIAction(title: "List", image: UIImage(systemName: "square.fill.text.grid.1x2"), handler: { (_) in
-				self.collectionLayout = .list
-			}),
-			UIAction(title: "Icons", image: UIImage(systemName: "squareshape.split.2x2"), handler: { (_) in
-				self.collectionLayout = .icons
-			}),
 			UIAction(title: "Columns", image: UIImage(systemName: "rectangle.split.3x1"), handler: { (_) in
 				self.collectionLayout = .columns
+			}),
+			UIAction(title: "List", image: UIImage(systemName: "square.fill.text.grid.1x2"), handler: { (_) in
+				self.collectionLayout = .list
 			})
 		])
 
@@ -140,7 +136,7 @@ final class NewMoviesListVC: BaseViewController {
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
 		let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: nil, menu: sizeMenu)
+		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
 
 		view.addSubview(movieCollectionView)
 
@@ -158,7 +154,7 @@ final class NewMoviesListVC: BaseViewController {
 		fetchMoviesSubscription = viewModel.outputs.fetchNewMoviesAction()
 			.filter({ !($0?.isEmpty ?? true) })
 			.sink(receiveValue: { [weak self] (movies) in
-				guard let `self` = self, let movies = movies else { return }
+				guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
 				self.updateDataSource(movies: movies)
 			})
 
@@ -171,9 +167,8 @@ final class NewMoviesListVC: BaseViewController {
 
 	// MARK: - ⚙️ Helpers
 	private func makeDataSource() -> DataSource {
-		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { [weak self] cell, _, movie in
-			guard let self = self else { return }
-			cell.configure(with: movie, and: self.viewModel)
+		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
+			cell.configure(with: movie)
 		}
 
 		let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: movieCollectionView) { (collectionView, indexPath, movie) in
@@ -191,8 +186,9 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	private func configureCollectionViewLayout() {
-		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-			let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), // CollectionLayout.list = 1.0 (initial size)
+		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
+			guard let `self` = self else { return nil }
+			let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(self.collectionLayout.rawValue),
 												  heightDimension: .fractionalHeight(1.0))
 
 			let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -248,7 +244,9 @@ final class NewMoviesListVC: BaseViewController {
 		var snapshot = dataSource.snapshot()
 		snapshot.deleteAllItems()
 		snapshot.appendSections(Section.allCases)
-		dataSource.apply(snapshot, animatingDifferences: true)
+
+		self.dataSource.apply(snapshot, animatingDifferences: true)
+		imageCache.removeAllObjects()
 	}
 
 	@objc
@@ -277,9 +275,20 @@ final class NewMoviesListVC: BaseViewController {
 		return layout
 	}
 
+	private func setCollectionViewLayout() {
+		switch collectionLayout {
+			case .columns:
+				self.collectionLayout = .list
+			case .list:
+				self.collectionLayout = .columns
+		}
+	}
+
 	// MARK: - 🗑 Deinit
 	deinit {
 		print("🗑 NewMoviesListVC deinit.")
+		fetchMoviesSubscription.cancel()
+		loadingSubscription.cancel()
 	}
 }
 

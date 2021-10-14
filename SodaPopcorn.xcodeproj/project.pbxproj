@@ -51,6 +51,7 @@
 		D97BCA7526F031C200A018EC /* Storable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97BCA7426F031C200A018EC /* Storable.swift */; };
 		D97BCA7F26F03D1500A018EC /* MovieService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97BCA7826F03D1500A018EC /* MovieService.swift */; };
 		D985656926E59B5300457264 /* NewMoviesListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D985656826E59B5300457264 /* NewMoviesListVC.swift */; };
+		D98D22E02715D14F0000A8E2 /* CustomImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98D22DF2715D14F0000A8E2 /* CustomImage.swift */; };
 		D9A3733326EB8A84004BC68A /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A3733226EB8A84004BC68A /* StorageManager.swift */; };
 		D9B89D2F26F829C0006E7D5E /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B89D2E26F829C0006E7D5E /* Coordinator.swift */; };
 		D9B89D3126F829F6006E7D5E /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B89D3026F829F6006E7D5E /* HomeCoordinator.swift */; };
@@ -167,6 +168,7 @@
 		D97BCA7826F03D1500A018EC /* MovieService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieService.swift; sourceTree = "<group>"; };
 		D97BCA8326F0520C00A018EC /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D985656826E59B5300457264 /* NewMoviesListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoviesListVC.swift; sourceTree = "<group>"; };
+		D98D22DF2715D14F0000A8E2 /* CustomImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImage.swift; sourceTree = "<group>"; };
 		D9A3733226EB8A84004BC68A /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		D9B89D2E26F829C0006E7D5E /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		D9B89D3026F829F6006E7D5E /* HomeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
@@ -370,6 +372,7 @@
 		D941ACD226E27A0100018E57 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				D98D22DE2715D0F70000A8E2 /* Common */,
 				D9B89D3226F82DD1006E7D5E /* Screens */,
 				D97BCA6926EFDC8E00A018EC /* Base */,
 				D97BCA6326EFBB6900A018EC /* Localization */,
@@ -485,6 +488,14 @@
 				D97BCA7826F03D1500A018EC /* MovieService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		D98D22DE2715D0F70000A8E2 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				D98D22DF2715D14F0000A8E2 /* CustomImage.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		D9B89D2D26F829A8006E7D5E /* Navigation */ = {
@@ -816,6 +827,7 @@
 				D941ACC626E278EF00018E57 /* URLParameterEncoder.swift in Sources */,
 				D941ACE526E27A8900018E57 /* NewMoviesListVM.swift in Sources */,
 				D97BCA7126EFFE6400A018EC /* MovieEntity+CoreDataProperties.swift in Sources */,
+				D98D22E02715D14F0000A8E2 /* CustomImage.swift in Sources */,
 				D9322E8126E3B00900522AFB /* MovieNetworkService.swift in Sources */,
 				D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */,
 				D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */,
@@ -1044,7 +1056,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice;
+				PRODUCT_BUNDLE_IDENTIFIER = com.automata.sodapopcorn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1065,7 +1077,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sodapopcorn.practice;
+				PRODUCT_BUNDLE_IDENTIFIER = com.automata.sodapopcorn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

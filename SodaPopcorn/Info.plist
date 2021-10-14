@@ -2,26 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string>Soda Popcorn</string>
-	<key>ImageBaseURL</key>
-	<dict>
-		<key>production</key>
-		<string>https://image.tmdb.org/t/p/</string>
-		<key>staging</key>
-		<string>https://image.tmdb.org/t/p/</string>
-	</dict>
-	<key>Environment</key>
-	<string>production</string>
 	<key>BaseURL</key>
 	<dict>
-		<key>staging</key>
-		<string>https://staging.themoviedb.org/3/movie/</string>
 		<key>production</key>
 		<string>https://api.themoviedb.org/3/movie/</string>
+		<key>staging</key>
+		<string>https://staging.themoviedb.org/3/movie/</string>
 	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Soda Popcorn</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -36,6 +27,15 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>Environment</key>
+	<string>production</string>
+	<key>ImageBaseURL</key>
+	<dict>
+		<key>production</key>
+		<string>https://image.tmdb.org/t/p/</string>
+		<key>staging</key>
+		<string>https://image.tmdb.org/t/p/</string>
+	</dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -63,6 +63,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIStatusBarHidden</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

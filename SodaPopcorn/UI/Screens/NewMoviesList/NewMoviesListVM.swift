@@ -41,7 +41,6 @@ public protocol NewMoviesListVMTypes: AnyObject {
 public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesListVMInputs, NewMoviesListVMOutputs, NewMoviesListVMTypes {
 	// MARK: Constants
 	private let movieService: MovieService
-	private let imageService: PosterImageService
 
 	// MARK: Variables
 	public var inputs: NewMoviesListVMInputs { return self }
@@ -51,9 +50,8 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
 
-	init(movieService: MovieService, imageService: PosterImageService) {
+	init(movieService: MovieService) {
 		self.movieService = movieService
-		self.imageService = imageService
 
 		self.movieSelectedProperty
 			.sink { [weak self] movie in
@@ -131,14 +129,14 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 		return movieService.getNewMovies(page: page)
 	}
 
-	public func getPosterImage(movie: Movie, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
-		imageService.getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { data, error in
-			completion(data, error)
-
+//	public func getPosterImage(movie: Movie, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+//		imageService.getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { data, error in
+//			completion(data, error)
+//
 //			guard let `self` = self, let data = data, !data.isEmpty else { return }
 //			self.fetchPosterImageSignalProperty.send((movie.id, data))
-		}
-	}
+//		}
+//	}
 
 	// MARK: - 🗑 Deinit
 	deinit {

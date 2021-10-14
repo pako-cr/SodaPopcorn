@@ -2,7 +2,7 @@
 //  NSDirectionalEdgeInsets+Uniform.swift
 //  SodaPopcorn
 //
-//  Created by Zimplifica Macbook Pro on 11/10/21.
+//  Created by Francisco Cordoba on 11/10/21.
 //
 
 import UIKit

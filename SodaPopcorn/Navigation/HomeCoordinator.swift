@@ -33,7 +33,7 @@ final class HomeCoordinator: Coordinator {
 	func start() {
 		self.homeVC = HomeVC()
 
-		let newMoviesListVM = NewMoviesListVM(movieService: movieService, imageService: imageService)
+		let newMoviesListVM = NewMoviesListVM(movieService: movieService)
 		let newMoviesListViewController = NavigationController(rootViewController: NewMoviesListVC(viewModel: newMoviesListVM))
 		newMoviesListViewController.tabBarItem = UITabBarItem(title: "New Movies", image: UIImage(systemName: "film.fill"), tag: 0)
 
