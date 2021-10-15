@@ -17,3 +17,4 @@
 "close" = "Cerrar";
 "collection_view_set_layout_button_title" = "Cambiar diseño";
 "collection_view_set_size_menu_title" = "Seleccionar tamaño";
+"collection_view_footer_no_more_movies_to_fetch" = "Fin de la lista de películas 🍿";
