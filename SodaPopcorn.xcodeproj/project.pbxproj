@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF59906F271C93980084E52E /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = CF59906E271C93980084E52E /* Reachability */; };
 		D9322E8126E3B00900522AFB /* MovieNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8026E3B00900522AFB /* MovieNetworkService.swift */; };
 		D9322E8326E3B41D00522AFB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8226E3B41D00522AFB /* Result.swift */; };
 		D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8426E3B45100522AFB /* NetworkResponse.swift */; };
@@ -188,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9449B3E26E4E9E3006B3856 /* Networking.framework in Frameworks */,
+				CF59906F271C93980084E52E /* Reachability in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,6 +611,9 @@
 				D9449B3D26E4E9E3006B3856 /* PBXTargetDependency */,
 			);
 			name = SodaPopcorn;
+			packageProductDependencies = (
+				CF59906E271C93980084E52E /* Reachability */,
+			);
 			productName = SodaPopcorn;
 			productReference = D941AC7E26E2787100018E57 /* SodaPopcorn.app */;
 			productType = "com.apple.product-type.application";
@@ -726,6 +731,9 @@
 				es,
 			);
 			mainGroup = D941AC7526E2787100018E57;
+			packageReferences = (
+				CF59906D271C93980084E52E /* XCRemoteSwiftPackageReference "Reachability" */,
+			);
 			productRefGroup = D941AC7F26E2787100018E57 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1333,6 +1341,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CF59906D271C93980084E52E /* XCRemoteSwiftPackageReference "Reachability" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CF59906E271C93980084E52E /* Reachability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CF59906D271C93980084E52E /* XCRemoteSwiftPackageReference "Reachability" */;
+			productName = Reachability;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */ = {
