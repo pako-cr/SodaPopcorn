@@ -281,19 +281,20 @@
 		D941AC8026E2787100018E57 /* SodaPopcorn */ = {
 			isa = PBXGroup;
 			children = (
-				D9B89D2D26F829A8006E7D5E /* Navigation */,
-				D97BCA7726F03D1500A018EC /* Services */,
+				D941AC8126E2787100018E57 /* AppDelegate.swift */,
+				D941AC8A26E2787300018E57 /* Assets.xcassets */,
 				D9C97C7F26EADFE800151E2D /* Domain */,
 				D9449B4926E4EF46006B3856 /* Extensions */,
-				D941ACD226E27A0100018E57 /* UI */,
-				D941ACD126E279EB00018E57 /* Storage */,
-				D941AC8126E2787100018E57 /* AppDelegate.swift */,
-				D941AC8326E2787100018E57 /* SceneDelegate.swift */,
-				D941AC8A26E2787300018E57 /* Assets.xcassets */,
-				D941AC8F26E2787300018E57 /* LaunchScreen.storyboard */,
 				D941AC9226E2787300018E57 /* Info.plist */,
-				D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */,
+				D941AC8F26E2787300018E57 /* LaunchScreen.storyboard */,
+				D9B89D2D26F829A8006E7D5E /* Navigation */,
 				D941AC8C26E2787300018E57 /* Preview Content */,
+				D941AC8326E2787100018E57 /* SceneDelegate.swift */,
+				D97BCA7726F03D1500A018EC /* Services */,
+				D941AC8726E2787100018E57 /* SodaPopcorn.xcdatamodeld */,
+				D941ACD126E279EB00018E57 /* Storage */,
+				D941ACD226E27A0100018E57 /* UI */,
+				D975D3C42719C41300C81E35 /* Utilities */,
 			);
 			path = SodaPopcorn;
 			sourceTree = "<group>";
@@ -440,6 +441,13 @@
 				D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D975D3C42719C41300C81E35 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		D97BCA5F26EF9C5E00A018EC /* Extensions */ = {

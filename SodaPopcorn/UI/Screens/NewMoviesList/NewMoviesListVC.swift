@@ -29,7 +29,7 @@ final class NewMoviesListVC: BaseViewController {
 
 	private var finishedFetching = false
 	private var reloadingDataSource = false
-	private lazy var dataSource = makeDataSource()
+	private var dataSource: DataSource!
 
 	private var collectionLayout: CollectionLayout = .columns {
 		didSet {
@@ -55,7 +55,7 @@ final class NewMoviesListVC: BaseViewController {
 
 	private var loading = false {
 		didSet {
-			DispatchQueue.main.async { [weak self] in
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
 				guard let `self` = self else { return }
 				if !self.loading {
 					self.refreshControl.endRefreshing()
@@ -65,6 +65,8 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	// MARK: - UI Elements
+	private var movieCollectionView: UICollectionView!
+
 	private lazy var sizeMenu: UIMenu = { [unowned self] in
 		let menu = UIMenu(title: NSLocalizedString("collection_view_set_size_menu_title", comment: "Select items size"), image: nil, identifier: nil, options: [.displayInline], children: [
 			UIAction(title: "Columns", image: UIImage(systemName: "rectangle.split.3x1"), handler: { (_) in
@@ -84,23 +86,9 @@ final class NewMoviesListVC: BaseViewController {
 		return refreshControl
 	}()
 
-	private let movieCollectionView: UICollectionView = {
-		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-		collectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
-		collectionView.register(SectionFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier)
-		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
-		collectionView.translatesAutoresizingMaskIntoConstraints = false
-		collectionView.isScrollEnabled = true
-		//		collectionView.showsVerticalScrollIndicator = false
-		collectionView.allowsSelection = true
-		collectionView.isPrefetchingEnabled = true
-		return collectionView
-	}()
-
 	init(viewModel: NewMoviesListVM) {
 		self.viewModel = viewModel
 		super.init()
-		self.reloadDataSource()
 	}
 
 	required init?(coder: NSCoder) {
@@ -108,9 +96,10 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	override func viewDidLoad() {
-		super.viewDidLoad()
+		configureCollectionView()
+		configureDataSource()
+		setInitialData()
 		setupUI()
-		configureCollectionViewLayout()
 		bindViewModel()
 		viewModel.inputs.fetchNewMovies()
 	}
@@ -118,6 +107,7 @@ final class NewMoviesListVC: BaseViewController {
 	override func viewWillLayoutSubviews() {
 		super.viewWillLayoutSubviews()
 		view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
 
 		let appearance = UINavigationBarAppearance()
 		appearance.configureWithDefaultBackground()
@@ -135,10 +125,6 @@ final class NewMoviesListVC: BaseViewController {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
 
 		view.addSubview(movieCollectionView)
-
-		movieCollectionView.prefetchDataSource = self
-		movieCollectionView.refreshControl = refreshControl
-		movieCollectionView.delegate = self
 
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
 		movieCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
@@ -171,26 +157,23 @@ final class NewMoviesListVC: BaseViewController {
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func makeDataSource() -> DataSource {
-		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
-			cell.configure(with: movie)
-		}
-
-		let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: movieCollectionView) { (collectionView, indexPath, movie) in
-			return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
-		}
-
-		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
-
-			return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
-		}
-
-		return dataSource
+	private func configureCollectionView() {
+		movieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
+		movieCollectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
+		movieCollectionView.register(SectionFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier)
+		movieCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
+		movieCollectionView.translatesAutoresizingMaskIntoConstraints = false
+		movieCollectionView.isScrollEnabled = true
+		movieCollectionView.showsVerticalScrollIndicator = false
+		movieCollectionView.allowsSelection = true
+		movieCollectionView.isPrefetchingEnabled = true
+		movieCollectionView.prefetchDataSource = self
+		movieCollectionView.refreshControl = refreshControl
+		movieCollectionView.delegate = self
 	}
 
-	private func configureCollectionViewLayout() {
-		movieCollectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
+	private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
+		return UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
 			guard let `self` = self else { return nil }
 			let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(self.collectionLayout.rawValue),
 												  heightDimension: .fractionalHeight(1.0))
@@ -221,6 +204,30 @@ final class NewMoviesListVC: BaseViewController {
 
 			return section
 		})
+	}
+
+	private func configureDataSource() {
+		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
+			cell.configure(with: movie)
+		}
+
+		let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: movieCollectionView) { (collectionView, indexPath, movie) in
+			return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
+		}
+
+		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
+
+			return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
+		}
+
+		self.dataSource = dataSource
+	}
+
+	private func setInitialData() {
+		var snapshot = dataSource.snapshot()
+		snapshot.appendSections(Section.allCases)
+		self.dataSource.apply(snapshot, animatingDifferences: false)
 	}
 
 	private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
@@ -326,8 +333,10 @@ extension NewMoviesListVC: UICollectionViewDataSourcePrefetching {
 		let numberOfItems = dataSource.snapshot().numberOfItems
 		let lastItem = indexPaths.last?.item ?? 0
 
-		if lastItem >= numberOfItems - 1 || lastItem >= numberOfItems {
-			self.viewModel.inputs.fetchNewMovies()
+		if (numberOfItems - 1)...numberOfItems ~= lastItem {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+				self?.viewModel.inputs.fetchNewMovies()
+			}
 		}
 	}
 }
