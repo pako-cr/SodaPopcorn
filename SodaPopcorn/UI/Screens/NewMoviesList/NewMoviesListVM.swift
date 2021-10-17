@@ -31,6 +31,9 @@ public protocol NewMoviesListVMOutputs: AnyObject {
 
 	/// Emits when a movie is selected.
 	func movieSelectedAction() -> PassthroughSubject<Movie, Never>
+
+	/// Emits when all the movied were fetched.
+	func finishedFetchingAction() -> CurrentValueSubject<Bool, Never>
 }
 
 public protocol NewMoviesListVMTypes: AnyObject {
@@ -77,8 +80,11 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 				guard let `self` = self else { return }
 
 				self.loadingProperty.value = false
+
 				if let movieApiResponse = movieApiResponse {
 					print("🔸 MoviesApiResponse [page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages), numberOfResults: \(movieApiResponse.numberOfResults)]")
+
+					self.finishedFetchingActionProperty.value = self.page >= movieApiResponse.numberOfPages
 					self.fetchNewMoviesActionProperty.value = movieApiResponse.movies
 				}
 			}).store(in: &cancellable)
@@ -122,21 +128,17 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 		return movieSelectedActionProperty
 	}
 
+	private let finishedFetchingActionProperty = CurrentValueSubject<Bool, Never>(false)
+	public func finishedFetchingAction() -> CurrentValueSubject<Bool, Never> {
+		return finishedFetchingActionProperty
+	}
+
 	// MARK: - ⚙️ Helpers
 	private func getNewMovies() -> AnyPublisher<MovieApiResponse?, Error> {
 		self.page += 1
 		self.loadingProperty.value = true
 		return movieService.getNewMovies(page: page)
 	}
-
-//	public func getPosterImage(movie: Movie, posterPath: String, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
-//		imageService.getPosterImage(posterPath: posterPath, posterSize: PosterSize.w154) { data, error in
-//			completion(data, error)
-//
-//			guard let `self` = self, let data = data, !data.isEmpty else { return }
-//			self.fetchPosterImageSignalProperty.send((movie.id, data))
-//		}
-//	}
 
 	// MARK: - 🗑 Deinit
 	deinit {
