@@ -8,6 +8,7 @@
 import UIKit
 
 extension UICollectionView {
+	/// Sets an empty view when a collection datasource is empty or is loading.
 	func setEmptyView(title: String, message: String, centered: Bool = false) {
 		let emptyView = UIView(frame: CGRect(x: self.center.x, y: self.center.y, width: self.bounds.size.width, height: self.bounds.size.height))
 
@@ -65,7 +66,8 @@ extension UICollectionView {
 		}
 	}
 
-	func restore() {
+	/// Restore the collection view when a datasource is fetched.
+	func removeEmptyView() {
 		self.backgroundView = nil
 	}
 }

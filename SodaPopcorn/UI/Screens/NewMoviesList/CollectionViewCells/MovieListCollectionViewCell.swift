@@ -147,6 +147,8 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 				posterImageLeadingAnchor?.isActive = true
 				posterImage.contentMode = .scaleAspectFit
 
+				separatorView.isHidden = false
+
 			case .columns:
 				movieTitle.isHidden = true
 				movieOverview.isHidden = true
@@ -155,6 +157,8 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 				posterImageCenterXAnchor?.isActive = true
 				posterImageLeadingAnchor?.isActive = false
 				posterImage.contentMode = .scaleAspectFit
+
+				separatorView.isHidden = true
 		}
 	}
 

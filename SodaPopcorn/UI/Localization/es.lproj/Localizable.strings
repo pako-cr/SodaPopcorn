@@ -18,3 +18,8 @@
 "collection_view_set_layout_button_title" = "Cambiar diseño";
 "collection_view_set_size_menu_title" = "Seleccionar tamaño";
 "collection_view_footer_no_more_movies_to_fetch" = "Fin de la lista de películas 🍿";
+"continue" = "Continuar";
+"alert" = "Alerta";
+"network_connection_error" = "No fue posible consultar la información. Por favor verifica tu conexión a internet e intenta de nuevo.";
+"no_internet_connection" = "Sin conexión a internet ❌";
+"new_movies_title" = "Nuevas";

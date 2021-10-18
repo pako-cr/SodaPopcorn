@@ -18,3 +18,8 @@
 "collection_view_set_layout_button_title" = "Set layout";
 "collection_view_set_size_menu_title" = "Select size";
 "collection_view_footer_no_more_movies_to_fetch" = "No more movies to fetch 🍿";
+"continue" = "Continue";
+"alert" = "Alert";
+"network_connection_error" = "Unable to fetch the information. Please check your network connection and try again.";
+"no_internet_connection" = "No internet connection ❌";
+"new_movies_title" = "New Movies";

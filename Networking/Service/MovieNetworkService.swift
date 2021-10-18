@@ -23,7 +23,10 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 				guard let `self` = self else { return }
 
 				if error != nil {
-					singles.onError(NSError(domain: "Please check your network connection.", code: 1, userInfo: [:]))
+					let networkResponseFailedError = "\(NetworkResponse.failed.rawValue). \(error?.localizedDescription ?? "")"
+					print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(networkResponseFailedError)")
+					singles.onError(NSError(domain: networkResponseFailedError, code: 1, userInfo: [:]))
+					singles.onComplete()
 				}
 
 				if let response = response as? HTTPURLResponse {
