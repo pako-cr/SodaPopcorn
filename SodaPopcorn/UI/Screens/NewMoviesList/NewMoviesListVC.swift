@@ -26,6 +26,7 @@ final class NewMoviesListVC: BaseViewController {
 	private var finishedFetchingSubscription: Cancellable!
 	private var fetchMoviesSubscription: Cancellable!
 	private var loadingSubscription: Cancellable!
+	private var showErrorSubscription: Cancellable!
 
 	private var finishedFetching = false
 	private var reloadingDataSource = false
@@ -124,6 +125,9 @@ final class NewMoviesListVC: BaseViewController {
 		let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
 		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
 
+		// Considere adding this button only when a fetch fails and making it dissapear when the internet is back.
+//		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.done, target: self, action: #selector(reloadCollectionView))
+
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
@@ -154,6 +158,13 @@ final class NewMoviesListVC: BaseViewController {
 					self.handleFetchingChange(finishedFetching: finishedFetching)
 				}
 			})
+
+		showErrorSubscription = viewModel.outputs.showError()
+			.sink(receiveValue: { [weak self] errorMessage in
+				guard let `self` = self else { return }
+				self.handleEmptyView()
+				Alert.showAlert(on: self, title: NSLocalizedString("alert", comment: "Alert title"), message: errorMessage)
+			})
 	}
 
 	// MARK: - ⚙️ Helpers
@@ -183,7 +194,7 @@ final class NewMoviesListVC: BaseViewController {
 
 			let groupSize = NSCollectionLayoutSize(
 				widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
-				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5)
+				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 4)
 			)
 
 			let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
@@ -193,13 +204,14 @@ final class NewMoviesListVC: BaseViewController {
 			// Supplementary footer view setup
 			let headerFooterSize = NSCollectionLayoutSize(
 				widthDimension: .fractionalWidth(1.0),
-				heightDimension: .estimated(20)
+				heightDimension: .absolute(50)
 			)
 			let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
 				layoutSize: headerFooterSize,
 				elementKind: UICollectionView.elementKindSectionFooter,
 				alignment: .bottom
 			)
+
 			section.boundarySupplementaryItems = [sectionFooter]
 
 			return section
@@ -228,6 +240,7 @@ final class NewMoviesListVC: BaseViewController {
 		var snapshot = dataSource.snapshot()
 		snapshot.appendSections(Section.allCases)
 		self.dataSource.apply(snapshot, animatingDifferences: false)
+		self.handleEmptyView()
 	}
 
 	private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
@@ -246,6 +259,7 @@ final class NewMoviesListVC: BaseViewController {
 			}
 
 			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
+			self.movieCollectionView.removeEmptyView()
 			self.dataSource.apply(snapshot, animatingDifferences: true)
 		}
 	}
@@ -275,7 +289,7 @@ final class NewMoviesListVC: BaseViewController {
 		item.contentInsets = .uniform(size: 5)
 
 		let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-												  heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 5))
+												  heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 4))
 
 		let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -283,7 +297,7 @@ final class NewMoviesListVC: BaseViewController {
 
 		let headerFooterSize = NSCollectionLayoutSize(
 			widthDimension: .fractionalWidth(1.0),
-			heightDimension: .estimated(20)
+			heightDimension: .absolute(20)
 		)
 
 		let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
@@ -317,6 +331,23 @@ final class NewMoviesListVC: BaseViewController {
 		}
 
 		self.finishedFetching = finishedFetching
+	}
+
+	private func handleEmptyView() {
+		let dataSourceItems = dataSource.snapshot().numberOfItems
+
+		DispatchQueue.main.async { [weak self] in
+			guard let `self` = self else { return }
+			if self.loading && dataSourceItems < 1 {
+				self.movieCollectionView.setEmptyView(title: "Loading", message: "Loading Message", centered: true)
+
+			} else if !self.loading && dataSourceItems < 1 {
+				self.movieCollectionView.setEmptyView(title: "Empty", message: "Empty Message", centered: true)
+
+			} else {
+				self.movieCollectionView.removeEmptyView()
+			}
+		}
 	}
 
 	// MARK: - 🗑 Deinit

@@ -28,6 +28,17 @@ final class HomeCoordinator: Coordinator {
 		self.window = window
 		self.window.rootViewController = parentViewController
 		self.window.makeKeyAndVisible()
+
+		_ = Reachability.signalProducer.sink { reachability in
+			switch reachability {
+				case .none:
+					if let rootViewController = self.window.rootViewController {
+						Alert.showAlert(on: rootViewController, title: NSLocalizedString("alert", comment: "Alert"), message: NSLocalizedString("no_internet_connection", comment: "No internet connection"))
+					}
+				default:
+					break
+			}
+		}
 	}
 
 	func start() {

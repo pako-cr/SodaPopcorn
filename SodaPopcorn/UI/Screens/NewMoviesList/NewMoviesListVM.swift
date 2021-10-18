@@ -23,9 +23,6 @@ public protocol NewMoviesListVMOutputs: AnyObject {
 	/// Emits to get the new movies.
 	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
-	/// Emits to get return the image.
-	func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never>
-
 	/// Emits when loading.
 	func loading() -> CurrentValueSubject<Bool, Never>
 
@@ -34,6 +31,9 @@ public protocol NewMoviesListVMOutputs: AnyObject {
 
 	/// Emits when all the movied were fetched.
 	func finishedFetchingAction() -> CurrentValueSubject<Bool, Never>
+
+	/// Emits when an error occurred.
+	func showError() -> PassthroughSubject<String, Never>
 }
 
 public protocol NewMoviesListVMTypes: AnyObject {
@@ -62,18 +62,25 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 				self.movieSelectedActionProperty.send(movie)
 			}.store(in: &cancellable)
 
-		Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
-			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Error> in
-				guard let `self` = self else { return Empty(completeImmediately: false).eraseToAnyPublisher() }
+		let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+//			.timeout(.seconds(3), scheduler: DispatchQueue.main, options: nil, customError: nil)
+			.retry(3)
+			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Never> in
+				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 				return self.getNewMovies()
-			})
-			.sink(receiveCompletion: { [weak self] completion in
+					.replaceError(with: MovieApiResponse(page: 0, numberOfResults: 0, numberOfPages: 0, movies: []))
+				 	.eraseToAnyPublisher()
+			}).share()
+
+		getNewMoviesEvent
+			.sink(receiveCompletion: { [weak self] completionReceived in
 				guard let `self` = self else { return }
 
 				self.loadingProperty.value = false
-				switch completion {
+				switch completionReceived {
 					case .failure(let error):
 						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(error.localizedDescription)")
+						self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
 					default: break
 				}
 			}, receiveValue: { [weak self] movieApiResponse in
@@ -81,11 +88,11 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 
 				self.loadingProperty.value = false
 
-				if let movieApiResponse = movieApiResponse {
+				if let movieApiResponse = movieApiResponse, movieApiResponse.numberOfResults != 0 {
 					print("🔸 MoviesApiResponse [page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages), numberOfResults: \(movieApiResponse.numberOfResults)]")
 
-					self.finishedFetchingActionProperty.value = self.page >= movieApiResponse.numberOfPages
-					self.fetchNewMoviesActionProperty.value = movieApiResponse.movies
+					self.finishedFetchingActionProperty.send(self.page >= movieApiResponse.numberOfPages)
+					self.fetchNewMoviesActionProperty.send(movieApiResponse.movies)
 				}
 			}).store(in: &cancellable)
 	}
@@ -113,11 +120,6 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 		return fetchNewMoviesActionProperty
 	}
 
-	private let fetchPosterImageSignalProperty = PassthroughSubject<(Int, Data), Never>()
-	public func fetchPosterImageSignal() -> PassthroughSubject<(Int, Data), Never> {
-		return fetchPosterImageSignalProperty
-	}
-
 	private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
 	public func loading() -> CurrentValueSubject<Bool, Never> {
 		return loadingProperty
@@ -133,11 +135,21 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 		return finishedFetchingActionProperty
 	}
 
+	private let showErrorProperty = PassthroughSubject<String, Never>()
+	public func showError() -> PassthroughSubject<String, Never> {
+		return showErrorProperty
+	}
+
 	// MARK: - ⚙️ Helpers
 	private func getNewMovies() -> AnyPublisher<MovieApiResponse?, Error> {
 		self.page += 1
 		self.loadingProperty.value = true
-		return movieService.getNewMovies(page: page)
+		return movieService.getNewMovies(page: self.page)
+			.mapError { error in
+				print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(error.localizedDescription)")
+				self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+				return error
+			}.eraseToAnyPublisher()
 	}
 
 	// MARK: - 🗑 Deinit

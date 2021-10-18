@@ -59,7 +59,9 @@
 		D9B89D3526F82DF2006E7D5E /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B89D3426F82DF2006E7D5E /* HomeVC.swift */; };
 		D9BBD68A26E71F6900A2C24D /* UIFont+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */; };
 		D9BE6AB7271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */; };
+		D9C517ED271DBB3B009ECE76 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C517EC271DBB3B009ECE76 /* Reachability.swift */; };
 		D9C97C7E26EADF0100151E2D /* MovieEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C97C7D26EADF0100151E2D /* MovieEntity+CoreDataClass.swift */; };
+		D9CB5B2A271C71C4005C542C /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CB5B29271C71C4005C542C /* Alert.swift */; };
 		D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */; };
 		D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E6D38326E9242B000292D4 /* PosterSize.swift */; };
 /* End PBXBuildFile section */
@@ -177,7 +179,9 @@
 		D9B89D3426F82DF2006E7D5E /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		D9BBD68926E71F6900A2C24D /* UIFont+Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Style.swift"; sourceTree = "<group>"; };
 		D9BE6AB6271530E900D69A25 /* NSDirectionalEdgeInsets+Uniform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSDirectionalEdgeInsets+Uniform.swift"; sourceTree = "<group>"; };
+		D9C517EC271DBB3B009ECE76 /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		D9C97C7D26EADF0100151E2D /* MovieEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MovieEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		D9CB5B29271C71C4005C542C /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		D9E6D38126E8FC28000292D4 /* PlistReaderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlistReaderManager.swift; sourceTree = "<group>"; };
 		D9E6D38326E9242B000292D4 /* PosterSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterSize.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -446,6 +450,7 @@
 		D975D3C42719C41300C81E35 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				D9C517EC271DBB3B009ECE76 /* Reachability.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -505,6 +510,7 @@
 			children = (
 				D98D22DF2715D14F0000A8E2 /* CustomImage.swift */,
 				D975D3C22719181400C81E35 /* CollectionLayout.swift */,
+				D9CB5B29271C71C4005C542C /* Alert.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -825,6 +831,7 @@
 				D97BCA7F26F03D1500A018EC /* MovieService.swift in Sources */,
 				D941AC8226E2787100018E57 /* AppDelegate.swift in Sources */,
 				D9509087271096D7003E3D91 /* SectionFooterReusableView.swift in Sources */,
+				D9CB5B2A271C71C4005C542C /* Alert.swift in Sources */,
 				D9B89D2F26F829C0006E7D5E /* Coordinator.swift in Sources */,
 				D941ACE926E27AA800018E57 /* Movie.swift in Sources */,
 				D9449B4B26E4EFA2006B3856 /* AnyPublisher+Create.swift in Sources */,
@@ -844,6 +851,7 @@
 				D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */,
 				D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */,
 				D9440BF1270F498E00D01C0A /* MovieDetailsVM.swift in Sources */,
+				D9C517ED271DBB3B009ECE76 /* Reachability.swift in Sources */,
 				D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */,
 				D9322E9126E3D5BE00522AFB /* PosterImageService.swift in Sources */,
 				D9410B762704B03A0040D6F2 /* NavigationController.swift in Sources */,
