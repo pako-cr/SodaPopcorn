@@ -7,12 +7,29 @@
 
 import Foundation
 
-public enum NetworkResponse: String {
-	case success
-	case authenticationError = "You need to be authenticated first."
-	case badRequest          = "Bad request."
-	case outdated            = "The url you requested is outdated."
-	case failed              = "Network request failed"
-	case noData              = "Response returned with no data to decode."
-	case unableToDecode      = "We could not decode the response."
+public enum NetworkResponse: Error {
+	case success(String)
+	case authenticationError
+	case badRequest
+	case outdated
+	case failed(String)
+	case noData
+	case unableToDecode
+}
+
+extension NetworkResponse: Equatable {
+	public static func == (lhs: NetworkResponse, rhs: NetworkResponse) -> Bool {
+		switch (lhs, rhs) {
+			case (NetworkResponse.success, NetworkResponse.success),
+				(NetworkResponse.authenticationError, NetworkResponse.authenticationError),
+				(NetworkResponse.badRequest, NetworkResponse.badRequest),
+				(NetworkResponse.outdated, NetworkResponse.outdated),
+				(NetworkResponse.failed, NetworkResponse.failed),
+				(NetworkResponse.noData, NetworkResponse.noData),
+				(NetworkResponse.unableToDecode, NetworkResponse.unableToDecode):
+				return true
+			default:
+				return false
+		}
+	}
 }

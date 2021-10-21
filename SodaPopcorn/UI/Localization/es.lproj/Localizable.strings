@@ -23,3 +23,10 @@
 "network_connection_error" = "No fue posible consultar la información. Por favor verifica tu conexión a internet e intenta de nuevo.";
 "no_internet_connection" = "Sin conexión a internet ❌";
 "new_movies_title" = "Nuevas";
+"network_response_error_authentication_error" = "Primero necesitas estar autenticado";
+"network_response_error_bad_request" = "Solicitud incorrecta";
+"network_response_error_outdated" = "La url que solicitaste está desactualizada";
+"network_response_error_failed" = "Falló en la conexión a internet. Por favor verifica tu conexión primero";
+"network_response_error_no_data" = "La respuesta llegó vacía";
+"network_response_error_unable_to_decode" = "No se pudo manejar la respuesta";
+

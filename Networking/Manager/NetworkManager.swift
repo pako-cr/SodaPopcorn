@@ -19,13 +19,13 @@ final class NetworkManager<EndPoint: EndPointType>: NetworkManagerProtocol {
 
     private var task: URLSessionTask?
 
-    func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
+    func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<NetworkResponse> {
         switch response.statusCode {
-            case 200...299: return .success(response.description)
-            case 401...500: return .failure(NetworkResponse.authenticationError.rawValue)
-            case 501...599: return .failure(NetworkResponse.badRequest.rawValue)
-            case 600: return .failure(NetworkResponse.outdated.rawValue)
-            default: return .failure(NetworkResponse.failed.rawValue)
+			case 200...299: return .success(NetworkResponse.success(response.description))
+            case 401...500: return .failure(NetworkResponse.authenticationError)
+            case 501...599: return .failure(NetworkResponse.badRequest)
+            case 600: return .failure(NetworkResponse.outdated)
+			default: return .failure(NetworkResponse.failed(response.description))
         }
     }
 

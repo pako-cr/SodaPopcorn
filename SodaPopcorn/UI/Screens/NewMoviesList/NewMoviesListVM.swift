@@ -53,7 +53,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
 
-	init(movieService: MovieService) {
+	public init(movieService: MovieService) {
 		self.movieService = movieService
 
 		self.movieSelectedProperty
@@ -63,11 +63,15 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 			}.store(in: &cancellable)
 
 		let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
-//			.timeout(.seconds(3), scheduler: DispatchQueue.main, options: nil, customError: nil)
 			.retry(3)
-			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse?, Never> in
+			.flatMap({ [weak self] _ -> AnyPublisher<MovieApiResponse, Never> in
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 				return self.getNewMovies()
+					.mapError({ [weak self] networkResponse -> NetworkResponse in
+						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+						self?.handleNetworkResponseError(networkResponse)
+						return networkResponse
+					})
 					.replaceError(with: MovieApiResponse(page: 0, numberOfResults: 0, numberOfPages: 0, movies: []))
 				 	.eraseToAnyPublisher()
 			}).share()
@@ -88,7 +92,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 
 				self.loadingProperty.value = false
 
-				if let movieApiResponse = movieApiResponse, movieApiResponse.numberOfResults != 0 {
+				if movieApiResponse.numberOfResults != 0 {
 					print("🔸 MoviesApiResponse [page: \(movieApiResponse.page), numberOfPages: \(movieApiResponse.numberOfPages), numberOfResults: \(movieApiResponse.numberOfResults)]")
 
 					self.finishedFetchingActionProperty.send(self.page >= movieApiResponse.numberOfPages)
@@ -141,15 +145,32 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func getNewMovies() -> AnyPublisher<MovieApiResponse?, Error> {
+	private func getNewMovies() -> AnyPublisher<MovieApiResponse, NetworkResponse> {
 		self.page += 1
 		self.loadingProperty.value = true
 		return movieService.getNewMovies(page: self.page)
-			.mapError { error in
+			.mapError { error -> NetworkResponse in
 				print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(error.localizedDescription)")
 				self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
 				return error
 			}.eraseToAnyPublisher()
+	}
+
+	private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
+		var localizedErrorString: String
+
+		switch networkResponse {
+
+			case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
+			case .badRequest: localizedErrorString = "network_response_error_bad_request"
+			case .outdated: localizedErrorString = "network_response_error_outdated"
+			case .failed: localizedErrorString = "network_response_error_failed"
+			case .noData: localizedErrorString = "network_response_error_no_data"
+			case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
+			default: localizedErrorString = "network_response_error_failed"
+		}
+
+		self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
 	}
 
 	// MARK: - 🗑 Deinit
