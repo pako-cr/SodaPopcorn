@@ -9,24 +9,24 @@ import Combine
 import Foundation
 
 public protocol MovieNetworkServiceProtocol {
-	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error>
+	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse, NetworkResponse>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
 	private let networkManager = NetworkManager<MovieApi>()
 	
-	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse?, Error> {
-		return AnyPublisher<MovieApiResponse?, Error>.create { [weak self] singles in
+	func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse, NetworkResponse> {
+		return AnyPublisher<MovieApiResponse, NetworkResponse>.create { [weak self] promise in
 			guard let `self` = self else { return Disposable {} }
 
 			self.networkManager.request(.newMovies(page: page), completion: { [weak self] data, response, error in
 				guard let `self` = self else { return }
 
 				if error != nil {
-					let networkResponseFailedError = "\(NetworkResponse.failed.rawValue). \(error?.localizedDescription ?? "")"
-					print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(networkResponseFailedError)")
-					singles.onError(NSError(domain: networkResponseFailedError, code: 1, userInfo: [:]))
-					singles.onComplete()
+					let errorDescription = error?.localizedDescription ?? ""
+					print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(errorDescription)")
+					promise.onError(NetworkResponse.failed(errorDescription))
+					promise.onComplete()
 				}
 
 				if let response = response as? HTTPURLResponse {
@@ -34,24 +34,25 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 					switch result {
 						case .success:
 							guard let responseData = data else {
-								singles.onError(NSError(domain: NetworkResponse.noData.rawValue, code: 2, userInfo: [:]))
-								singles.onComplete()
+								promise.onError(NetworkResponse.noData)
+								promise.onComplete()
 								return
 							}
 							do {
 								let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
 
-								singles.onNext(apiResponse)
-								singles.onComplete()
+								promise.onNext(apiResponse)
+								promise.onComplete()
 
 							} catch let exception {
 								print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(exception.localizedDescription)")
-								singles.onError(NSError(domain: NetworkResponse.unableToDecode.rawValue, code: 3, userInfo: [:]))
-								singles.onComplete()
+								promise.onError(NetworkResponse.unableToDecode)
+								promise.onComplete()
 							}
 						case .failure(let networkFailureError):
-							singles.onError(NSError(domain: networkFailureError, code: 1, userInfo: [:]))
-							singles.onComplete()
+							print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(networkFailureError)")
+							promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
+							promise.onComplete()
 					}
 				}
 			})

@@ -23,3 +23,10 @@
 "network_connection_error" = "Unable to fetch the information. Please check your network connection and try again.";
 "no_internet_connection" = "No internet connection ❌";
 "new_movies_title" = "New Movies";
+
+"network_response_error_authentication_error" = "You need to be authenticated first";
+"network_response_error_bad_request" = "Bad request";
+"network_response_error_outdated" = "The url you requested is outdated";
+"network_response_error_failed" = "Network request failed";
+"network_response_error_no_data" = "Response returned with no data to decode";
+"network_response_error_unable_to_decode" = "We could not decode the response";

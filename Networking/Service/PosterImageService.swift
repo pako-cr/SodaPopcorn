@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol PosterImageServiceProtocol {
-	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void)
+	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: NetworkResponse?) -> Void)
 }
 
 final class PosterImageService: PosterImageServiceProtocol {
@@ -26,12 +26,14 @@ final class PosterImageService: PosterImageServiceProtocol {
 		return sharedPosterImageService
 	}
 
-	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: String?) -> Void) {
+	func getPosterImage(posterPath: String, posterSize: PosterSize, completion: @escaping (_ imageData: Data?, _ error: NetworkResponse?) -> Void) {
 		networkManager.request(.posterImage((posterPath: posterPath, posterSize: posterSize.rawValue))) { [weak self] data, response, error in
 			guard let `self` = self else { return }
 
 			if error != nil {
-				completion(nil, "Please check your network connection.")
+				let errorMessage = error?.localizedDescription ?? ""
+				print("🔴 [PosterImageService] [getPosterImage] An error occurred: \(errorMessage)")
+				completion(nil, NetworkResponse.failed(errorMessage))
 			}
 
 			if let response = response as? HTTPURLResponse {
@@ -39,12 +41,13 @@ final class PosterImageService: PosterImageServiceProtocol {
 				switch result {
 					case .success:
 						guard let responseData = data else {
-							completion(nil, NetworkResponse.noData.rawValue)
+							completion(nil, NetworkResponse.noData)
 							return
 						}
 						completion(responseData, nil)
 					case .failure(let networkFailureError):
-						completion(nil, networkFailureError)
+						print("🔴 [PosterImageService] [getPosterImage] An error occurred: \(networkFailureError)")
+						completion(nil, NetworkResponse.failed(networkFailureError.localizedDescription))
 				}
 			}
 		}

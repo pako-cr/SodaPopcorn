@@ -15,7 +15,6 @@ final class SectionFooterReusableView: UICollectionReusableView {
 	private let activityIndicator: UIActivityIndicatorView = {
 		let activity = UIActivityIndicatorView(style: .medium)
 		activity.translatesAutoresizingMaskIntoConstraints = false
-		activity.startAnimating()
 		return activity
 	}()
 

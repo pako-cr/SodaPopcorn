@@ -258,6 +258,8 @@ final class NewMoviesListVC: BaseViewController {
 				snapshot.appendItems(movies, toSection: .movies)
 			}
 
+			self.handleFetchingChange(finishedFetching: false)
+
 			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
 			self.movieCollectionView.removeEmptyView()
 			self.dataSource.apply(snapshot, animatingDifferences: true)
