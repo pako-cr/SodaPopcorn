@@ -13,8 +13,8 @@ final class CustomImage: UIImageView {
 			DispatchQueue.main.async { [weak self] in
 				guard let `self` = self, let urlString = self.urlString else { return }
 
-				if let posterImage = imageCache.object(forKey: NSString(string: self.urlString ?? "")) {
-					self.image = posterImage
+                if let posterImage = cache.value(forKey: self.urlString ?? "") {
+                    self.image = posterImage
 					self.activityIndicatorView.stopAnimating()
 
 				} else {
@@ -39,7 +39,7 @@ final class CustomImage: UIImageView {
 
 							if let newImage = UIImage(data: data) {
 								self.image = newImage
-								imageCache.setObject(newImage, forKey: NSString(string: urlString))
+                                cache.insert(newImage, forKey: urlString)
 							}
 						}
 					}

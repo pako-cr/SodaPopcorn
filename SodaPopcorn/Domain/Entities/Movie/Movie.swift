@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Movie: Codable, Hashable {
+public class Movie: Codable, Identifiable, Hashable {
 	public let id: String
 	public let title: String?
 	public let overview: String?
