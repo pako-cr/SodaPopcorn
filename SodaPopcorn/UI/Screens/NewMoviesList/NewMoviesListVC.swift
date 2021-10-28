@@ -81,9 +81,9 @@ final class NewMoviesListVC: BaseViewController {
 		return menu
 	}()
 
-	private let refreshControl: UIRefreshControl = {
+	private lazy var refreshControl: UIRefreshControl = {
 		let refreshControl = UIRefreshControl()
-		refreshControl.addTarget(self, action: #selector(reloadCollectionView), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(self.reloadCollectionView), for: .valueChanged)
 		return refreshControl
 	}()
 

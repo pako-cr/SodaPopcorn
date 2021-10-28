@@ -16,7 +16,7 @@ final class MovieDetailsVC: BaseViewController {
 	private var movieInfoSubscription: Cancellable!
 
 	// MARK: UI Elements
-	private let closeButton: UIButton = {
+	private lazy var closeButton: UIButton = {
 		let image = UIImage(systemName: "xmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
 		let button = UIButton(type: UIButton.ButtonType.system)
 		button.setImage(image, for: .normal)
