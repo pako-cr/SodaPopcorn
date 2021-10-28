@@ -7,10 +7,9 @@
 
 import UIKit
 
-let imageCache = NSCache<NSString, UIImage>()
-
 final class MovieListCollectionViewCell: UICollectionViewCell {
-	// MARK: Constants
+	
+    // MARK: Constants
 	static let reuseIdentifier = "movieListCollectionViewCellId"
 
 	// MARK: Variables

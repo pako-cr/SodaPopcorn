@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A15F064272AE0690011C5F1 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15F063272AE0690011C5F1 /* Cache.swift */; };
 		D9322E8126E3B00900522AFB /* MovieNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8026E3B00900522AFB /* MovieNetworkService.swift */; };
 		D9322E8326E3B41D00522AFB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8226E3B41D00522AFB /* Result.swift */; };
 		D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8426E3B45100522AFB /* NetworkResponse.swift */; };
@@ -119,6 +120,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A15F063272AE0690011C5F1 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		D9322E8026E3B00900522AFB /* MovieNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieNetworkService.swift; sourceTree = "<group>"; };
 		D9322E8226E3B41D00522AFB /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		D9322E8426E3B45100522AFB /* NetworkResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResponse.swift; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				D9C517EC271DBB3B009ECE76 /* Reachability.swift */,
+				8A15F063272AE0690011C5F1 /* Cache.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -833,6 +836,7 @@
 				D9509087271096D7003E3D91 /* SectionFooterReusableView.swift in Sources */,
 				D9CB5B2A271C71C4005C542C /* Alert.swift in Sources */,
 				D9B89D2F26F829C0006E7D5E /* Coordinator.swift in Sources */,
+				8A15F064272AE0690011C5F1 /* Cache.swift in Sources */,
 				D941ACE926E27AA800018E57 /* Movie.swift in Sources */,
 				D9449B4B26E4EFA2006B3856 /* AnyPublisher+Create.swift in Sources */,
 				D941AC8426E2787100018E57 /* SceneDelegate.swift in Sources */,
