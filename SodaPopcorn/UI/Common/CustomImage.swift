@@ -8,6 +8,26 @@
 import UIKit
 
 final class CustomImage: UIImageView {
+    // MARK: - Variables
+    var posterSize = PosterSize.w154
+
+    var customContentMode = ContentMode.scaleAspectFit {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let `self` = self else { return }
+                self.contentMode = self.customContentMode
+            }
+        }
+    }
+    var defaultImage = UIImage(named: "no_poster") {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let `self` = self else { return }
+                self.image = self.defaultImage
+            }
+        }
+    }
+
 	private var urlString: String? {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
@@ -18,16 +38,16 @@ final class CustomImage: UIImageView {
 					self.activityIndicatorView.stopAnimating()
 
 				} else {
-					self.image = UIImage(named: "no_poster")
+                    self.image = self.defaultImage
 					self.activityIndicatorView.startAnimating()
 
-					PosterImageService.shared().getPosterImage(posterPath: urlString, posterSize: PosterSize.w154) { data, error in
+                    PosterImageService.shared().getPosterImage(posterPath: urlString, posterSize: self.posterSize) { data, error in
 
 						if error != nil {
 							DispatchQueue.main.async { [weak self] in
 								guard let `self` = self else { return }
 								self.activityIndicatorView.stopAnimating()
-								self.image = UIImage(named: "no_poster")
+                                self.image = self.defaultImage
 							}
 						}
 
@@ -62,9 +82,9 @@ final class CustomImage: UIImageView {
 
 	private func setupView() {
 		translatesAutoresizingMaskIntoConstraints = false
-		contentMode = .scaleAspectFit
-		clipsToBounds = true
-		image = UIImage(named: "no_poster")
+        clipsToBounds = true
+        contentMode = self.customContentMode
+        image = self.defaultImage
 
 		addSubview(activityIndicatorView)
 

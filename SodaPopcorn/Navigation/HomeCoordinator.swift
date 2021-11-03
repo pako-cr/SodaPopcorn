@@ -65,7 +65,7 @@ final class HomeCoordinator: Coordinator {
 	private func showMovieDetails(movie: Movie) {
 		print(movie.title ?? "")
 
-		let viewModel = MovieDetailsVM(movie: movie)
+        let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
 		homeVC?.present(viewController, animated: true, completion: nil)
