@@ -30,3 +30,5 @@
 "network_response_error_no_data" = "Response returned with no data to decode";
 "network_response_error_unable_to_decode" = "We could not decode the response";
 "movie_details_vc_genre_label" = "Genres";
+"not_applicable" = "N/A";
+"movie_details_vc_overview_label" = "Overview";

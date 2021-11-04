@@ -16,6 +16,14 @@ final class MovieDetailsVC: BaseViewController {
 	private var movieInfoSubscription: Cancellable!
 
 	// MARK: UI Elements
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.showsVerticalScrollIndicator = true
+        return scrollView
+    }()
+
 	private lazy var closeButton: UIButton = {
 		let image = UIImage(systemName: "xmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
 		let button = UIButton(type: UIButton.ButtonType.system)
@@ -27,6 +35,7 @@ final class MovieDetailsVC: BaseViewController {
 		button.titleLabel?.adjustsFontSizeToFitWidth = true
 		button.titleLabel?.adjustsFontForContentSizeCategory = true
 		button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
+        button.tintColor = UIColor(named: "PrimaryColor")
 		return button
 	}()
 
@@ -45,26 +54,46 @@ final class MovieDetailsVC: BaseViewController {
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle).bold()
         label.textAlignment = .natural
         label.adjustsFontSizeToFitWidth = true
+        label.sizeToFit()
         return label
+    }()
+
+    private let subHeaderStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fill
+        stack.alignment = .leading
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
     }()
 
     private let releaseDateLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .caption1)
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.textAlignment = .natural
         label.adjustsFontSizeToFitWidth = true
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return label
     }()
 
     private let runtimeLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .caption1)
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
         label.textAlignment = .natural
         label.adjustsFontSizeToFitWidth = true
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        return label
+    }()
+
+    private let ratingLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.textAlignment = .natural
+        label.adjustsFontSizeToFitWidth = true
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
     }()
 
@@ -89,6 +118,30 @@ final class MovieDetailsVC: BaseViewController {
         return label
     }()
 
+    private let overviewLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.textAlignment = .natural
+        label.adjustsFontSizeToFitWidth = true
+        label.text = NSLocalizedString("movie_details_vc_overview_label", comment: "Overview Label")
+        return label
+    }()
+
+    private let overviewValue: UITextView = {
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.font = UIFont.preferredFont(forTextStyle: .body).italic()
+        textView.textAlignment = .natural
+        textView.isSelectable = false
+        textView.isEditable = false
+        textView.backgroundColor = .clear
+//        textView.isScrollEnabled = true
+//        textView.showsVerticalScrollIndicator = true
+        return textView
+    }()
+
 	init(viewModel: MovieDetailsVM) {
 		self.viewModel = viewModel
 		super.init()
@@ -111,49 +164,64 @@ final class MovieDetailsVC: BaseViewController {
 	}
 
 	override func setupUI() {
-        view.addSubview(backdropImage)
-        view.addSubview(closeButton)
-        view.addSubview(movieTitleLabel)
-        view.addSubview(releaseDateLabel)
-        view.addSubview(runtimeLabel)
-        view.addSubview(genresLabel)
-        view.addSubview(genresValue)
+        view.addSubview(scrollView)
 
-        backdropImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        backdropImage.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        backdropImage.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 
-        closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        scrollView.addSubview(backdropImage)
+        scrollView.addSubview(closeButton)
+        scrollView.addSubview(movieTitleLabel)
+        scrollView.addSubview(subHeaderStackView)
+        scrollView.addSubview(genresLabel)
+        scrollView.addSubview(genresValue)
+        scrollView.addSubview(overviewLabel)
+        scrollView.addSubview(overviewValue)
+
+        subHeaderStackView.addArrangedSubview(releaseDateLabel)
+        subHeaderStackView.addArrangedSubview(runtimeLabel)
+        subHeaderStackView.addArrangedSubview(ratingLabel)
+
+        backdropImage.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        backdropImage.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        backdropImage.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.3).isActive = true
+
+        closeButton.topAnchor.constraint(equalTo: scrollView.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
+        closeButton.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
         closeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
 
         movieTitleLabel.topAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
-        movieTitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        movieTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-        movieTitleLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.075).isActive = true
+        movieTitleLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        movieTitleLabel.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        movieTitleLabel.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.05).isActive = true
 
-        releaseDateLabel.topAnchor.constraint(equalTo: movieTitleLabel.bottomAnchor, constant: 0).isActive = true
-        releaseDateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        releaseDateLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.08).isActive = true
-        releaseDateLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
-
-        runtimeLabel.topAnchor.constraint(equalTo: movieTitleLabel.bottomAnchor, constant: 0).isActive = true
-        runtimeLabel.leadingAnchor.constraint(equalTo: releaseDateLabel.trailingAnchor).isActive = true
-        runtimeLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.2).isActive = true
-        runtimeLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
+        subHeaderStackView.topAnchor.constraint(equalTo: movieTitleLabel.bottomAnchor, constant: 0).isActive = true
+        subHeaderStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        subHeaderStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        subHeaderStackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.05).isActive = true
 
         genresLabel.topAnchor.constraint(equalTo: releaseDateLabel.bottomAnchor, constant: 20).isActive = true
-        genresLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        genresLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-        genresLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.075).isActive = true
+        genresLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        genresLabel.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        genresLabel.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.05).isActive = true
 
         genresValue.topAnchor.constraint(equalTo: genresLabel.bottomAnchor).isActive = true
-        genresValue.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        genresValue.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-        genresValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.075).isActive = true
+        genresValue.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        genresValue.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        genresValue.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.05).isActive = true
 
+        overviewLabel.topAnchor.constraint(equalTo: genresValue.bottomAnchor, constant: 20).isActive = true
+        overviewLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        overviewLabel.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        overviewLabel.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 0.05).isActive = true
+
+        overviewValue.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor).isActive = true
+        overviewValue.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10).isActive = true
+        overviewValue.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9).isActive = true
+        overviewValue.heightAnchor.constraint(equalTo: scrollView.heightAnchor, multiplier: 1.3).isActive = true
 	}
 
 	override func bindViewModel() {
@@ -168,28 +236,39 @@ final class MovieDetailsVC: BaseViewController {
 	private func handleMovieInfo(movie: Movie) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
+            let notApplicableString = NSLocalizedString("not_applicable", comment: "Not applicable")
 
             if let backdropImageUrl = movie.backdropPath {
                 self.backdropImage.setUrlString(urlString: backdropImageUrl)
             }
 
-            if let movieTitle = movie.title {
-                self.movieTitleLabel.text = movieTitle
-            }
+            self.movieTitleLabel.text = !(movie.title?.isEmpty ?? true) ? movie.title : notApplicableString
 
-            if let releaseDate = movie.releaseDate {
-                self.releaseDateLabel.text = releaseDate.split(separator: Character.init("-"), maxSplits: 1, omittingEmptySubsequences: true).first?.description ?? ""
-            }
+            self.releaseDateLabel.text = !(movie.releaseDate?.isEmpty ?? true)
+            ? (movie.releaseDate?.split(separator: Character.init("-"), maxSplits: 1, omittingEmptySubsequences: true).first?.description ?? "")
+            : notApplicableString
 
             if let genres = movie.genres {
+                if genres.isEmpty { self.genresValue.text = notApplicableString }
                 self.genresValue.text = genres.reduce("", { partialResult, genre in
-                    return partialResult + (genre.name ?? "") + " / "
+
+                    return partialResult != ""
+                    ? partialResult + " / " + (genre.name ?? "")
+                    : partialResult + (genre.name ?? "")
                 })
             }
 
-            if let runtime = movie.runtime {
-                self.runtimeLabel.text = self.formatRuntime(runtime: runtime)
-            }
+            self.runtimeLabel.text = movie.runtime != nil && (movie.runtime ?? 0) > 0
+            ? self.formatRuntime(runtime: movie.runtime ?? 0)
+            : notApplicableString
+
+            self.ratingLabel.text = movie.rating != nil && (movie.rating ?? 0.0) > 0.0
+            ? "﹒ \(movie.rating ?? 0.0)/10 ⭐️"
+            : notApplicableString
+
+            self.overviewValue.text = !(movie.overview?.isEmpty ?? true)
+            ? (movie.overview ?? "" )
+            : notApplicableString
 
             print("⭐️ homepage: \(movie.homepage ?? "")")
         }

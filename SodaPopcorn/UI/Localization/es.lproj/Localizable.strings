@@ -30,3 +30,5 @@
 "network_response_error_no_data" = "La respuesta llegó vacía";
 "network_response_error_unable_to_decode" = "No se pudo manejar la respuesta";
 "movie_details_vc_genre_label" = "Géneros";
+"not_applicable" = "N/A";
+"movie_details_vc_overview_label" = "Descripción";

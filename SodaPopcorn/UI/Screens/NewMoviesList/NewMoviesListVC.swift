@@ -107,26 +107,19 @@ final class NewMoviesListVC: BaseViewController {
 
 	override func viewWillLayoutSubviews() {
 		super.viewWillLayoutSubviews()
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
 		view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-		movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-
-		let appearance = UINavigationBarAppearance()
-		appearance.configureWithDefaultBackground()
-		appearance.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-		navigationController?.navigationBar.standardAppearance = appearance
-		navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-
-		navigationItem.standardAppearance = appearance
 	}
 
 	override func setupUI() {
 		navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
 		let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-		navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
+		navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
 
 		// Considere adding this button only when a fetch fails and making it dissapear when the internet is back.
-//		navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.done, target: self, action: #selector(reloadCollectionView))
+//		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.done, target: self, action: #selector(reloadCollectionView))
 
 		view.addSubview(movieCollectionView)
 

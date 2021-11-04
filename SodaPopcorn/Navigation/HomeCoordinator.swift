@@ -50,6 +50,7 @@ final class HomeCoordinator: Coordinator {
 
 		homeVC?.viewControllers = [newMoviesListViewController]
 		homeVC?.selectedIndex = 0
+        homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
 		parentViewController.addChild(homeVC!)
 		parentViewController.view.addSubview(homeVC!.view)

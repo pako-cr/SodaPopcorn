@@ -32,8 +32,13 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 					self.posterImage.setUrlString(urlString: posterPath)
 				}
 
-				self.movieTitle.text = movie.title
-				self.movieOverview.text = movie.overview != "" ? movie.overview : NSLocalizedString("movie_list_collection_view_cell_no_overview_found", comment: "")
+                self.movieTitle.text = !(movie.title?.isEmpty ?? true)
+                ? movie.title
+                : NSLocalizedString("not_applicable", comment: "Not applicable")
+
+                self.movieOverview.text = !(movie.overview?.isEmpty ?? true)
+                ? movie.overview
+                : NSLocalizedString("movie_list_collection_view_cell_no_overview_found", comment: "")
 
 				self.sizeToFit()
 			}
@@ -76,13 +81,14 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		return label
 	}()
 
-	private let movieOverview: UILabel = {
-		let label = UILabel()
-		label.translatesAutoresizingMaskIntoConstraints = false
-		label.numberOfLines = 0
-		label.font = UIFont.preferredFont(forTextStyle: .footnote)
-		label.textAlignment = .natural
-		return label
+	private let movieOverview: UITextView = {
+		let textView = UITextView()
+		textView.translatesAutoresizingMaskIntoConstraints = false
+		textView.font = UIFont.preferredFont(forTextStyle: .footnote)
+        textView.textAlignment = .left
+        textView.isUserInteractionEnabled = false
+        textView.isEditable = false
+		return textView
 	}()
 
 	override init(frame: CGRect) {
