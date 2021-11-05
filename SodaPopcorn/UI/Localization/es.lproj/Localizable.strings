@@ -32,3 +32,7 @@
 "movie_details_vc_genre_label" = "Géneros";
 "not_applicable" = "N/A";
 "movie_details_vc_overview_label" = "Descripción";
+"movie_details_vc_no_overview_found" = "Sin descripción.";
+"movie_details_vc_budget_revenue_label" = "Presupuesto/Ganancias";
+"movie_details_vc_production_companies_label" = "Compañias Productoras";
+"movie_details_vc_homepage_label" = "Página Web";

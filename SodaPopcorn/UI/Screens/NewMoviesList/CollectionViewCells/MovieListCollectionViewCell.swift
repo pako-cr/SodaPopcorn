@@ -74,7 +74,8 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		let label = UILabel()
 		label.translatesAutoresizingMaskIntoConstraints = false
 		label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-		label.adjustsFontSizeToFitWidth = true
+		label.adjustsFontForContentSizeCategory = true
+        label.maximumContentSizeCategory = .accessibilityMedium
 		label.numberOfLines = 2
 		label.setContentCompressionResistancePriority(UILayoutPriority.fittingSizeLevel, for: .horizontal)
 		label.textAlignment = .left
@@ -88,6 +89,8 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
         textView.textAlignment = .left
         textView.isUserInteractionEnabled = false
         textView.isEditable = false
+        textView.adjustsFontForContentSizeCategory = true
+        textView.maximumContentSizeCategory = .accessibilityMedium
 		return textView
 	}()
 

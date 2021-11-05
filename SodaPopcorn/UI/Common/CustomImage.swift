@@ -72,6 +72,7 @@ final class CustomImage: UIImageView {
 		let activityIndicator = UIActivityIndicatorView(style: .medium)
 		activityIndicator.startAnimating()
 		activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = UIColor(named: "PrimaryColor")
 		return activityIndicator
 	}()
 
