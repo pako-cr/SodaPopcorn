@@ -34,6 +34,9 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when an backdrop image is selected from the movie details.
     func backdropImageAction() -> PassthroughSubject<String, Never>
+
+    /// Emits when the backdrop images are fetched.
+    func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -108,23 +111,38 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 self.movieInfoActionProperty.send(movieDetails)
             }).store(in: &cancellable)
 
-//        let movieImagesEvent = viewDidLoadProperty
-//            .flatMap { [weak self] _ -> AnyPublisher<ImagesApiResponse, Never> in
-//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-//
-//                self.loadingProperty.value = true
-//
-//                return movieService.getImages(movieId: self.movie.id ?? "")
-//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-//                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-//                        self?.loadingProperty.value = false
-//                        self?.handleNetworkResponseError(networkResponse)
-//                        return networkResponse
-//                    })
-//                    .replaceError(with: ImagesApiResponse.init(from: ""))
-//                // .replaceError(with: MoviesApiResponse(page: 0, numberOfResults: 0, numberOfPages: 0, movies: []))
-//                    .eraseToAnyPublisher()
-//            }.share()
+        let imagesEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<ImagesApiResponse, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.getImages(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: ImagesApiResponse())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        imagesEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] imagesApiResponse in
+                guard let `self` = self else { return }
+
+                if let backdrops = imagesApiResponse.backdrops, !backdrops.isEmpty {
+                    self.backdropImagesActionProperty.send(backdrops.filter({ $0.filePath != self.movie.backdropPath }))
+                }
+            }).store(in: &cancellable)
 	}
 
 	// MARK: - ⬇️ INPUTS Definition
@@ -167,6 +185,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let backdropImageActionProperty = PassthroughSubject<String, Never>()
     public func backdropImageAction() -> PassthroughSubject<String, Never> {
         return backdropImageActionProperty
+    }
+
+    private let backdropImagesActionProperty = PassthroughSubject<[Backdrop], Never>()
+    public func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never> {
+        return backdropImagesActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

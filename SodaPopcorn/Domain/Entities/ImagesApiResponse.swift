@@ -29,6 +29,20 @@ public final class ImagesApiResponse: Codable, Hashable {
         posters = try imageContainer.decodeIfPresent([Poster].self, forKey: .posters)
     }
 
+    init() {
+        self.id = nil
+        self.backdrops = nil
+        self.logos = nil
+        self.posters = nil
+    }
+
+    func isEmpty() -> Bool {
+        return id?.isEmpty ?? true &&
+        backdrops?.isEmpty ?? true &&
+        logos?.isEmpty ?? true &&
+        posters?.isEmpty ?? true
+    }
+
     public func hash(into hasher: inout Hasher) {
         return hasher.combine(id)
     }

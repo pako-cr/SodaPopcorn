@@ -44,7 +44,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
         let button = UIButton(type: .system)
         button.setImage(image, for: .normal)
         button.contentMode = .scaleAspectFit
@@ -113,8 +113,8 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
         backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         backdropImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -154,12 +154,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
 
     @objc
     private func tapGestureZoomOutAction(recognizer: UITapGestureRecognizer) {
-        if scrollView.zoomScale > 5 {
-            scrollView.setZoomScale(1.0, animated: true)
-        } else {
-            let position = recognizer.location(in: backdropImage)
-            scrollView.zoom(to: CGRect(x: position.x, y: position.y, width: 0.0, height: 0.0), animated: true)
-        }
+        scrollView.setZoomScale(1.0, animated: true)
     }
 
     @objc

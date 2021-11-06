@@ -49,7 +49,7 @@ extension MovieApi: EndPointType {
         case .details(let movieId):
             return "\(movieId)"
         case .images(let movieId):
-            return "\(movieId)"
+            return "\(movieId)/images"
         }
     }
 

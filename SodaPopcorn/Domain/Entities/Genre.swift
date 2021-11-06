@@ -23,3 +23,9 @@ public final class Genre: Codable {
         name = try genreContainer.decodeIfPresent(String.self, forKey: .name)
     }
 }
+
+extension Genre: Equatable {
+    public static func == (lhs: Genre, rhs: Genre) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
+    }
+}
