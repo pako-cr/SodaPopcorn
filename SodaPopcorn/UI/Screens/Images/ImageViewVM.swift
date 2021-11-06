@@ -37,7 +37,7 @@ public protocol ImageViewVMTypes: AnyObject {
 
 public final class ImageViewVM: ObservableObject, Identifiable, ImageViewVMInputs, ImageViewVMOutputs, ImageViewVMTypes {
     // MARK: Constants
-    private let imageURL: String
+    let imageURL: String
 
     // MARK: Variables
     public var inputs: ImageViewVMInputs { return self }

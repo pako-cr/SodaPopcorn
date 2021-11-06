@@ -18,6 +18,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
+                self.backdropImage.posterSize = .original
                 self.backdropImage.setUrlString(urlString: imageURL)
             }
         }
@@ -27,8 +28,10 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = true
-        scrollView.showsVerticalScrollIndicator = true
+        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 10.0
         return scrollView
@@ -52,12 +55,18 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         return button
     }()
 
-    private let backdropImage: CustomImage = {
+    private lazy var backdropImage: CustomImage = {
         let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .original
+        customImage.posterSize = .w780
         customImage.customContentMode = .scaleAspectFit
-        customImage.defaultImage = UIImage(named: "no_backdrop")
         customImage.sizeToFit()
+
+        if let posterImage = cache.value(forKey: "\(PosterSize.w780.rawValue)\(self.viewModel.imageURL)") {
+            customImage.defaultImage = posterImage
+        } else {
+            customImage.defaultImage = UIImage(named: "no_backdrop")
+        }
+
         return customImage
     }()
 

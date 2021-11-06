@@ -94,13 +94,6 @@ final class CustomImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-
-        if activityIndicatorView.isAnimating {
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 8) { [weak self] in
-                guard let `self` = self else { return }
-                self.activityIndicatorView.stopAnimating()
-            }
-        }
     }
 
     required init?(coder: NSCoder) {
