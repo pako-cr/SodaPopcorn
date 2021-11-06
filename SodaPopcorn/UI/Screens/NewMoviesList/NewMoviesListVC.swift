@@ -263,7 +263,7 @@ final class NewMoviesListVC: BaseViewController {
 		snapshot.appendSections(Section.allCases)
 
 		self.dataSource.apply(snapshot, animatingDifferences: true)
-		imageCache.removeAllObjects()
+        cache.removeAllValues()
 	}
 
 	@objc
