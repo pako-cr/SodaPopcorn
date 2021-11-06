@@ -1,6 +1,6 @@
 //
 //  MovieEndpoint.swift
-//  StarWarsWorld
+//  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
 //
@@ -8,11 +8,10 @@
 import Foundation
 
 public enum MovieApi {
-	case recommended(id: Int)
-	case popular(page: Int)
 	case newMovies(page: Int)
 	case video(id: Int)
     case details(movieId: String)
+    case images(movieId: String)
 }
 
 // Example url: https://api.themoviedb.org/3/movie/550?page=1&api_key=ae3f83170dac3764098efb70c9dd7cdf
@@ -41,20 +40,18 @@ extension MovieApi: EndPointType {
 		return .reloadIgnoringLocalAndRemoteCacheData
 	}
 
-	var path: String {
-		switch self {
-			case .recommended(let id):
-				return "\(id)/recommendations"
-			case .popular:
-				return "popular"
-			case .newMovies:
-				return "now_playing"
-			case .video(let id):
-				return "\(id)/videos"
-            case .details(let movieId):
-                return "\(movieId)"
+    var path: String {
+        switch self {
+        case .newMovies:
+            return "now_playing"
+        case .video(let id):
+            return "\(id)/videos"
+        case .details(let movieId):
+            return "\(movieId)"
+        case .images(let movieId):
+            return "\(movieId)"
         }
-	}
+    }
 
 	var httpMethod: HTTPMethod {
         return .get
@@ -69,6 +66,11 @@ extension MovieApi: EndPointType {
                                                       "api_key": publicApiKey,
                                                       "language": locale])
         case .details:
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["api_key": publicApiKey,
+                                                      "language": locale])
+        case .images:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,

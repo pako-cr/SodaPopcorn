@@ -99,8 +99,8 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
 
-        contentView.addSubview(closeButton)
         contentView.addSubview(backdropImage)
+        contentView.addSubview(closeButton)
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -112,6 +112,8 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         backdropImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
+
+        handleGestureRecongnizers()
     }
 
     override func bindViewModel() {
@@ -123,13 +125,52 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     }
 
     // MARK: - Helpers ⚙️
+    private func handleGestureRecongnizers() {
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(presentImageOptionsActionSheet))
+        longPressRecognizer.minimumPressDuration = 1.0
+
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomOutAction))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+
+        backdropImage.isUserInteractionEnabled = true
+        backdropImage.addGestureRecognizer(longPressRecognizer)
+        backdropImage.addGestureRecognizer(doubleTapRecognizer)
+
+        scrollView.addGestureRecognizer(doubleTapRecognizer)
+    }
+
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return self.backdropImage
+    }
+
+    @objc
+    private func tapGestureZoomOutAction(recognizer: UITapGestureRecognizer) {
+        if scrollView.zoomScale > 5 {
+            scrollView.setZoomScale(1.0, animated: true)
+        } else {
+            let position = recognizer.location(in: backdropImage)
+            scrollView.zoom(to: CGRect(x: position.x, y: position.y, width: 0.0, height: 0.0), animated: true)
+        }
+    }
+
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
     }
 
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return self.backdropImage
+    @objc
+    private func presentImageOptionsActionSheet() {
+        let saveAction = UIAlertAction(title: NSLocalizedString("alert_save_button", comment: "Save button"), style: .default) { [weak self] _ in
+            self?.downloadImageToPhotosAlbum()
+        }
+
+        Alert.showActionSheet(on: self, actions: [saveAction])
+    }
+
+    @objc
+    private func downloadImageToPhotosAlbum() {
+        guard let image = backdropImage.image else { return }
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
 
     // MARK: - 🗑 Deinit

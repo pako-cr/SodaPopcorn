@@ -21,7 +21,6 @@ final class MovieDetailsVC: BaseViewController {
 
                 // Backdrop
                 if let backdropImageUrl = movie.backdropPath {
-//                    self.backdropCollectionView.setUrlString(urlString: backdropImageUrl)
                     self.backdropCollectionView.updateCollectionViewData(images: [backdropImageUrl])
                 }
 

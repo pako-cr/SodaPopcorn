@@ -36,3 +36,5 @@
 "movie_details_vc_budget_revenue_label" = "Presupuesto/Ganancias";
 "movie_details_vc_production_companies_label" = "Compañias Productoras";
 "movie_details_vc_homepage_label" = "Página Web";
+"alert_cancel_button" = "Cancelar";
+"alert_save_button" = "Guardar Imagen";

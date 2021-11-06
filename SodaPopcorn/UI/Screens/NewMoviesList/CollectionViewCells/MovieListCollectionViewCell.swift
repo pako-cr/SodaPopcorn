@@ -8,7 +8,7 @@
 import UIKit
 
 final class MovieListCollectionViewCell: UICollectionViewCell {
-	
+
     // MARK: Constants
 	static let reuseIdentifier = "movieListCollectionViewCellId"
 

@@ -88,9 +88,8 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(viewController, animated: true, completion: nil)
 
         viewModel.outputs.closeButtonAction()
-            .sink { [weak self] _ in
-                guard let `self` = self else { return }
-                self.homeVC?.dismiss(animated: true, completion: nil)
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
             }.store(in: &cancellable)
     }
 }

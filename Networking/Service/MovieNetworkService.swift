@@ -11,6 +11,7 @@ import Foundation
 public protocol MovieNetworkServiceProtocol {
 	func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse>
     func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse>
+    func getImages(movieId: String) -> AnyPublisher<ImagesApiResponse, NetworkResponse>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
@@ -97,6 +98,51 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             }
                         case .failure(let networkFailureError):
                             print("🔴 [MovieNetworkService] [movieDetails] An error occurred: \(networkFailureError)")
+                            promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
+                            promise.onComplete()
+                    }
+                }
+            })
+            return Disposable {}
+        }
+    }
+
+    func getImages(movieId: String) -> AnyPublisher<ImagesApiResponse, NetworkResponse> {
+        return AnyPublisher<ImagesApiResponse, NetworkResponse>.create { [weak self] promise in
+            guard let `self` = self else { return Disposable {} }
+
+            self.networkManager.request(.images(movieId: movieId), completion: { [weak self] data, response, error in
+                guard let `self` = self else { return }
+
+                if error != nil {
+                    let errorDescription = error?.localizedDescription ?? ""
+                    print("🔴 [MovieNetworkService] [images] An error occurred: \(errorDescription)")
+                    promise.onError(NetworkResponse.failed(errorDescription))
+                    promise.onComplete()
+                }
+
+                if let response = response as? HTTPURLResponse {
+                    let result = self.networkManager.handleNetworkResponse(response)
+                    switch result {
+                        case .success:
+                            guard let responseData = data else {
+                                promise.onError(NetworkResponse.noData)
+                                promise.onComplete()
+                                return
+                            }
+                            do {
+                                let apiResponse = try JSONDecoder().decode(ImagesApiResponse.self, from: responseData)
+
+                                promise.onNext(apiResponse)
+                                promise.onComplete()
+
+                            } catch let exception {
+                                print("🔴 [MovieNetworkService] [images] An error occurred: \(exception.localizedDescription)")
+                                promise.onError(NetworkResponse.unableToDecode)
+                                promise.onComplete()
+                            }
+                        case .failure(let networkFailureError):
+                            print("🔴 [MovieNetworkService] [images] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }

@@ -36,3 +36,5 @@
 "movie_details_vc_budget_revenue_label" = "Budget/Revenue";
 "movie_details_vc_production_companies_label" = "Production Companies";
 "movie_details_vc_homepage_label" = "Website";
+"alert_cancel_button" = "Cancel";
+"alert_save_button" = "Save Image";

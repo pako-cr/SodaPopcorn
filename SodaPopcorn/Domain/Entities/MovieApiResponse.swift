@@ -17,9 +17,9 @@ public struct MoviesApiResponse {
 extension MoviesApiResponse: Decodable {
 	private enum MoviesApiResponseCodingKeys: String, CodingKey {
 		case page
-		case numberOfResults = "total_results"
-		case numberOfPages = "total_pages"
-		case movies = "results"
+		case numberOfResults    = "total_results"
+		case numberOfPages      = "total_pages"
+		case movies             = "results"
 	}
 
 	public init(from decoder: Decoder) throws {

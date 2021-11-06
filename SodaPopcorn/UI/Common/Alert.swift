@@ -16,6 +16,18 @@ struct Alert {
 		}
 	}
 
+    private static func showBasicActionSheet(on viewController: UIViewController, actions: [UIAlertAction]) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        var newActions = actions
+        newActions.append(UIAlertAction(title: NSLocalizedString("alert_cancel_button", comment: "Cancel button"), style: .cancel, handler: nil))
+        newActions.forEach { alert.addAction($0) }
+
+        DispatchQueue.main.async {
+            viewController.present(alert, animated: true)
+        }
+    }
+
 	/// Present an basic alert on the center of the screen.
 	/// - Parameters:
 	///     - viewController: The view controller to be presented in.
@@ -38,4 +50,14 @@ struct Alert {
 		let actions: [UIAlertAction] = [completeAction]
 		showBasicAlert(on: viewController, with: title, message: message, actions: actions)
 	}
+
+    /// Present an basic action sheet alert with multiple options on the center of the screen with a callback handler.
+    /// - Parameters:
+    ///     - viewController: The view controller to be presented in.
+    ///     - message: A message for the alert.
+    ///     - title: A title for the alert.
+    ///     - handler: A callback.
+    static func showActionSheet(on viewController: UIViewController, actions: [UIAlertAction]) {
+        showBasicActionSheet(on: viewController, actions: actions)
+    }
 }

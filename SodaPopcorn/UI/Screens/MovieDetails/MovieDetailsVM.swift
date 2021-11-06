@@ -107,6 +107,24 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
                 self.movieInfoActionProperty.send(movieDetails)
             }).store(in: &cancellable)
+
+//        let movieImagesEvent = viewDidLoadProperty
+//            .flatMap { [weak self] _ -> AnyPublisher<ImagesApiResponse, Never> in
+//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+//
+//                self.loadingProperty.value = true
+//
+//                return movieService.getImages(movieId: self.movie.id ?? "")
+//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+//                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+//                        self?.loadingProperty.value = false
+//                        self?.handleNetworkResponseError(networkResponse)
+//                        return networkResponse
+//                    })
+//                    .replaceError(with: ImagesApiResponse.init(from: ""))
+//                // .replaceError(with: MoviesApiResponse(page: 0, numberOfResults: 0, numberOfPages: 0, movies: []))
+//                    .eraseToAnyPublisher()
+//            }.share()
 	}
 
 	// MARK: - ⬇️ INPUTS Definition

@@ -1,6 +1,6 @@
 //
 //  NewMoviesListVM.swift
-//  StarWarsWorld
+//  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
 //
