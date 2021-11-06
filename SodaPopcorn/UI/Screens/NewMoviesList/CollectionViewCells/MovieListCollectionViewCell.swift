@@ -67,18 +67,21 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 
 	private let posterImage: CustomImage = {
 		let customImageView = CustomImage(frame: .zero)
+        customImageView.sizeToFit()
 		return customImageView
 	}()
 
 	private let movieTitle: UILabel = {
 		let label = UILabel()
 		label.translatesAutoresizingMaskIntoConstraints = false
-		label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
+		label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
 		label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
-		label.numberOfLines = 2
+		label.numberOfLines = 1
 		label.setContentCompressionResistancePriority(UILayoutPriority.fittingSizeLevel, for: .horizontal)
 		label.textAlignment = .left
+        label.lineBreakMode = .byTruncatingTail
+        label.sizeToFit()
 		return label
 	}()
 
@@ -91,6 +94,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
         textView.isEditable = false
         textView.adjustsFontForContentSizeCategory = true
         textView.maximumContentSizeCategory = .accessibilityMedium
+        textView.sizeToFit()
 		return textView
 	}()
 

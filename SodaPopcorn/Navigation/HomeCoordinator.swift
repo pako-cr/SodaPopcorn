@@ -64,8 +64,6 @@ final class HomeCoordinator: Coordinator {
 	}
 
 	private func showMovieDetails(movie: Movie) {
-		print(movie.title ?? "")
-
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
@@ -76,5 +74,23 @@ final class HomeCoordinator: Coordinator {
 				guard let `self` = self else { return }
 				self.homeVC?.dismiss(animated: true, completion: nil)
 			}.store(in: &cancellable)
+
+        viewModel.outputs.backdropImageAction()
+            .sink { [weak self] (imageURL) in
+                self?.showImageView(with: imageURL, on: viewController)
+            }.store(in: &cancellable)
 	}
+
+    private func showImageView(with imageURL: String, on navigationController: UIViewController) {
+        let viewModel = ImageViewVM(imageURL: imageURL)
+        let viewController = ImageViewVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { [weak self] _ in
+                guard let `self` = self else { return }
+                self.homeVC?.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+    }
 }

@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A15B5B727356FF3004241C8 /* BackdropCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */; };
+		8A15B5BA2735728C004241C8 /* BackdropCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */; };
 		8A15C60E2732CBEC00D6A68A /* Genre.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15C60D2732CBEC00D6A68A /* Genre.swift */; };
 		8A15C6102732D00100D6A68A /* ProductionCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15C60F2732D00100D6A68A /* ProductionCountry.swift */; };
 		8A15C6122732DBF300D6A68A /* SpokenLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15C6112732DBF300D6A68A /* SpokenLanguage.swift */; };
 		8A15C6142732DCFF00D6A68A /* ProductionCompany.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15C6132732DCFF00D6A68A /* ProductionCompany.swift */; };
+		8AE8FC99273603700094AFE8 /* ImageViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE8FC98273603700094AFE8 /* ImageViewVC.swift */; };
+		8AE8FC9B273603D00094AFE8 /* ImageViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE8FC9A273603D00094AFE8 /* ImageViewVM.swift */; };
 		D9322E8126E3B00900522AFB /* MovieNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8026E3B00900522AFB /* MovieNetworkService.swift */; };
 		D9322E8326E3B41D00522AFB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8226E3B41D00522AFB /* Result.swift */; };
 		D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9322E8426E3B45100522AFB /* NetworkResponse.swift */; };
@@ -123,10 +127,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackdropCollectionView.swift; sourceTree = "<group>"; };
+		8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackdropCollectionViewCell.swift; sourceTree = "<group>"; };
 		8A15C60D2732CBEC00D6A68A /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
 		8A15C60F2732D00100D6A68A /* ProductionCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionCountry.swift; sourceTree = "<group>"; };
 		8A15C6112732DBF300D6A68A /* SpokenLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenLanguage.swift; sourceTree = "<group>"; };
 		8A15C6132732DCFF00D6A68A /* ProductionCompany.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionCompany.swift; sourceTree = "<group>"; };
+		8AE8FC98273603700094AFE8 /* ImageViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewVC.swift; sourceTree = "<group>"; };
+		8AE8FC9A273603D00094AFE8 /* ImageViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewVM.swift; sourceTree = "<group>"; };
 		D9322E8026E3B00900522AFB /* MovieNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieNetworkService.swift; sourceTree = "<group>"; };
 		D9322E8226E3B41D00522AFB /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		D9322E8426E3B45100522AFB /* NetworkResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResponse.swift; sourceTree = "<group>"; };
@@ -235,6 +243,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A15B5B82735726B004241C8 /* CollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */,
+			);
+			path = CollectionViewCells;
+			sourceTree = "<group>";
+		};
+		8AE8FC972736035C0094AFE8 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				8AE8FC98273603700094AFE8 /* ImageViewVC.swift */,
+				8AE8FC9A273603D00094AFE8 /* ImageViewVM.swift */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
 		D9322E7F26E3AFDC00522AFB /* ServiceHelpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -413,8 +438,10 @@
 		D9440BEF270F495600D01C0A /* MovieDetails */ = {
 			isa = PBXGroup;
 			children = (
+				8A15B5B82735726B004241C8 /* CollectionViewCells */,
 				D9440BF0270F498E00D01C0A /* MovieDetailsVM.swift */,
 				D9440BF2270F4AA100D01C0A /* MovieDetailsVC.swift */,
+				8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */,
 			);
 			path = MovieDetails;
 			sourceTree = "<group>";
@@ -531,6 +558,7 @@
 		D9B89D3226F82DD1006E7D5E /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				8AE8FC972736035C0094AFE8 /* Images */,
 				D9440BEF270F495600D01C0A /* MovieDetails */,
 				D9B89D3326F82DE0006E7D5E /* Home */,
 				D941ACE126E27A8900018E57 /* NewMoviesList */,
@@ -820,7 +848,10 @@
 				D9322E8326E3B41D00522AFB /* Result.swift in Sources */,
 				D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */,
 				D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */,
+				8AE8FC9B273603D00094AFE8 /* ImageViewVM.swift in Sources */,
 				D9323E2C26E30F7E00DE497B /* MovieApiResponse.swift in Sources */,
+				8AE8FC99273603700094AFE8 /* ImageViewVC.swift in Sources */,
+				8A15B5BA2735728C004241C8 /* BackdropCollectionViewCell.swift in Sources */,
 				D9BBD68A26E71F6900A2C24D /* UIFont+Style.swift in Sources */,
 				D985656926E59B5300457264 /* NewMoviesListVC.swift in Sources */,
 				D941ACC726E278EF00018E57 /* JSONParameterEncoder.swift in Sources */,
@@ -857,6 +888,7 @@
 				D941ACCA26E278EF00018E57 /* HTTPTask.swift in Sources */,
 				D9E6D38526E9246C000292D4 /* PosterSize.swift in Sources */,
 				D9440BF1270F498E00D01C0A /* MovieDetailsVM.swift in Sources */,
+				8A15B5B727356FF3004241C8 /* BackdropCollectionView.swift in Sources */,
 				8A15C60E2732CBEC00D6A68A /* Genre.swift in Sources */,
 				D9C517ED271DBB3B009ECE76 /* Reachability.swift in Sources */,
 				D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */,

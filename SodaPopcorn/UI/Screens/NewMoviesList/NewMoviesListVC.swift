@@ -118,9 +118,6 @@ final class NewMoviesListVC: BaseViewController {
 		let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
 		navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
 
-		// Considere adding this button only when a fetch fails and making it dissapear when the internet is back.
-//		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.done, target: self, action: #selector(reloadCollectionView))
-
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true

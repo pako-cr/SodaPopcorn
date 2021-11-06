@@ -14,6 +14,9 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
 	/// Call when the close button is pressed.
 	func closeButtonPressed()
+
+    /// Call when an backdrop image is selected from the movie details.
+    func backdropImageSelected(imageURL: String)
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -28,6 +31,9 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when an error occurred.
     func showError() -> PassthroughSubject<String, Never>
+
+    /// Emits when an backdrop image is selected from the movie details.
+    func backdropImageAction() -> PassthroughSubject<String, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -58,9 +64,12 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 		}.store(in: &cancellable)
 
 		closeButtonPressedProperty.sink { [weak self] _ in
-			guard let `self` = self else { return }
-			self.closeButtonActionProperty.send(())
+			self?.closeButtonActionProperty.send(())
 		}.store(in: &cancellable)
+
+        backdropImageSelectedProperty.sink { [weak self] (imageURL) in
+            self?.backdropImageActionProperty.send(imageURL)
+        }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
             .flatMap { [weak self] _ -> AnyPublisher<Movie, Never> in
@@ -111,6 +120,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 		closeButtonPressedProperty.send(())
 	}
 
+    private let backdropImageSelectedProperty = PassthroughSubject<String, Never>()
+    public func backdropImageSelected(imageURL: String) {
+        backdropImageSelectedProperty.send(imageURL)
+    }
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
 	public func closeButtonAction() -> PassthroughSubject<Void, Never> {
@@ -130,6 +144,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let showErrorProperty = PassthroughSubject<String, Never>()
     public func showError() -> PassthroughSubject<String, Never> {
         return showErrorProperty
+    }
+
+    private let backdropImageActionProperty = PassthroughSubject<String, Never>()
+    public func backdropImageAction() -> PassthroughSubject<String, Never> {
+        return backdropImageActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

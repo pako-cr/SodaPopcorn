@@ -21,7 +21,8 @@ final class MovieDetailsVC: BaseViewController {
 
                 // Backdrop
                 if let backdropImageUrl = movie.backdropPath {
-                    self.backdropImage.setUrlString(urlString: backdropImageUrl)
+//                    self.backdropCollectionView.setUrlString(urlString: backdropImageUrl)
+                    self.backdropCollectionView.updateCollectionViewData(images: [backdropImageUrl])
                 }
 
                 // Title
@@ -115,13 +116,9 @@ final class MovieDetailsVC: BaseViewController {
         return button
     }()
 
-    private let backdropImage: CustomImage = {
-        let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .w780
-        customImage.customContentMode = .scaleAspectFill
-        customImage.defaultImage = UIImage(named: "no_backdrop")
-        customImage.sizeToFit()
-        return customImage
+    private lazy var backdropCollectionView: BackdropCollectionView = {
+        let collectionView = BackdropCollectionView(movieDetailsVM: self.viewModel)
+        return collectionView
     }()
 
     private let headerStack: UIStackView = {
@@ -389,7 +386,7 @@ final class MovieDetailsVC: BaseViewController {
         headerStack.addArrangedSubview(movieTitleLabel)
         headerStack.addArrangedSubview(taglineLabel)
 
-        contentView.addSubview(backdropImage)
+        contentView.addSubview(backdropCollectionView.view)
         contentView.addSubview(closeButton)
         contentView.addSubview(headerStack)
         contentView.addSubview(subHeaderStack)
@@ -408,17 +405,17 @@ final class MovieDetailsVC: BaseViewController {
         subHeaderStack.addArrangedSubview(runtimeLabel)
         subHeaderStack.addArrangedSubview(ratingLabel)
 
-        backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        backdropImage.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
-        backdropImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        backdropCollectionView.view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        backdropCollectionView.view.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        backdropCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        backdropCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         closeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
 
-        headerStack.topAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
+        headerStack.topAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: 10).isActive = true
         headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
 
