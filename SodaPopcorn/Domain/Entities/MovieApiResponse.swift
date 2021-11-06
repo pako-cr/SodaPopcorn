@@ -7,15 +7,15 @@
 
 import Foundation
 
-public struct MovieApiResponse {
+public struct MoviesApiResponse {
 	let page: Int
 	let numberOfResults: Int
 	let numberOfPages: Int
 	var movies: [Movie]
 }
 
-extension MovieApiResponse: Decodable {
-	private enum MovieApiResponseCodingKeys: String, CodingKey {
+extension MoviesApiResponse: Decodable {
+	private enum MoviesApiResponseCodingKeys: String, CodingKey {
 		case page
 		case numberOfResults = "total_results"
 		case numberOfPages = "total_pages"
@@ -23,7 +23,7 @@ extension MovieApiResponse: Decodable {
 	}
 
 	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: MovieApiResponseCodingKeys.self)
+		let container = try decoder.container(keyedBy: MoviesApiResponseCodingKeys.self)
 
 		page = try container.decode(Int.self, forKey: .page)
 		numberOfResults = try container.decode(Int.self, forKey: .numberOfResults)

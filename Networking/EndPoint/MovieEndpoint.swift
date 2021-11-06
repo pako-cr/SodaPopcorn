@@ -12,6 +12,7 @@ public enum MovieApi {
 	case popular(page: Int)
 	case newMovies(page: Int)
 	case video(id: Int)
+    case details(movieId: String)
 }
 
 // Example url: https://api.themoviedb.org/3/movie/550?page=1&api_key=ae3f83170dac3764098efb70c9dd7cdf
@@ -50,26 +51,32 @@ extension MovieApi: EndPointType {
 				return "now_playing"
 			case .video(let id):
 				return "\(id)/videos"
-		}
+            case .details(let movieId):
+                return "\(movieId)"
+        }
 	}
 
 	var httpMethod: HTTPMethod {
-		return .get
-	}
-
-	var task: HTTPTask {
-		switch self {
-			case .newMovies(let page):
-
-				return .requestParameters(bodyParameters: nil,
-										  bodyEncoding: .urlEncoding,
-										  urlParameters: ["page": page,
-														  "api_key": publicApiKey,
-														  "language": locale])
-			default:
-				return .request
-		}
-	}
+        return .get
+    }
+    
+    var task: HTTPTask {
+        switch self {
+        case .newMovies(let page):
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["page": page,
+                                                      "api_key": publicApiKey,
+                                                      "language": locale])
+        case .details:
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["api_key": publicApiKey,
+                                                      "language": locale])
+        default:
+            return .request
+        }
+    }
 
 	var headers: HTTPHeaders? {
 		return nil

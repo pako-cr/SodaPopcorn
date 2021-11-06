@@ -10,18 +10,16 @@ import Combine
 import CoreData
 import UIKit
 
-public final class MovieService: MovieNetworkServiceProtocol, StorageContext {
+public final class MovieService: MovieNetworkServiceProtocol {
 	private let movieNetworkService: MovieNetworkService
-	private let storageManager: StorageManager
 
 	private static let sharedMovieService: MovieService = {
 		let managedObjectContext = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
-		return MovieService(movieNetworkService: MovieNetworkService(), storageManager: StorageManager(managedObjectContext: managedObjectContext!))
+		return MovieService(movieNetworkService: MovieNetworkService())
 	}()
 
-	private init(movieNetworkService: MovieNetworkService, storageManager: StorageManager) {
+	private init(movieNetworkService: MovieNetworkService) {
 		self.movieNetworkService = movieNetworkService
-		self.storageManager = storageManager
 	}
 
 	static func shared() -> MovieService {
@@ -29,32 +27,36 @@ public final class MovieService: MovieNetworkServiceProtocol, StorageContext {
 	}
 
 	// MARK: - Network Service
-	public func getNewMovies(page: Int) -> AnyPublisher<MovieApiResponse, NetworkResponse> {
+	public func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse> {
 		return movieNetworkService.getNewMovies(page: page)
 	}
 
+    public func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse> {
+        return movieNetworkService.movieDetails(movieId: movieId)
+    }
+
 	// MARK: - Storage Context
-	func create(movie: Movie) {
-		storageManager.create(movie: movie)
-	}
-
-	func fetch() -> [Movie]? {
-		return storageManager.fetch()
-	}
-
-	func update(movie: Movie) throws {
-		try storageManager.update(movie: movie)
-	}
-
-	func delete(movie: Movie) throws {
-		try storageManager.delete(movie: movie)
-	}
-
-	func deleteAll() throws {
-		try storageManager.deleteAll()
-	}
-
-	func saveAll(movies: [Movie]) throws {
-		try storageManager.saveAll(movies: movies)
-	}
+//	func create(movie: Movie) {
+//		storageManager.create(movie: movie)
+//	}
+//
+//	func fetch() -> [Movie]? {
+//		return storageManager.fetch()
+//	}
+//
+//	func update(movie: Movie) throws {
+//		try storageManager.update(movie: movie)
+//	}
+//
+//	func delete(movie: Movie) throws {
+//		try storageManager.delete(movie: movie)
+//	}
+//
+//	func deleteAll() throws {
+//		try storageManager.deleteAll()
+//	}
+//
+//	func saveAll(movies: [Movie]) throws {
+//		try storageManager.saveAll(movies: movies)
+//	}
 }

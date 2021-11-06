@@ -29,3 +29,10 @@
 "network_response_error_failed" = "Falló en la conexión a internet. Por favor verifica tu conexión primero";
 "network_response_error_no_data" = "La respuesta llegó vacía";
 "network_response_error_unable_to_decode" = "No se pudo manejar la respuesta";
+"movie_details_vc_genre_label" = "Géneros";
+"not_applicable" = "N/A";
+"movie_details_vc_overview_label" = "Descripción";
+"movie_details_vc_no_overview_found" = "Sin descripción.";
+"movie_details_vc_budget_revenue_label" = "Presupuesto/Ganancias";
+"movie_details_vc_production_companies_label" = "Compañias Productoras";
+"movie_details_vc_homepage_label" = "Página Web";

@@ -29,3 +29,10 @@
 "network_response_error_failed" = "Network request failed";
 "network_response_error_no_data" = "Response returned with no data to decode";
 "network_response_error_unable_to_decode" = "We could not decode the response";
+"movie_details_vc_genre_label" = "Genres";
+"not_applicable" = "N/A";
+"movie_details_vc_overview_label" = "Overview";
+"movie_details_vc_no_overview_found" = "Without overview.";
+"movie_details_vc_budget_revenue_label" = "Budget/Revenue";
+"movie_details_vc_production_companies_label" = "Production Companies";
+"movie_details_vc_homepage_label" = "Website";
