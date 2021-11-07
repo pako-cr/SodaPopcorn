@@ -27,7 +27,7 @@ public final class MovieService: MovieNetworkServiceProtocol {
 	}
 
 	// MARK: - Network Service
-	public func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse> {
+	public func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
 		return movieNetworkService.getNewMovies(page: page)
 	}
 
@@ -35,7 +35,7 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.movieDetails(movieId: movieId)
     }
 
-    public func getImages(movieId: String) -> AnyPublisher<ImagesApiResponse, NetworkResponse> {
+    public func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse> {
         return movieNetworkService.getImages(movieId: movieId)
     }
 

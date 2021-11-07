@@ -18,7 +18,6 @@ public class MovieEntity: NSManagedObject, Storable {
 		self.setValue(movie.backdropPath, forKey: "backdropPath")
 		self.setValue(movie.rating, forKey: "rating")
 		self.setValue(movie.overview, forKey: "overview")
-		self.setValue(movie.posterImageData, forKey: "posterImageData")
 	}
 
 	func update(with movie: Movie) {
@@ -27,6 +26,5 @@ public class MovieEntity: NSManagedObject, Storable {
 		self.setValue(movie.backdropPath, forKey: "backdropPath")
 		self.setValue(movie.rating, forKey: "rating")
 		self.setValue(movie.overview, forKey: "overview")
-		self.setValue(movie.posterImageData, forKey: "posterImageData")
 	}
 }

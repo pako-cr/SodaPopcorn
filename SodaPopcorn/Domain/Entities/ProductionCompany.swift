@@ -5,27 +5,26 @@
 //  Created by Francisco Cordoba on 3/11/21.
 //
 
-import Foundation
-
-public final class ProductionCompany: Codable {
+public final class ProductionCompany {
     public var id: Int?
     public var logoPath: String?
     public var name: String?
-    public var originCountry: String?
 
-    private enum ProductionCompanyCodingKeys: String, CodingKey {
-        case id
-        case logoPath       = "logo_path"
-        case name
-        case originCountry  = "origin_country"
+    private init(id: Int?, logoPath: String?, name: String?) {
+        self.id = id
+        self.logoPath = logoPath
+        self.name = name
     }
 
-    public init(from decoder: Decoder) throws {
-        let productionCompanyContainer = try decoder.container(keyedBy: ProductionCompanyCodingKeys.self)
+    convenience init(productionCompanyApiResponse: ProductionCompanyApiResponse) {
+        self.init(id: productionCompanyApiResponse.id,
+                  logoPath: productionCompanyApiResponse.logoPath,
+                  name: productionCompanyApiResponse.name)
+    }
+}
 
-        id = try productionCompanyContainer.decodeIfPresent(Int.self, forKey: .id)
-        logoPath = try productionCompanyContainer.decodeIfPresent(String.self, forKey: .logoPath)
-        name = try productionCompanyContainer.decodeIfPresent(String.self, forKey: .name)
-        originCountry = try productionCompanyContainer.decodeIfPresent(String.self, forKey: .originCountry)
+extension ProductionCompany: Equatable {
+    public static func == (lhs: ProductionCompany, rhs: ProductionCompany) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
 }

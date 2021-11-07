@@ -5,78 +5,64 @@
 //  Created by Francisco Cordoba on 3/9/21.
 //
 
-import Foundation
-
-public final class Movie: Codable, Hashable {
-	public var id: String?
-	public var title: String?
-	public var overview: String?
-	public var rating: Double?
-	public var posterPath: String?
-	public var backdropPath: String?
-	public var posterImageData: Data?
+public final class Movie: Hashable {
+    public var id: String?
+    public var title: String?
+    public var overview: String?
+    public var rating: Double?
+    public var posterPath: String?
+    public var backdropPath: String?
     public var releaseDate: String?
     public var genres: [Genre]?
     public var homepage: String?
     public var runtime: Int?
-    public var video: Bool?
     public var voteCount: Int?
     public var budget: Int?
     public var revenue: Int?
-    public var productionCountries: [ProductionCountry]?
     public var tagline: String?
-    public var spokenLanguages: [SpokenLanguage]?
     public var productionCompanies: [ProductionCompany]?
 
-	private enum MovieCodingKeys: String, CodingKey {
-		case id
-		case title
-		case overview
-		case rating      	      = "vote_average"
-		case posterPath  	      = "poster_path"
-		case backdropPath	      = "backdrop_path"
-        case releaseDate          = "release_date"
-        case genres
-        case homepage
-        case runtime
-        case video
-        case voteCount            = "vote_count"
-        case budget
-        case revenue
-        case productionCountries  = "production_countries"
-        case tagline
-        case spokenLanguages      = "spoken_languages"
-        case productionCompanies  = "production_companies"
-	}
+    private init(id: String?, title: String?, overview: String?, rating: Double?, posterPath: String?, backdropPath: String?, releaseDate: String?, genres: [Genre]?, homepage: String?, runtime: Int?, voteCount: Int?, budget: Int?, revenue: Int?, tagline: String?, productionCompanies: [ProductionCompany]?) {
+        self.id = id
+        self.title = title
+        self.overview = overview
+        self.rating = rating
+        self.posterPath = posterPath
+        self.backdropPath = backdropPath
+        self.releaseDate = releaseDate
+        self.genres = genres
+        self.homepage = homepage
+        self.runtime = runtime
+        self.voteCount = voteCount
+        self.budget = budget
+        self.revenue = revenue
+        self.tagline = tagline
+        self.productionCompanies = productionCompanies
+    }
 
-	required public init(from decoder: Decoder) throws {
-		let movieContainer = try decoder.container(keyedBy: MovieCodingKeys.self)
+    convenience init(movieApiResponse: MovieApiResponse) {
+        self.init(id: movieApiResponse.id,
+                  title: movieApiResponse.title,
+                  overview: movieApiResponse.overview,
+                  rating: movieApiResponse.rating,
+                  posterPath: movieApiResponse.posterPath,
+                  backdropPath: movieApiResponse.backdropPath,
+                  releaseDate: movieApiResponse.releaseDate,
+                  genres: movieApiResponse.genres?.map({ Genre(genreApiResponse: $0) }) ?? [],
+                  homepage: movieApiResponse.homepage,
+                  runtime: movieApiResponse.runtime,
+                  voteCount: movieApiResponse.voteCount,
+                  budget: movieApiResponse.budget,
+                  revenue: movieApiResponse.revenue,
+                  tagline: movieApiResponse.tagline,
+                  productionCompanies: movieApiResponse.productionCompanies?.map({ ProductionCompany(productionCompanyApiResponse: $0) }))
+    }
 
-		id = try String(movieContainer.decode(Int.self, forKey: .id))
-		title = try movieContainer.decodeIfPresent(String.self, forKey: .title)
-		overview = try movieContainer.decodeIfPresent(String.self, forKey: .overview)
-		rating = try movieContainer.decodeIfPresent(Double.self, forKey: .rating)
-		posterPath = try movieContainer.decodeIfPresent(String.self, forKey: .posterPath)
-		backdropPath = try movieContainer.decodeIfPresent(String.self, forKey: .backdropPath)
-        releaseDate = try movieContainer.decodeIfPresent(String.self, forKey: .releaseDate)
-        genres = try movieContainer.decodeIfPresent([Genre].self, forKey: .genres)
-        homepage = try movieContainer.decodeIfPresent(String.self, forKey: .homepage)
-        runtime = try movieContainer.decodeIfPresent(Int.self, forKey: .runtime)
-        video = try movieContainer.decodeIfPresent(Bool.self, forKey: .video)
-        voteCount = try movieContainer.decodeIfPresent(Int.self, forKey: .voteCount)
-        budget = try movieContainer.decodeIfPresent(Int.self, forKey: .budget)
-        revenue = try movieContainer.decodeIfPresent(Int.self, forKey: .revenue)
-        productionCountries = try movieContainer.decodeIfPresent([ProductionCountry].self, forKey: .productionCountries)
-        tagline = try movieContainer.decodeIfPresent(String.self, forKey: .tagline)
-        spokenLanguages = try movieContainer.decodeIfPresent([SpokenLanguage].self, forKey: .spokenLanguages)
-        productionCompanies = try movieContainer.decodeIfPresent([ProductionCompany].self, forKey: .productionCompanies)
-	}
+    public func hash(into hasher: inout Hasher) {
+        return hasher.combine(id)
+    }
 
-	public func hash(into hasher: inout Hasher) {
-		return hasher.combine(id)
-	}
-
-	public static func == (lhs: Movie, rhs: Movie) -> Bool {
-		return lhs.id == rhs.id
-	}
+    public static func == (lhs: Movie, rhs: Movie) -> Bool {
+        return lhs.id == rhs.id
+    }
 }

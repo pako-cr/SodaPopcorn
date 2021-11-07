@@ -5,25 +5,23 @@
 //  Created by Francisco Cordoba on 5/11/21.
 //
 
-import Foundation
-
-public final class Logo: Codable, Hashable {
+public final class Logo: Hashable {
     public var filePath: String?
 
-    private enum LogoCodingKeys: String, CodingKey {
-        case filePath = "file_path"
+    private init(filePath: String? = nil) {
+        self.filePath = filePath
     }
 
-    required public init(from decoder: Decoder) throws {
-        let logoContainer = try decoder.container(keyedBy: LogoCodingKeys.self)
-
-        filePath = try logoContainer.decodeIfPresent(String.self, forKey: .filePath)
+    convenience init(logoApiResponse: LogoApiResponse) {
+        self.init(filePath: logoApiResponse.filePath)
     }
 
     public func hash(into hasher: inout Hasher) {
         return hasher.combine(filePath)
     }
+}
 
+extension Logo: Equatable {
     public static func == (lhs: Logo, rhs: Logo) -> Bool {
         return lhs.filePath == rhs.filePath
     }

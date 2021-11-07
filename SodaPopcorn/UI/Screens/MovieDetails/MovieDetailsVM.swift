@@ -112,7 +112,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
             }).store(in: &cancellable)
 
         let imagesEvent = viewDidLoadProperty
-            .flatMap { [weak self] _ -> AnyPublisher<ImagesApiResponse, Never> in
+            .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
                 return movieService.getImages(movieId: self.movie.id ?? "")
@@ -122,7 +122,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                         self?.handleNetworkResponseError(networkResponse)
                         return networkResponse
                     })
-                    .replaceError(with: ImagesApiResponse())
+                    .replaceError(with: MovieImages())
                     .eraseToAnyPublisher()
             }.share()
 

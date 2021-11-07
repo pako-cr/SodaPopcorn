@@ -9,16 +9,16 @@ import Combine
 import Foundation
 
 public protocol MovieNetworkServiceProtocol {
-	func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse>
+	func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse>
     func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse>
-    func getImages(movieId: String) -> AnyPublisher<ImagesApiResponse, NetworkResponse>
+    func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
 	private let networkManager = NetworkManager<MovieApi>()
 	
-	func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse> {
-		return AnyPublisher<MoviesApiResponse, NetworkResponse>.create { [weak self] promise in
+	func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
+		return AnyPublisher<Movies, NetworkResponse>.create { [weak self] promise in
 			guard let `self` = self else { return Disposable {} }
 
 			self.networkManager.request(.newMovies(page: page), completion: { [weak self] data, response, error in
@@ -43,7 +43,9 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 							do {
 								let apiResponse = try JSONDecoder().decode(MoviesApiResponse.self, from: responseData)
 
-								promise.onNext(apiResponse)
+                                let moviesResponse = Movies(moviesApiResponse: apiResponse)
+
+                                promise.onNext(moviesResponse)
 								promise.onComplete()
 
 							} catch let exception {
@@ -86,9 +88,11 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                                 return
                             }
                             do {
-                                let apiResponse = try JSONDecoder().decode(Movie.self, from: responseData)
+                                let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
 
-                                promise.onNext(apiResponse)
+                                let movieResponse = Movie(movieApiResponse: apiResponse)
+
+                                promise.onNext(movieResponse)
                                 promise.onComplete()
 
                             } catch let exception {
@@ -107,8 +111,8 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         }
     }
 
-    func getImages(movieId: String) -> AnyPublisher<ImagesApiResponse, NetworkResponse> {
-        return AnyPublisher<ImagesApiResponse, NetworkResponse>.create { [weak self] promise in
+    func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse> {
+        return AnyPublisher<MovieImages, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
             self.networkManager.request(.images(movieId: movieId), completion: { [weak self] data, response, error in
@@ -133,7 +137,9 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             do {
                                 let apiResponse = try JSONDecoder().decode(ImagesApiResponse.self, from: responseData)
 
-                                promise.onNext(apiResponse)
+                                let movieImagesResponse = MovieImages(imagesApiResponse: apiResponse)
+
+                                promise.onNext(movieImagesResponse)
                                 promise.onComplete()
 
                             } catch let exception {
