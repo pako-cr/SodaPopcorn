@@ -12,6 +12,7 @@ public protocol MovieNetworkServiceProtocol {
 	func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse>
     func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse>
     func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse>
+    func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
@@ -43,7 +44,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 							do {
 								let apiResponse = try JSONDecoder().decode(MoviesApiResponse.self, from: responseData)
 
-                                let moviesResponse = Movies(moviesApiResponse: apiResponse)
+                                let moviesResponse = Movies(apiResponse: apiResponse)
 
                                 promise.onNext(moviesResponse)
 								promise.onComplete()
@@ -90,7 +91,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             do {
                                 let apiResponse = try JSONDecoder().decode(MovieApiResponse.self, from: responseData)
 
-                                let movieResponse = Movie(movieApiResponse: apiResponse)
+                                let movieResponse = Movie(apiResponse: apiResponse)
 
                                 promise.onNext(movieResponse)
                                 promise.onComplete()
@@ -137,7 +138,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             do {
                                 let apiResponse = try JSONDecoder().decode(ImagesApiResponse.self, from: responseData)
 
-                                let movieImagesResponse = MovieImages(imagesApiResponse: apiResponse)
+                                let movieImagesResponse = MovieImages(apiResponse: apiResponse)
 
                                 promise.onNext(movieImagesResponse)
                                 promise.onComplete()
@@ -149,6 +150,53 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             }
                         case .failure(let networkFailureError):
                             print("🔴 [MovieNetworkService] [images] An error occurred: \(networkFailureError)")
+                            promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
+                            promise.onComplete()
+                    }
+                }
+            })
+            return Disposable {}
+        }
+    }
+
+    func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
+        return AnyPublisher<SocialNetworks, NetworkResponse>.create { [weak self] promise in
+            guard let `self` = self else { return Disposable {} }
+
+            self.networkManager.request(.socialNetworks(movieId: movieId), completion: { [weak self] data, response, error in
+                guard let `self` = self else { return }
+
+                if error != nil {
+                    let errorDescription = error?.localizedDescription ?? ""
+                    print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(errorDescription)")
+                    promise.onError(NetworkResponse.failed(errorDescription))
+                    promise.onComplete()
+                }
+
+                if let response = response as? HTTPURLResponse {
+                    let result = self.networkManager.handleNetworkResponse(response)
+                    switch result {
+                        case .success:
+                            guard let responseData = data else {
+                                promise.onError(NetworkResponse.noData)
+                                promise.onComplete()
+                                return
+                            }
+                            do {
+                                let apiResponse = try JSONDecoder().decode(SocialNetworksApiResponse.self, from: responseData)
+
+                                let socialNetworksResponse = SocialNetworks(apiResponse: apiResponse)
+
+                                promise.onNext(socialNetworksResponse)
+                                promise.onComplete()
+
+                            } catch let exception {
+                                print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(exception.localizedDescription)")
+                                promise.onError(NetworkResponse.unableToDecode)
+                                promise.onComplete()
+                            }
+                        case .failure(let networkFailureError):
+                            print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }

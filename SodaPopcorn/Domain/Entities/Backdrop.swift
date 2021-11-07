@@ -12,8 +12,8 @@ public final class Backdrop: Hashable {
         self.filePath = filePath
     }
 
-    convenience init(backdropApiResponse: BackdropApiResponse) {
-        self.init(filePath: backdropApiResponse.filePath)
+    convenience init(apiResponse: BackdropApiResponse) {
+        self.init(filePath: apiResponse.filePath)
     }
 
     public func hash(into hasher: inout Hasher) {

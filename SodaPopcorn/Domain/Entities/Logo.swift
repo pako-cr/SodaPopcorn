@@ -12,8 +12,8 @@ public final class Logo: Hashable {
         self.filePath = filePath
     }
 
-    convenience init(logoApiResponse: LogoApiResponse) {
-        self.init(filePath: logoApiResponse.filePath)
+    convenience init(apiResponse: LogoApiResponse) {
+        self.init(filePath: apiResponse.filePath)
     }
 
     public func hash(into hasher: inout Hasher) {

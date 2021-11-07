@@ -18,11 +18,11 @@ public final class MovieImages: Hashable {
         self.posters = posters
     }
 
-    convenience init(imagesApiResponse: ImagesApiResponse) {
-        self.init(id: imagesApiResponse.id,
-                  backdrops: imagesApiResponse.backdropsApiResponse?.map({ Backdrop(backdropApiResponse: $0) }) ?? [] ,
-                  logos: imagesApiResponse.logosApiResponse?.map({ Logo(logoApiResponse: $0) }) ?? [],
-                  posters: imagesApiResponse.postersApiResponse?.map({ Poster(posterApiResponse: $0) }) ?? [])
+    convenience init(apiResponse: ImagesApiResponse) {
+        self.init(id: apiResponse.id,
+                  backdrops: apiResponse.backdropsApiResponse?.map({ Backdrop(apiResponse: $0) }) ?? [] ,
+                  logos: apiResponse.logosApiResponse?.map({ Logo(apiResponse: $0) }) ?? [],
+                  posters: apiResponse.postersApiResponse?.map({ Poster(apiResponse: $0) }) ?? [])
     }
 
     convenience init() {

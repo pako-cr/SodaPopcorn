@@ -136,12 +136,43 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                         self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
                     default: break
                 }
-            }, receiveValue: { [weak self] imagesApiResponse in
+            }, receiveValue: { [weak self] movieImages in
                 guard let `self` = self else { return }
 
-                if let backdrops = imagesApiResponse.backdrops, !backdrops.isEmpty {
+                if let backdrops = movieImages.backdrops, !backdrops.isEmpty {
                     self.backdropImagesActionProperty.send(backdrops.filter({ $0.filePath != self.movie.backdropPath }))
                 }
+            }).store(in: &cancellable)
+
+        let socialNetworksEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.socialNetworks(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: SocialNetworks())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        socialNetworksEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] socialNetworks in
+                guard let `self` = self else { return }
+                print(socialNetworks.instagramId ?? "no insta")
+                
             }).store(in: &cancellable)
 	}
 

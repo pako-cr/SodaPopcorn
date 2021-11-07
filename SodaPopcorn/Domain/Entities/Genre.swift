@@ -14,8 +14,8 @@ public final class Genre {
         self.name = name
     }
 
-    convenience init(genreApiResponse: GenreApiResponse) {
-        self.init(id: genreApiResponse.id, name: genreApiResponse.name)
+    convenience init(apiResponse: GenreApiResponse) {
+        self.init(id: apiResponse.id, name: apiResponse.name)
     }
 }
 

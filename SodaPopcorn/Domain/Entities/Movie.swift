@@ -40,22 +40,22 @@ public final class Movie: Hashable {
         self.productionCompanies = productionCompanies
     }
 
-    convenience init(movieApiResponse: MovieApiResponse) {
-        self.init(id: movieApiResponse.id,
-                  title: movieApiResponse.title,
-                  overview: movieApiResponse.overview,
-                  rating: movieApiResponse.rating,
-                  posterPath: movieApiResponse.posterPath,
-                  backdropPath: movieApiResponse.backdropPath,
-                  releaseDate: movieApiResponse.releaseDate,
-                  genres: movieApiResponse.genres?.map({ Genre(genreApiResponse: $0) }) ?? [],
-                  homepage: movieApiResponse.homepage,
-                  runtime: movieApiResponse.runtime,
-                  voteCount: movieApiResponse.voteCount,
-                  budget: movieApiResponse.budget,
-                  revenue: movieApiResponse.revenue,
-                  tagline: movieApiResponse.tagline,
-                  productionCompanies: movieApiResponse.productionCompanies?.map({ ProductionCompany(productionCompanyApiResponse: $0) }))
+    convenience init(apiResponse: MovieApiResponse) {
+        self.init(id: apiResponse.id,
+                  title: apiResponse.title,
+                  overview: apiResponse.overview,
+                  rating: apiResponse.rating,
+                  posterPath: apiResponse.posterPath,
+                  backdropPath: apiResponse.backdropPath,
+                  releaseDate: apiResponse.releaseDate,
+                  genres: apiResponse.genres?.map({ Genre(apiResponse: $0) }) ?? [],
+                  homepage: apiResponse.homepage,
+                  runtime: apiResponse.runtime,
+                  voteCount: apiResponse.voteCount,
+                  budget: apiResponse.budget,
+                  revenue: apiResponse.revenue,
+                  tagline: apiResponse.tagline,
+                  productionCompanies: apiResponse.productionCompanies?.map({ ProductionCompany(apiResponse: $0) }))
     }
 
     public func hash(into hasher: inout Hasher) {

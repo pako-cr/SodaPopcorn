@@ -18,11 +18,11 @@ public final class Movies {
         self.movies = movies
     }
 
-    convenience init(moviesApiResponse: MoviesApiResponse) {
-        self.init(page: moviesApiResponse.page,
-                  numberOfResults: moviesApiResponse.numberOfResults,
-                  numberOfPages: moviesApiResponse.numberOfPages,
-                  movies: moviesApiResponse.movies?.map({ Movie(movieApiResponse: $0) }) ?? [])
+    convenience init(apiResponse: MoviesApiResponse) {
+        self.init(page: apiResponse.page,
+                  numberOfResults: apiResponse.numberOfResults,
+                  numberOfPages: apiResponse.numberOfPages,
+                  movies: apiResponse.movies?.map({ Movie(apiResponse: $0) }) ?? [])
     }
 
     convenience init() {

@@ -39,6 +39,10 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.getImages(movieId: movieId)
     }
 
+    public func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
+        return movieNetworkService.socialNetworks(movieId: movieId)
+    }
+
 	// MARK: - Storage Context
 //	func create(movie: Movie) {
 //		storageManager.create(movie: movie)

@@ -12,6 +12,7 @@ public enum MovieApi {
 	case video(id: Int)
     case details(movieId: String)
     case images(movieId: String)
+    case socialNetworks(movieId: String)
 }
 
 // Example url: https://api.themoviedb.org/3/movie/550?page=1&api_key=ae3f83170dac3764098efb70c9dd7cdf
@@ -50,10 +51,12 @@ extension MovieApi: EndPointType {
             return "\(movieId)"
         case .images(let movieId):
             return "\(movieId)/images"
+        case .socialNetworks(let movieId):
+            return "\(movieId)/external_ids"
         }
     }
 
-	var httpMethod: HTTPMethod {
+    var httpMethod: HTTPMethod {
         return .get
     }
     
@@ -75,6 +78,11 @@ extension MovieApi: EndPointType {
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,
                                                       "language": locale])
+        case .socialNetworks:
+                    return .requestParameters(bodyParameters: nil,
+                                              bodyEncoding: .urlEncoding,
+                                              urlParameters: ["api_key": publicApiKey,
+                                                              "language": locale])
         default:
             return .request
         }

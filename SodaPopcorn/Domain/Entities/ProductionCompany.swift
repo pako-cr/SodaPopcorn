@@ -16,10 +16,10 @@ public final class ProductionCompany {
         self.name = name
     }
 
-    convenience init(productionCompanyApiResponse: ProductionCompanyApiResponse) {
-        self.init(id: productionCompanyApiResponse.id,
-                  logoPath: productionCompanyApiResponse.logoPath,
-                  name: productionCompanyApiResponse.name)
+    convenience init(apiResponse: ProductionCompanyApiResponse) {
+        self.init(id: apiResponse.id,
+                  logoPath: apiResponse.logoPath,
+                  name: apiResponse.name)
     }
 }
 

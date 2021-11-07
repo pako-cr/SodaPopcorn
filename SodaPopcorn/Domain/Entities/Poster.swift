@@ -12,8 +12,8 @@ public final class Poster: Hashable {
         self.filePath = filePath
     }
 
-    convenience init(posterApiResponse: PosterApiResponse) {
-        self.init(filePath: posterApiResponse.filePath)
+    convenience init(apiResponse: PosterApiResponse) {
+        self.init(filePath: apiResponse.filePath)
     }
 
     public func hash(into hasher: inout Hasher) {
