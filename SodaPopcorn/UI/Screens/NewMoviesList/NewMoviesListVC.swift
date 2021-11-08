@@ -49,7 +49,7 @@ final class NewMoviesListVC: BaseViewController {
 				}
 
 				self.navigationItem.rightBarButtonItem?.image = buttonImage
-				self.movieCollectionView.setCollectionViewLayout(self.handleCollectionViewLayoutChange(), animated: true)
+				self.movieCollectionView.setCollectionViewLayout(self.configureCollectionViewLayout(), animated: true)
 			}
 		}
 	}
@@ -121,9 +121,9 @@ final class NewMoviesListVC: BaseViewController {
 		view.addSubview(movieCollectionView)
 
 		movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-		movieCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-		movieCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-		movieCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+		movieCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		movieCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 	}
 
 	override func bindViewModel() {
@@ -171,21 +171,22 @@ final class NewMoviesListVC: BaseViewController {
 		movieCollectionView.prefetchDataSource = self
 		movieCollectionView.refreshControl = refreshControl
 		movieCollectionView.delegate = self
+        movieCollectionView.alwaysBounceVertical = true
 	}
 
 	private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
 		return UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
 			guard let `self` = self else { return nil }
-			let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(self.collectionLayout.rawValue),
-												  heightDimension: .fractionalHeight(1.0))
+
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(self.collectionLayout.rawValue),
+                                                  heightDimension: .fractionalHeight(1.0))
 
 			let item = NSCollectionLayoutItem(layoutSize: itemSize)
-			item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 5)
+            item.contentInsets = .uniform(size: 5.0)
 
 			let groupSize = NSCollectionLayoutSize(
-				widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
-				heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 4)
-			)
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
 
 			let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -194,19 +195,53 @@ final class NewMoviesListVC: BaseViewController {
 			// Supplementary footer view setup
 			let headerFooterSize = NSCollectionLayoutSize(
 				widthDimension: .fractionalWidth(1.0),
-				heightDimension: .absolute(50)
-			)
+				heightDimension: .absolute(20))
+
 			let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
 				layoutSize: headerFooterSize,
 				elementKind: UICollectionView.elementKindSectionFooter,
-				alignment: .bottom
-			)
+				alignment: .bottom)
 
 			section.boundarySupplementaryItems = [sectionFooter]
 
 			return section
 		})
 	}
+
+    private func configureCollectionViewLayout2() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
+            guard let `self` = self else { return nil }
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(self.collectionLayout.rawValue),
+                                                  heightDimension: .fractionalHeight(1.0))
+
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 5)
+
+            let groupSize = NSCollectionLayoutSize(
+                widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
+                heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 4)
+            )
+
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
+            let section = NSCollectionLayoutSection(group: group)
+
+            // Supplementary footer view setup
+            let headerFooterSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(50)
+            )
+            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerFooterSize,
+                elementKind: UICollectionView.elementKindSectionFooter,
+                alignment: .bottom
+            )
+
+            section.boundarySupplementaryItems = [sectionFooter]
+
+            return section
+        })
+    }
 
 	private func configureDataSource() {
 		let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
@@ -270,36 +305,6 @@ final class NewMoviesListVC: BaseViewController {
 	private func reloadCollectionView() {
 		reloadingDataSource = true
 		viewModel.inputs.pullToRefresh()
-	}
-
-	@objc
-	private func handleCollectionViewLayoutChange() -> UICollectionViewLayout {
-		let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(collectionLayout.rawValue),
-											  heightDimension: .fractionalHeight(1.0))
-
-		let item = NSCollectionLayoutItem(layoutSize: itemSize)
-		item.contentInsets = .uniform(size: 5)
-
-		let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-												  heightDimension: NSCollectionLayoutDimension.absolute(UIScreen.main.bounds.height / 4))
-
-		let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
-		let section = NSCollectionLayoutSection(group: group)
-
-		let headerFooterSize = NSCollectionLayoutSize(
-			widthDimension: .fractionalWidth(1.0),
-			heightDimension: .absolute(20)
-		)
-
-		let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
-			layoutSize: headerFooterSize,
-			elementKind: UICollectionView.elementKindSectionFooter,
-			alignment: .bottom
-		)
-		section.boundarySupplementaryItems = [sectionFooter]
-
-		return UICollectionViewCompositionalLayout(section: section)
 	}
 
 	private func setCollectionViewLayout() {

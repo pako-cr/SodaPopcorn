@@ -50,7 +50,7 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
-.DS_Store
+*.DS_Store
 
 # CocoaPods
 #
