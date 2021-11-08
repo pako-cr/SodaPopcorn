@@ -15,6 +15,7 @@ final class MovieDetailsVC: BaseViewController {
     // MARK: - Variables
     private var movieInfoSubscription: Cancellable!
     private var imagesSubscription: Cancellable!
+    private var socialNetworksSubscription: Cancellable!
 
     private var oldMovie: Movie?
     private var movie: Movie? {
@@ -98,7 +99,7 @@ final class MovieDetailsVC: BaseViewController {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
-        scrollView.showsVerticalScrollIndicator = true
+        scrollView.showsVerticalScrollIndicator = false
         return scrollView
     }()
 
@@ -352,6 +353,12 @@ final class MovieDetailsVC: BaseViewController {
         return button
     }()
 
+    private lazy var socialNetworksCollectionView: SocialNetworksCollectionView = {
+        let collectionView = SocialNetworksCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+
     init(viewModel: MovieDetailsVM) {
         self.viewModel = viewModel
         super.init()
@@ -405,6 +412,7 @@ final class MovieDetailsVC: BaseViewController {
         contentView.addSubview(budgetRevenueValue)
         contentView.addSubview(homepageLabel)
         contentView.addSubview(homepageValueButton)
+        contentView.addSubview(socialNetworksCollectionView.view)
 
         subHeaderStack.addArrangedSubview(releaseDateLabel)
         subHeaderStack.addArrangedSubview(runtimeLabel)
@@ -477,7 +485,13 @@ final class MovieDetailsVC: BaseViewController {
         homepageValueButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         homepageValueButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         homepageValueButton.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
-        homepageValueButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+
+        socialNetworksCollectionView.view.topAnchor.constraint(equalTo: homepageValueButton.bottomAnchor, constant: 20).isActive = true
+        socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        socialNetworksCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.15).isActive = true
+        socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
     override func bindViewModel() {
@@ -492,6 +506,13 @@ final class MovieDetailsVC: BaseViewController {
                 guard let `self` = self else { return }
                 let backdrops = backdropImages.map({ $0.filePath ?? ""})
                 self.backdropCollectionView.updateCollectionViewData(images: backdrops)
+            })
+
+        socialNetworksSubscription = viewModel.outputs.socialNetworksAction()
+            .sink(receiveValue: { [weak self] socialNetworks in
+                if let networks = socialNetworks.networks {
+                    self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: networks)
+                }
             })
     }
 

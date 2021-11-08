@@ -5,8 +5,8 @@
 //  Created by Francisco Cordoba on 7/10/21.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 public protocol MovieDetailsVMInputs: AnyObject {
 	/// Call when the view did load.
@@ -37,6 +37,9 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when the backdrop images are fetched.
     func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never>
+
+    /// Emits when the social networks are fetched.
+    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -171,8 +174,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 }
             }, receiveValue: { [weak self] socialNetworks in
                 guard let `self` = self else { return }
-                print(socialNetworks.instagramId ?? "no insta")
-                
+                self.socialNetworksActionProperty.send(socialNetworks)
             }).store(in: &cancellable)
 	}
 
@@ -190,6 +192,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let backdropImageSelectedProperty = PassthroughSubject<String, Never>()
     public func backdropImageSelected(imageURL: String) {
         backdropImageSelectedProperty.send(imageURL)
+    }
+
+    private let socialNetworkSelectedProperty = PassthroughSubject<SocialNetwork, Never>()
+    public func socialNetworkSelected(socialNetwork: SocialNetwork) {
+        socialNetworkSelectedProperty.send(socialNetwork)
     }
 
 	// MARK: - ⬆️ OUTPUTS Definition
@@ -221,6 +228,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let backdropImagesActionProperty = PassthroughSubject<[Backdrop], Never>()
     public func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never> {
         return backdropImagesActionProperty
+    }
+
+    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
+    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+        return socialNetworksActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A153ABB2738A93D00E96886 /* SocialNetworksCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A153ABA2738A93D00E96886 /* SocialNetworksCollectionView.swift */; };
+		8A153ABD2738A99100E96886 /* SocialNetworksCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A153ABC2738A99100E96886 /* SocialNetworksCollectionViewCell.swift */; };
 		8A15B5B727356FF3004241C8 /* BackdropCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */; };
 		8A15B5BA2735728C004241C8 /* BackdropCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */; };
 		8A15C60E2732CBEC00D6A68A /* Genre.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A15C60D2732CBEC00D6A68A /* Genre.swift */; };
@@ -140,6 +142,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A153ABA2738A93D00E96886 /* SocialNetworksCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialNetworksCollectionView.swift; sourceTree = "<group>"; };
+		8A153ABC2738A99100E96886 /* SocialNetworksCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialNetworksCollectionViewCell.swift; sourceTree = "<group>"; };
 		8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackdropCollectionView.swift; sourceTree = "<group>"; };
 		8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackdropCollectionViewCell.swift; sourceTree = "<group>"; };
 		8A15C60D2732CBEC00D6A68A /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
@@ -273,6 +277,7 @@
 			isa = PBXGroup;
 			children = (
 				8A15B5B92735728C004241C8 /* BackdropCollectionViewCell.swift */,
+				8A153ABC2738A99100E96886 /* SocialNetworksCollectionViewCell.swift */,
 			);
 			path = CollectionViewCells;
 			sourceTree = "<group>";
@@ -487,6 +492,7 @@
 				D9440BF0270F498E00D01C0A /* MovieDetailsVM.swift */,
 				D9440BF2270F4AA100D01C0A /* MovieDetailsVC.swift */,
 				8A15B5B627356FF3004241C8 /* BackdropCollectionView.swift */,
+				8A153ABA2738A93D00E96886 /* SocialNetworksCollectionView.swift */,
 			);
 			path = MovieDetails;
 			sourceTree = "<group>";
@@ -896,6 +902,7 @@
 				8A5E8700273768FE006EC3FC /* SocialNetworks.swift in Sources */,
 				D9E6D38226E8FC28000292D4 /* PlistReaderManager.swift in Sources */,
 				D941ACC826E278EF00018E57 /* NetworkManager.swift in Sources */,
+				8A153ABB2738A93D00E96886 /* SocialNetworksCollectionView.swift in Sources */,
 				8AE8FC9B273603D00094AFE8 /* ImageViewVM.swift in Sources */,
 				D9323E2C26E30F7E00DE497B /* MovieApiResponse.swift in Sources */,
 				8AE8FC99273603700094AFE8 /* ImageViewVC.swift in Sources */,
@@ -951,6 +958,7 @@
 				D9322E8526E3B45100522AFB /* NetworkResponse.swift in Sources */,
 				8A5E86FE27376524006EC3FC /* Movies.swift in Sources */,
 				D9322E9126E3D5BE00522AFB /* PosterImageService.swift in Sources */,
+				8A153ABD2738A99100E96886 /* SocialNetworksCollectionViewCell.swift in Sources */,
 				8AE8FC9D273648640094AFE8 /* MovieImages.swift in Sources */,
 				D9410B762704B03A0040D6F2 /* NavigationController.swift in Sources */,
 				D9C97C7E26EADF0100151E2D /* MovieEntity+CoreDataClass.swift in Sources */,
