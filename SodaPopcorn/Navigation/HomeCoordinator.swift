@@ -13,7 +13,6 @@ final class HomeCoordinator: Coordinator {
 	// MARK: - Const
 	private let parentViewController: UIViewController
 	private let movieService = MovieService.shared()
-	private let imageService = PosterImageService.shared()
 
 	// MARK: - Vars
 	var childCoordinators = [Coordinator]()
@@ -77,13 +76,13 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.backdropImageAction()
             .sink { [weak self] (imageURL) in
-                self?.showImageView(with: imageURL, on: viewController)
+                self?.showBackdropImageView(with: imageURL, on: viewController)
             }.store(in: &cancellable)
 	}
 
-    private func showImageView(with imageURL: String, on navigationController: UIViewController) {
-        let viewModel = ImageViewVM(imageURL: imageURL)
-        let viewController = ImageViewVC(viewModel: viewModel)
+    private func showBackdropImageView(with imageURL: String, on navigationController: UIViewController) {
+        let viewModel = BackdropImageViewVM(imageURL: imageURL)
+        let viewController = BackdropImageViewVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 

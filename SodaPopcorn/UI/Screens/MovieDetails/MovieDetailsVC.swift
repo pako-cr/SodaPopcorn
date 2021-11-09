@@ -359,6 +359,25 @@ final class MovieDetailsVC: BaseViewController {
         return collectionView
     }()
 
+    private let videosLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.textAlignment = .natural
+        label.adjustsFontForContentSizeCategory = true
+        label.maximumContentSizeCategory = .accessibilityMedium
+        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
+        label.sizeToFit()
+        return label
+    }()
+
+    private lazy var videosCollectionView: VideosCollectionView = {
+        let collectionView = VideosCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+
     init(viewModel: MovieDetailsVM) {
         self.viewModel = viewModel
         super.init()

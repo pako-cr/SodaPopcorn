@@ -22,12 +22,9 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let backdropImage: CustomImage = {
-        let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .w780
-        customImage.customContentMode = .scaleAspectFill
-        customImage.defaultImage = UIImage(named: "no_backdrop")
-        customImage.sizeToFit()
+    private let backdropImage: CustomBackdropImage = {
+        let customImage = CustomBackdropImage(frame: .zero)
+        customImage.contentMode = .scaleAspectFill
         return customImage
     }()
 

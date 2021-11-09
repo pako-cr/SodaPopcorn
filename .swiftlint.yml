@@ -2,6 +2,9 @@
 disabled_rules: # rule identifiers turned on by default to exclude from running
   - switch_case_alignment
   - line_length
+  - cyclomatic_complexity
+  - type_body_length
+  - file_length
 opt_in_rules:
   # some rules are turned off by default, so you need to opt-in
   # Find all the available rules by running: `swiftlint rules`

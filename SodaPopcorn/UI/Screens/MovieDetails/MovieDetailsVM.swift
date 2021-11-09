@@ -176,6 +176,38 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 guard let `self` = self else { return }
                 self.socialNetworksActionProperty.send(socialNetworks)
             }).store(in: &cancellable)
+
+        let videosEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<Videos, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.getVideos(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Videos())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        videosEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] videos in
+//                guard let `self` = self else { return }
+
+                print("\(videos.results?.count ?? 0)")
+
+            }).store(in: &cancellable)
 	}
 
 	// MARK: - ⬇️ INPUTS Definition

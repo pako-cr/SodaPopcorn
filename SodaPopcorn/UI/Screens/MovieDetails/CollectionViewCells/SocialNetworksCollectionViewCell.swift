@@ -2,7 +2,7 @@
 //  SocialNetworksCollectionViewCell.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Zimplifica on 7/11/21.
+//  Created by Francisco Cordoba on 7/11/21.
 //
 
 import UIKit

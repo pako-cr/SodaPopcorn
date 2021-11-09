@@ -2,7 +2,7 @@
 //  MoviesApiResponse.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Zimplifica on 6/11/21.
+//  Created by Francisco Cordoba on 6/11/21.
 //
 
 public final class MoviesApiResponse: Decodable {

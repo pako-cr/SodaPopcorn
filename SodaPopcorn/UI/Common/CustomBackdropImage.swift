@@ -1,54 +1,34 @@
 //
-//  CustomImage.swift
+//  CustomBackdropImage.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Córdoba on 12/10/21.
+//  Created by Francisco Cordoba on 9/11/21.
 //
 
 import UIKit
 
-final class CustomImage: UIImageView {
+final class CustomBackdropImage: UIImageView {
     // MARK: - Variables
-    var posterSize = PosterSize.w154
-
-    var customContentMode = ContentMode.scaleAspectFit {
-        didSet {
-            DispatchQueue.main.async { [weak self] in
-                guard let `self` = self else { return }
-                self.contentMode = self.customContentMode
-            }
-        }
-    }
-    var defaultImage = UIImage(named: "no_poster") {
-        didSet {
-            DispatchQueue.main.async { [weak self] in
-                guard let `self` = self else { return }
-                self.image = self.defaultImage
-            }
-        }
-    }
+    var backdropSize = BackdropSize.w780
 
     private var urlString: String? {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let urlString = self.urlString else { return }
 
-                if let posterImage = cache.value(forKey: "\(self.posterSize.rawValue)\(urlString)") {
+                if let posterImage = cache.value(forKey: "\(self.backdropSize.rawValue)\(urlString)") {
                     self.image = posterImage
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
-                    self.image = self.defaultImage
                     self.activityIndicatorView.startAnimating()
-
-//                    print("⭐️ getPosterImage \(urlString) with poster size: \(self.posterSize)")
-                    PosterImageService.shared().getPosterImage(posterPath: urlString, posterSize: self.posterSize) { data, error in
+//                    print("⭐️ getBackdropImage \(urlString) with backdrop size: \(self.posterSize)")
+                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(backdropSize: self.backdropSize)) { data, error in
 
                         if error != nil {
                             DispatchQueue.main.async { [weak self] in
                                 guard let `self` = self else { return }
                                 self.activityIndicatorView.stopAnimating()
-                                self.image = self.defaultImage
                             }
                         }
 
@@ -60,7 +40,7 @@ final class CustomImage: UIImageView {
 
                             if let newImage = UIImage(data: data) {
                                 self.image = newImage
-                                cache.insert(newImage, forKey: "\(self.posterSize.rawValue)\(urlString)")
+                                cache.insert(newImage, forKey: "\(self.backdropSize.rawValue)\(urlString)")
                             }
                         }
                     }
@@ -85,8 +65,9 @@ final class CustomImage: UIImageView {
     private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
         clipsToBounds = true
-        contentMode = self.customContentMode
-        image = self.defaultImage
+        sizeToFit()
+        contentMode = .scaleAspectFit
+        image = UIImage(named: "no_backdrop")
 
         addSubview(activityIndicatorView)
 

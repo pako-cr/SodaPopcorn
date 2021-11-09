@@ -1,5 +1,5 @@
 //
-//  ImageViewVC.swift
+//  BackdropImageViewVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/11/21.
@@ -8,9 +8,9 @@
 import Combine
 import UIKit
 
-final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
+final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
     // MARK: Consts
-    private let viewModel: ImageViewVM
+    private let viewModel: BackdropImageViewVM
 
     // MARK: - Variables
     private var imageURLSubscription: Cancellable!
@@ -18,7 +18,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
-                self.backdropImage.posterSize = .original
+                self.backdropImage.backdropSize = .original
                 self.backdropImage.setUrlString(urlString: imageURL)
             }
         }
@@ -55,22 +55,17 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         return button
     }()
 
-    private lazy var backdropImage: CustomImage = {
-        let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .w780
-        customImage.customContentMode = .scaleAspectFit
-        customImage.sizeToFit()
+    private lazy var backdropImage: CustomBackdropImage = {
+        let customImage = CustomBackdropImage(frame: .zero)
 
-        if let posterImage = cache.value(forKey: "\(PosterSize.w780.rawValue)\(self.viewModel.imageURL)") {
-            customImage.defaultImage = posterImage
-        } else {
-            customImage.defaultImage = UIImage(named: "no_backdrop")
+        if let posterImage = cache.value(forKey: "\(BackdropSize.w780.rawValue)\(self.viewModel.imageURL)") {
+            customImage.image = posterImage
         }
 
         return customImage
     }()
 
-    init(viewModel: ImageViewVM) {
+    init(viewModel: BackdropImageViewVM) {
         self.viewModel = viewModel
         super.init()
     }

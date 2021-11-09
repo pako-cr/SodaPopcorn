@@ -14,7 +14,6 @@ public final class MovieService: MovieNetworkServiceProtocol {
 	private let movieNetworkService: MovieNetworkService
 
 	private static let sharedMovieService: MovieService = {
-		let managedObjectContext = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
 		return MovieService(movieNetworkService: MovieNetworkService())
 	}()
 
@@ -43,28 +42,7 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.socialNetworks(movieId: movieId)
     }
 
-	// MARK: - Storage Context
-//	func create(movie: Movie) {
-//		storageManager.create(movie: movie)
-//	}
-//
-//	func fetch() -> [Movie]? {
-//		return storageManager.fetch()
-//	}
-//
-//	func update(movie: Movie) throws {
-//		try storageManager.update(movie: movie)
-//	}
-//
-//	func delete(movie: Movie) throws {
-//		try storageManager.delete(movie: movie)
-//	}
-//
-//	func deleteAll() throws {
-//		try storageManager.deleteAll()
-//	}
-//
-//	func saveAll(movies: [Movie]) throws {
-//		try storageManager.saveAll(movies: movies)
-//	}
+    public func getVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse> {
+        return movieNetworkService.getVideos(movieId: movieId)
+    }
 }

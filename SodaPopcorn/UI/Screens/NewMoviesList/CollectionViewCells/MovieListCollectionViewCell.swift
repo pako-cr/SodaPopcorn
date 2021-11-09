@@ -64,11 +64,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		return view
 	}()
 
-	private let posterImage: CustomImage = {
-		let customImageView = CustomImage(frame: .zero)
-        customImageView.sizeToFit()
-		return customImageView
-	}()
+	private let posterImage = CustomPosterImage(frame: .zero)
 
 	private let movieTitle: UILabel = {
 		let label = UILabel()
