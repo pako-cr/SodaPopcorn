@@ -26,4 +26,8 @@ public final class ImageService: ImageNetworkServiceProtocol {
     public func getImage(imagePath: String, imageSize: ImageSize, completion: @escaping (Data?, NetworkResponse?) -> Void) {
         return imageNetworkService.getImage(imagePath: imagePath, imageSize: imageSize, completion: completion)
     }
+
+    public func getVideoThumbnail(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponse?) -> Void) {
+        return imageNetworkService.getVideoThumbnail(videoUrl: videoUrl, completion: completion)
+    }
 }

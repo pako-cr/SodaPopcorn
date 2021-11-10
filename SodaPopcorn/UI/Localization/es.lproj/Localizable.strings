@@ -38,3 +38,10 @@
 "movie_details_vc_homepage_label" = "Redes Sociales";
 "alert_cancel_button" = "Cancelar";
 "alert_save_button" = "Guardar Imagen";
+"gallery" = "Galería";
+"gallery_view_backdrops_header" = "Fondos";
+"gallery_view_posters_header" = "Posters";
+"gallery_view_videos_header" = "Vídeos";
+"poster_collection_view_cell_no_posters" = "No hay posters";
+"poster_collection_view_cell_no_backdrops" = "No hay fondos";
+"poster_collection_view_cell_no_videos" = "No hay vídeos";

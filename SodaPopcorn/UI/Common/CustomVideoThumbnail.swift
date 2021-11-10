@@ -1,5 +1,5 @@
 //
-//  CustomBackdropImage.swift
+//  CustomVideoThumbnail.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 9/11/21.
@@ -7,23 +7,22 @@
 
 import UIKit
 
-final class CustomBackdropImage: UIImageView {
+final class CustomVideoThumbnail: UIImageView {
     // MARK: - Variables
-    var backdropSize = BackdropSize.w780
 
     private var urlString: String? {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let urlString = self.urlString else { return }
 
-                if let posterImage = cache.value(forKey: "\(self.backdropSize.rawValue)\(urlString)") {
+                if let posterImage = cache.value(forKey: urlString) {
                     self.image = posterImage
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
                     self.activityIndicatorView.startAnimating()
-//                    print("⭐️ getBackdropImage \(urlString) with backdrop size: \(self.posterSize)")
-                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(backdropSize: self.backdropSize)) { data, error in
+//                    print("⭐️ getVideoThumbnail \(urlString) with backdrop size: \(self.posterSize)")
+                    ImageService.shared().getVideoThumbnail(videoUrl: urlString) { data, error in
 
                         if error != nil {
                             DispatchQueue.main.async { [weak self] in
@@ -40,7 +39,7 @@ final class CustomBackdropImage: UIImageView {
 
                             if let newImage = UIImage(data: data) {
                                 self.image = newImage
-                                cache.insert(newImage, forKey: "\(self.backdropSize.rawValue)\(urlString)")
+                                cache.insert(newImage, forKey: urlString)
                             }
                         }
                     }

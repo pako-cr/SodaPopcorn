@@ -1,16 +1,16 @@
 //
-//  BackdropImageViewVC.swift
+//  PosterImageVC.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 5/11/21.
+//  Created by Francisco Cordoba on 9/11/21.
 //
 
 import Combine
 import UIKit
 
-final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
+final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     // MARK: Consts
-    private let viewModel: BackdropImageViewVM
+    private let viewModel: PosterImageVM
 
     // MARK: - Variables
     private var imageURLSubscription: Cancellable!
@@ -18,8 +18,8 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
-                self.backdropImage.backdropSize = .original
-                self.backdropImage.setUrlString(urlString: imageURL)
+                self.posterImage.posterSize = .original
+                self.posterImage.setUrlString(urlString: imageURL)
             }
         }
     }
@@ -55,17 +55,18 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
         return button
     }()
 
-    private lazy var backdropImage: CustomBackdropImage = {
-        let customImage = CustomBackdropImage(frame: .zero)
+    private lazy var posterImage: CustomPosterImage = {
+        let customImage = CustomPosterImage(frame: .zero)
 
-        if let posterImage = cache.value(forKey: "\(BackdropSize.w780.rawValue)\(self.viewModel.imageURL)") {
+        if let posterImage = cache.value(forKey: "\(PosterSize.w342.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = posterImage
         }
+        customImage.contentMode = .scaleAspectFit
 
         return customImage
     }()
 
-    init(viewModel: BackdropImageViewVM) {
+    init(viewModel: PosterImageVM) {
         self.viewModel = viewModel
         super.init()
     }
@@ -103,7 +104,7 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
 
-        contentView.addSubview(backdropImage)
+        contentView.addSubview(posterImage)
         contentView.addSubview(closeButton)
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
@@ -111,11 +112,11 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
         closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        backdropImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        backdropImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        backdropImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
+        posterImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        posterImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        posterImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
 
         handleGestureRecongnizers()
     }
@@ -136,15 +137,15 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomOutAction))
         doubleTapRecognizer.numberOfTapsRequired = 2
 
-        backdropImage.isUserInteractionEnabled = true
-        backdropImage.addGestureRecognizer(longPressRecognizer)
-        backdropImage.addGestureRecognizer(doubleTapRecognizer)
+        posterImage.isUserInteractionEnabled = true
+        posterImage.addGestureRecognizer(longPressRecognizer)
+        posterImage.addGestureRecognizer(doubleTapRecognizer)
 
         scrollView.addGestureRecognizer(doubleTapRecognizer)
     }
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return self.backdropImage
+        return self.posterImage
     }
 
     @objc
@@ -168,12 +169,12 @@ final class BackdropImageViewVC: BaseViewController, UIScrollViewDelegate {
 
     @objc
     private func downloadImageToPhotosAlbum() {
-        guard let image = backdropImage.image else { return }
+        guard let image = posterImage.image else { return }
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑 ImageViewVC deinit.")
+        print("🗑 PosterImageVC deinit.")
     }
 }

@@ -33,13 +33,13 @@ force_try:
 # implicitly
 function_body_length: 210
 # they can set both implicitly with an array
-type_body_length:
-  - 300 # warning
-  - 400 # error
+# type_body_length:
+#   - 300 # warning
+#   - 400 # error
 # or they can set both explicitly
-file_length:
-  warning: 500
-  error: 1200
+# file_length:
+#   warning: 500
+#   error: 1200
 # naming rules can set warnings/errors for min_length and max_length
 # additionally they can set excluded names
 type_name:

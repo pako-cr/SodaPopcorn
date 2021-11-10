@@ -1,5 +1,5 @@
 //
-//  BackdropImageViewVM.swift
+//  BackdropImageVM.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/11/21.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol BackdropImageViewVMInputs: AnyObject {
+public protocol BackdropImageVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
@@ -16,7 +16,7 @@ public protocol BackdropImageViewVMInputs: AnyObject {
     func closeButtonPressed()
 }
 
-public protocol BackdropImageViewVMOutputs: AnyObject {
+public protocol BackdropImageVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
@@ -30,18 +30,18 @@ public protocol BackdropImageViewVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 }
 
-public protocol BackdropImageViewVMTypes: AnyObject {
-    var inputs: BackdropImageViewVMInputs { get }
-    var outputs: BackdropImageViewVMOutputs { get }
+public protocol BackdropImageVMTypes: AnyObject {
+    var inputs: BackdropImageVMInputs { get }
+    var outputs: BackdropImageVMOutputs { get }
 }
 
-public final class BackdropImageViewVM: ObservableObject, Identifiable, BackdropImageViewVMInputs, BackdropImageViewVMOutputs, BackdropImageViewVMTypes {
+public final class BackdropImageVM: ObservableObject, Identifiable, BackdropImageVMInputs, BackdropImageVMOutputs, BackdropImageVMTypes {
     // MARK: Constants
     let imageURL: String
 
     // MARK: Variables
-    public var inputs: BackdropImageViewVMInputs { return self }
-    public var outputs: BackdropImageViewVMOutputs { return self }
+    public var inputs: BackdropImageVMInputs { return self }
+    public var outputs: BackdropImageVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
@@ -96,6 +96,6 @@ public final class BackdropImageViewVM: ObservableObject, Identifiable, Backdrop
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "BackdropImageViewVM deinit.")
+        print("🗑", "BackdropImageVM deinit.")
     }
 }

@@ -127,6 +127,20 @@ final class MovieDetailsVC: BaseViewController {
         return collectionView
     }()
 
+    private lazy var galleryButton: UIButton = {
+        let button = UIButton(type: .roundedRect)
+        button.contentMode = .scaleAspectFit
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(galleryButtonPressed), for: .touchUpInside)
+        button.accessibilityLabel = NSLocalizedString("gallery", comment: "Gallert button")
+        button.tintColor = UIColor(named: "PrimaryColor")
+        button.setTitle(NSLocalizedString("gallery", comment: "Gallert button"), for: .normal)
+        button.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
+        button.layer.cornerRadius = 10
+        button.layer.borderWidth = 1
+        return button
+    }()
+
     private let headerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -359,25 +373,6 @@ final class MovieDetailsVC: BaseViewController {
         return collectionView
     }()
 
-    private let videosLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
-        label.sizeToFit()
-        return label
-    }()
-
-    private lazy var videosCollectionView: VideosCollectionView = {
-        let collectionView = VideosCollectionView(movieDetailsVM: self.viewModel)
-        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
-        return collectionView
-    }()
-
     init(viewModel: MovieDetailsVM) {
         self.viewModel = viewModel
         super.init()
@@ -419,6 +414,7 @@ final class MovieDetailsVC: BaseViewController {
 
         contentView.addSubview(backdropCollectionView.view)
         contentView.addSubview(closeButton)
+        contentView.addSubview(galleryButton)
         contentView.addSubview(headerStack)
         contentView.addSubview(subHeaderStack)
         contentView.addSubview(overviewLabel)
@@ -447,6 +443,11 @@ final class MovieDetailsVC: BaseViewController {
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+
+        galleryButton.bottomAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: -10).isActive = true
+        galleryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        galleryButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        galleryButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
         headerStack.topAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: 10).isActive = true
         headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -509,7 +510,7 @@ final class MovieDetailsVC: BaseViewController {
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         socialNetworksCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.15).isActive = true
+        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.175).isActive = true
         socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
@@ -542,6 +543,11 @@ final class MovieDetailsVC: BaseViewController {
     }
 
     @objc
+    private func galleryButtonPressed() {
+        viewModel.inputs.galleryButtonPressed()
+    }
+
+    @objc
     private func openMovieWebsite() {
         if let homepage = self.homepageValueButton.titleLabel?.text, !homepage.isEmpty,
            !homepage.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
@@ -550,7 +556,6 @@ final class MovieDetailsVC: BaseViewController {
         }
     }
 
-    // MARK: - Helpers ⚙️
     private func formatRuntime(runtime: Int) -> String {
         guard runtime > 0 else { return "" }
         let stringRuntime = "\((Double.init(runtime) / 60.0).description)"

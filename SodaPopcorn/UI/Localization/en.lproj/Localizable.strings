@@ -38,3 +38,10 @@
 "movie_details_vc_homepage_label" = "Social Networks";
 "alert_cancel_button" = "Cancel";
 "alert_save_button" = "Save Image";
+"gallery" = "Gallery";
+"gallery_view_backdrops_header" = "Backdrops";
+"gallery_view_posters_header" = "Posters";
+"gallery_view_videos_header" = "Videos";
+"poster_collection_view_cell_no_posters" = "No posters";
+"poster_collection_view_cell_no_backdrops" = "No backdrops";
+"poster_collection_view_cell_no_videos" = "No videos";

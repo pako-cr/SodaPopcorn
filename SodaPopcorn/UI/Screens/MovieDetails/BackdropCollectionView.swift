@@ -45,6 +45,10 @@ public final class BackdropCollectionView: UICollectionViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
+    public override func viewWillLayoutSubviews() {
+        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
     // MARK: - ⚙️ Helpers
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())

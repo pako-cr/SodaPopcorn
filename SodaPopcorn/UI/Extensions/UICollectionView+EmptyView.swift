@@ -71,3 +71,38 @@ extension UICollectionView {
 		self.backgroundView = nil
 	}
 }
+
+extension UICollectionViewCell {
+    /// Sets an empty view when a collection datasource is empty or is loading.
+    func setEmptyView(title: String, centered: Bool = false) {
+        let emptyView = UIView(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height))
+
+        let titleLabel: UILabel = {
+            let label = UILabel()
+            label.font = UIFont.preferredFont(forTextStyle: .title3)
+            label.text = title
+            label.numberOfLines = 0
+            label.textAlignment = .left
+            label.adjustsFontSizeToFitWidth = true
+            label.adjustsFontForContentSizeCategory = true
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.accessibilityLabel = title
+            label.accessibilityHint = "No movie information title"
+            return label
+        }()
+
+        self.backgroundView = emptyView
+
+        emptyView.addSubview(titleLabel)
+
+        titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 5).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 5).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor).isActive = true
+        titleLabel.heightAnchor.constraint(equalTo: emptyView.heightAnchor, multiplier: 0.2).isActive = true
+    }
+
+    /// Restore the collection view when a datasource is fetched.
+    func removeEmptyView() {
+        self.backgroundView = nil
+    }
+}
