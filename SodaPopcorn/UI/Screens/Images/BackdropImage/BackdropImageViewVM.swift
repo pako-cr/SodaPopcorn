@@ -1,5 +1,5 @@
 //
-//  ImageViewVM.swift
+//  BackdropImageVM.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/11/21.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol ImageViewVMInputs: AnyObject {
+public protocol BackdropImageVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
@@ -16,7 +16,7 @@ public protocol ImageViewVMInputs: AnyObject {
     func closeButtonPressed()
 }
 
-public protocol ImageViewVMOutputs: AnyObject {
+public protocol BackdropImageVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
@@ -30,18 +30,18 @@ public protocol ImageViewVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 }
 
-public protocol ImageViewVMTypes: AnyObject {
-    var inputs: ImageViewVMInputs { get }
-    var outputs: ImageViewVMOutputs { get }
+public protocol BackdropImageVMTypes: AnyObject {
+    var inputs: BackdropImageVMInputs { get }
+    var outputs: BackdropImageVMOutputs { get }
 }
 
-public final class ImageViewVM: ObservableObject, Identifiable, ImageViewVMInputs, ImageViewVMOutputs, ImageViewVMTypes {
+public final class BackdropImageVM: ObservableObject, Identifiable, BackdropImageVMInputs, BackdropImageVMOutputs, BackdropImageVMTypes {
     // MARK: Constants
-    private let imageURL: String
+    let imageURL: String
 
     // MARK: Variables
-    public var inputs: ImageViewVMInputs { return self }
-    public var outputs: ImageViewVMOutputs { return self }
+    public var inputs: BackdropImageVMInputs { return self }
+    public var outputs: BackdropImageVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
@@ -96,6 +96,6 @@ public final class ImageViewVM: ObservableObject, Identifiable, ImageViewVMInput
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "ImageViewVM deinit.")
+        print("🗑", "BackdropImageVM deinit.")
     }
 }

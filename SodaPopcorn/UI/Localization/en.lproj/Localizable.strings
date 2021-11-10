@@ -17,7 +17,7 @@
 "close" = "Close";
 "collection_view_set_layout_button_title" = "Set layout";
 "collection_view_set_size_menu_title" = "Select size";
-"collection_view_footer_no_more_movies_to_fetch" = "No more movies to fetch 🍿";
+"collection_view_footer_no_more_movies_to_fetch" = "No more movies to display 🍿";
 "continue" = "Continue";
 "alert" = "Alert";
 "network_connection_error" = "Unable to fetch the information. Please check your network connection and try again.";
@@ -35,4 +35,16 @@
 "movie_details_vc_no_overview_found" = "Without overview.";
 "movie_details_vc_budget_revenue_label" = "Budget/Revenue";
 "movie_details_vc_production_companies_label" = "Production Companies";
-"movie_details_vc_homepage_label" = "Website";
+"movie_details_vc_homepage_label" = "Social Networks";
+"alert_cancel_button" = "Cancel";
+"alert_save_button" = "Save Image";
+"gallery" = "Gallery";
+"gallery_view_backdrops_header" = "Backdrops";
+"gallery_view_posters_header" = "Posters";
+"gallery_view_videos_header" = "Videos";
+"poster_collection_view_cell_no_posters" = "No posters";
+"poster_collection_view_cell_no_backdrops" = "No backdrops";
+"poster_collection_view_cell_no_videos" = "No videos";
+"movie_list_view_controller_empty_movies_title_label" = "No movies 😞";
+"movie_list_view_controller_empty_movies_description_label" = "No movies to display here 🎬";
+"cast_collection_view_title" = "Cast";

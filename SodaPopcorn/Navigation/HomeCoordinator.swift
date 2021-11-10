@@ -13,7 +13,6 @@ final class HomeCoordinator: Coordinator {
 	// MARK: - Const
 	private let parentViewController: UIViewController
 	private let movieService = MovieService.shared()
-	private let imageService = PosterImageService.shared()
 
 	// MARK: - Vars
 	var childCoordinators = [Coordinator]()
@@ -77,20 +76,58 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.backdropImageAction()
             .sink { [weak self] (imageURL) in
-                self?.showImageView(with: imageURL, on: viewController)
+                self?.showBackdropImageView(with: imageURL, on: viewController)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.galleryButtonAction()
+            .sink { [weak self] _ in
+                self?.showGalleryView(with: movie, on: viewController)
             }.store(in: &cancellable)
 	}
 
-    private func showImageView(with imageURL: String, on navigationController: UIViewController) {
-        let viewModel = ImageViewVM(imageURL: imageURL)
-        let viewController = ImageViewVC(viewModel: viewModel)
+    private func showBackdropImageView(with imageURL: String, on navigationController: UIViewController) {
+        let viewModel = BackdropImageVM(imageURL: imageURL)
+        let viewController = BackdropImageVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 
         viewModel.outputs.closeButtonAction()
-            .sink { [weak self] _ in
-                guard let `self` = self else { return }
-                self.homeVC?.dismiss(animated: true, completion: nil)
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+    }
+
+    private func showPosterImageView(with imageURL: String, on navigationController: UIViewController) {
+        let viewModel = PosterImageVM(imageURL: imageURL)
+        let viewController = PosterImageVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+    }
+
+    private func showGalleryView(with movie: Movie, on navigationController: UIViewController) {
+        let viewModel = GalleryVM(movieService: movieService, movie: movie)
+        let viewController = GalleryVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.backdropImageAction()
+            .sink { [weak self] imageUrl in
+                self?.showBackdropImageView(with: imageUrl, on: viewController)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.posterImageAction()
+            .sink { [weak self] imageUrl in
+                self?.showPosterImageView(with: imageUrl, on: viewController)
             }.store(in: &cancellable)
     }
 }

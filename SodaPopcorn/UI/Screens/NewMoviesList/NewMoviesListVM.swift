@@ -1,6 +1,6 @@
 //
 //  NewMoviesListVM.swift
-//  StarWarsWorld
+//  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
 //
@@ -63,7 +63,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 			}.store(in: &cancellable)
 
 		let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
-			.flatMap({ [weak self] _ -> AnyPublisher<MoviesApiResponse, Never> in
+			.flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
                 self.loadingProperty.value = true
@@ -75,7 +75,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 						self?.handleNetworkResponseError(networkResponse)
 						return networkResponse
 					})
-					.replaceError(with: MoviesApiResponse(page: 0, numberOfResults: 0, numberOfPages: 0, movies: []))
+					.replaceError(with: Movies())
 				 	.eraseToAnyPublisher()
             }).share()
 
@@ -90,16 +90,16 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 						self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
 					default: break
 				}
-			}, receiveValue: { [weak self] moviesApiResponse in
+			}, receiveValue: { [weak self] movies in
 				guard let `self` = self else { return }
 
 				self.loadingProperty.value = false
 
-				if moviesApiResponse.numberOfResults != 0 {
-					print("🔸 MoviesApiResponse [page: \(moviesApiResponse.page), numberOfPages: \(moviesApiResponse.numberOfPages), numberOfResults: \(moviesApiResponse.numberOfResults)]")
+				if movies.numberOfResults != 0 {
+					print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
 
-					self.finishedFetchingActionProperty.send(self.page >= moviesApiResponse.numberOfPages)
-					self.fetchNewMoviesActionProperty.send(moviesApiResponse.movies)
+					self.finishedFetchingActionProperty.send(self.page >= movies.numberOfPages ?? 0)
+					self.fetchNewMoviesActionProperty.send(movies.movies)
 				}
 			}).store(in: &cancellable)
 	}

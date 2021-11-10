@@ -1,6 +1,6 @@
 //
 //  NetworkingManager.swift
-//  StarWarsWorld
+//  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
 //
@@ -33,8 +33,8 @@ final class NetworkManager<EndPoint: EndPointType>: NetworkManagerProtocol {
         do {
             let request = try self.buildRequest(from: route)
 
-			if route is MovieApi {
-				print("🔸 Request: \(request)")
+			if route is MovieApiEndpoint {
+				print("🌐 \(request)")
 			}
 
 			task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in

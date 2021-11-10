@@ -5,8 +5,8 @@
 //  Created by Francisco Cordoba on 7/10/21.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 public protocol MovieDetailsVMInputs: AnyObject {
 	/// Call when the view did load.
@@ -17,6 +17,9 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when an backdrop image is selected from the movie details.
     func backdropImageSelected(imageURL: String)
+
+    /// Call when the gallery button is pressed.
+    func galleryButtonPressed()
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -34,6 +37,18 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when an backdrop image is selected from the movie details.
     func backdropImageAction() -> PassthroughSubject<String, Never>
+
+    /// Emits when the backdrop images are fetched.
+    func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never>
+
+    /// Emits when the cast information is fetched.
+    func castAction() -> PassthroughSubject<[Cast], Never>
+
+    /// Emits when the social networks are fetched.
+    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
+
+    /// Emits when the gallery button is pressed.
+    func galleryButtonAction() -> PassthroughSubject<Void, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -69,6 +84,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
         backdropImageSelectedProperty.sink { [weak self] (imageURL) in
             self?.backdropImageActionProperty.send(imageURL)
+        }.store(in: &cancellable)
+
+        galleryButtonPressedProperty.sink { [weak self] _ in
+            guard let `self` = self else { return }
+            self.galleryButtonActionProperty.send(())
         }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
@@ -107,6 +127,102 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
                 self.movieInfoActionProperty.send(movieDetails)
             }).store(in: &cancellable)
+
+        let imagesEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.getImages(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: MovieImages())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        imagesEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] movieImages in
+                guard let `self` = self else { return }
+
+                if let backdrops = movieImages.backdrops, !backdrops.isEmpty {
+                    self.backdropImagesActionProperty.send(backdrops.filter({ $0.filePath != self.movie.backdropPath }))
+                }
+            }).store(in: &cancellable)
+
+        let socialNetworksEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.socialNetworks(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: SocialNetworks())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        socialNetworksEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] socialNetworks in
+                guard let `self` = self else { return }
+                self.socialNetworksActionProperty.send(socialNetworks)
+            }).store(in: &cancellable)
+
+        let creditsEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<Credits, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.movieCredits(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Credits())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        creditsEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] movieCredits in
+                guard let `self` = self else { return }
+
+                if let cast = movieCredits.cast {
+                    self.castActionProperty.send(cast)
+                }
+            }).store(in: &cancellable)
 	}
 
 	// MARK: - ⬇️ INPUTS Definition
@@ -123,6 +239,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let backdropImageSelectedProperty = PassthroughSubject<String, Never>()
     public func backdropImageSelected(imageURL: String) {
         backdropImageSelectedProperty.send(imageURL)
+    }
+
+    private let socialNetworkSelectedProperty = PassthroughSubject<SocialNetwork, Never>()
+    public func socialNetworkSelected(socialNetwork: SocialNetwork) {
+        socialNetworkSelectedProperty.send(socialNetwork)
+    }
+
+    private let galleryButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func galleryButtonPressed() {
+        galleryButtonPressedProperty.send(())
     }
 
 	// MARK: - ⬆️ OUTPUTS Definition
@@ -149,6 +275,26 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let backdropImageActionProperty = PassthroughSubject<String, Never>()
     public func backdropImageAction() -> PassthroughSubject<String, Never> {
         return backdropImageActionProperty
+    }
+
+    private let backdropImagesActionProperty = PassthroughSubject<[Backdrop], Never>()
+    public func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never> {
+        return backdropImagesActionProperty
+    }
+
+    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
+    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+        return socialNetworksActionProperty
+    }
+
+    private let galleryButtonActionProperty = PassthroughSubject<Void, Never>()
+    public func galleryButtonAction() -> PassthroughSubject<Void, Never> {
+        return galleryButtonActionProperty
+    }
+
+    private let castActionProperty = PassthroughSubject<[Cast], Never>()
+    public func castAction() -> PassthroughSubject<[Cast], Never> {
+        return castActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

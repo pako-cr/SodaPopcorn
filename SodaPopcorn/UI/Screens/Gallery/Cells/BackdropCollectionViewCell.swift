@@ -16,20 +16,19 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
-                self.backdropImage.setUrlString(urlString: imageURL)
+
+                if imageURL.elementsEqual("no_backdrops") {
+                    self.backdropImage.isHidden = true
+                    self.setEmptyView(title: NSLocalizedString("poster_collection_view_cell_no_backdrops", comment: "No Backdrops"))
+                } else {
+                    self.backdropImage.setUrlString(urlString: imageURL)
+                }
             }
         }
     }
 
     // MARK: UI Elements
-    private let backdropImage: CustomImage = {
-        let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .w780
-        customImage.customContentMode = .scaleAspectFill
-        customImage.defaultImage = UIImage(named: "no_backdrop")
-        customImage.sizeToFit()
-        return customImage
-    }()
+    private let backdropImage = CustomBackdropImage(frame: .zero)
 
     override init(frame: CGRect) {
         super.init(frame: frame)

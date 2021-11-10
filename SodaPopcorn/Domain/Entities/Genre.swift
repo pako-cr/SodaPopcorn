@@ -5,21 +5,22 @@
 //  Created by Francisco Cordoba on 3/11/21.
 //
 
-import Foundation
-
-public final class Genre: Codable {
+public final class Genre {
     public var id: Int?
     public var name: String?
 
-    private enum GenreCodingKeys: String, CodingKey {
-        case id
-        case name
+    private init(id: Int?, name: String?) {
+        self.id = id
+        self.name = name
     }
 
-    required public init(from decoder: Decoder) throws {
-        let genreContainer = try decoder.container(keyedBy: GenreCodingKeys.self)
+    convenience init(apiResponse: GenreApiResponse) {
+        self.init(id: apiResponse.id, name: apiResponse.name)
+    }
+}
 
-        id = try genreContainer.decodeIfPresent(Int.self, forKey: .id)
-        name = try genreContainer.decodeIfPresent(String.self, forKey: .name)
+extension Genre: Equatable {
+    public static func == (lhs: Genre, rhs: Genre) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
 }

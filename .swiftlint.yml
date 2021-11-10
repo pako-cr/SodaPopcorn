@@ -2,6 +2,9 @@
 disabled_rules: # rule identifiers turned on by default to exclude from running
   - switch_case_alignment
   - line_length
+  - cyclomatic_complexity
+  - type_body_length
+  - file_length
 opt_in_rules:
   # some rules are turned off by default, so you need to opt-in
   # Find all the available rules by running: `swiftlint rules`
@@ -30,13 +33,13 @@ force_try:
 # implicitly
 function_body_length: 210
 # they can set both implicitly with an array
-type_body_length:
-  - 300 # warning
-  - 400 # error
+# type_body_length:
+#   - 300 # warning
+#   - 400 # error
 # or they can set both explicitly
-file_length:
-  warning: 500
-  error: 1200
+# file_length:
+#   warning: 500
+#   error: 1200
 # naming rules can set warnings/errors for min_length and max_length
 # additionally they can set excluded names
 type_name:
@@ -47,8 +50,8 @@ type_name:
   excluded: iPhone # excluded via string
   allowed_symbols: ["_"] # these are allowed in type names
 identifier_name:
-  min_length: # only min_length
-    error: 4 # only error
+  min_length:  # only min_length
+    error: 3 # only error
   excluded: # excluded via string array
     - id
     - URL

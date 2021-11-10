@@ -37,7 +37,6 @@ public final class BackdropCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
 
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -46,32 +45,35 @@ public final class BackdropCollectionView: UICollectionViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
+    public override func viewWillLayoutSubviews() {
+        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
     // MARK: - ⚙️ Helpers
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
         collectionView.register(BackdropCollectionViewCell.self, forCellWithReuseIdentifier: BackdropCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.isScrollEnabled = true
-        collectionView.alwaysBounceHorizontal = true
         collectionView.allowsSelection = true
+        collectionView.isScrollEnabled = false
     }
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                  heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: NSCollectionLayoutDimension.fractionalWidth(1.0),
-                heightDimension: NSCollectionLayoutDimension.fractionalHeight(1.0)
-            )
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
-            return NSCollectionLayoutSection(group: group)
+            let section = NSCollectionLayoutSection(group: group)
+
+            section.orthogonalScrollingBehavior = .groupPagingCentered
+
+            return section
         })
     }
 
@@ -98,9 +100,10 @@ public final class BackdropCollectionView: UICollectionViewController {
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
+
             snapshot.appendItems(images, toSection: .images)
 
-            print("🔸 Images Snapshot items: \(snapshot.numberOfItems)")
+//            print("🔸 Images Snapshot items: \(snapshot.numberOfItems)")
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }

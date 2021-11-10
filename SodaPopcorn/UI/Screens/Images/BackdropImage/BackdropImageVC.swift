@@ -1,5 +1,5 @@
 //
-//  ImageViewVC.swift
+//  BackdropImageVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/11/21.
@@ -8,9 +8,9 @@
 import Combine
 import UIKit
 
-final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
+final class BackdropImageVC: BaseViewController, UIScrollViewDelegate {
     // MARK: Consts
-    private let viewModel: ImageViewVM
+    private let viewModel: BackdropImageVM
 
     // MARK: - Variables
     private var imageURLSubscription: Cancellable!
@@ -18,6 +18,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
+                self.backdropImage.backdropSize = .original
                 self.backdropImage.setUrlString(urlString: imageURL)
             }
         }
@@ -27,8 +28,10 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = true
-        scrollView.showsVerticalScrollIndicator = true
+        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 10.0
         return scrollView
@@ -41,7 +44,7 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
         let button = UIButton(type: .system)
         button.setImage(image, for: .normal)
         button.contentMode = .scaleAspectFit
@@ -52,16 +55,18 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         return button
     }()
 
-    private let backdropImage: CustomImage = {
-        let customImage = CustomImage(frame: .zero)
-        customImage.posterSize = .original
-        customImage.customContentMode = .scaleAspectFit
-        customImage.defaultImage = UIImage(named: "no_backdrop")
-        customImage.sizeToFit()
+    private lazy var backdropImage: CustomBackdropImage = {
+        let customImage = CustomBackdropImage(frame: .zero)
+
+        if let cacheImage = cache.value(forKey: "\(BackdropSize.w780.rawValue)\(self.viewModel.imageURL)") {
+            customImage.image = cacheImage
+        }
+        customImage.contentMode = .scaleAspectFit
+
         return customImage
     }()
 
-    init(viewModel: ImageViewVM) {
+    init(viewModel: BackdropImageVM) {
         self.viewModel = viewModel
         super.init()
     }
@@ -99,19 +104,21 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
 
-        contentView.addSubview(closeButton)
         contentView.addSubview(backdropImage)
+        contentView.addSubview(closeButton)
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
         backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         backdropImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         backdropImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
+
+        handleGestureRecongnizers()
     }
 
     override func bindViewModel() {
@@ -123,17 +130,51 @@ final class ImageViewVC: BaseViewController, UIScrollViewDelegate {
     }
 
     // MARK: - Helpers ⚙️
-    @objc
-    private func closeButtonPressed() {
-        viewModel.inputs.closeButtonPressed()
+    private func handleGestureRecongnizers() {
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(presentImageOptionsActionSheet))
+        longPressRecognizer.minimumPressDuration = 1.0
+
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomOutAction))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+
+        backdropImage.isUserInteractionEnabled = true
+        backdropImage.addGestureRecognizer(longPressRecognizer)
+        backdropImage.addGestureRecognizer(doubleTapRecognizer)
+
+        scrollView.addGestureRecognizer(doubleTapRecognizer)
     }
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return self.backdropImage
     }
 
+    @objc
+    private func tapGestureZoomOutAction(recognizer: UITapGestureRecognizer) {
+        scrollView.setZoomScale(1.0, animated: true)
+    }
+
+    @objc
+    private func closeButtonPressed() {
+        viewModel.inputs.closeButtonPressed()
+    }
+
+    @objc
+    private func presentImageOptionsActionSheet() {
+        let saveAction = UIAlertAction(title: NSLocalizedString("alert_save_button", comment: "Save button"), style: .default) { [weak self] _ in
+            self?.downloadImageToPhotosAlbum()
+        }
+
+        Alert.showActionSheet(on: self, actions: [saveAction])
+    }
+
+    @objc
+    private func downloadImageToPhotosAlbum() {
+        guard let image = backdropImage.image else { return }
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+    }
+
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑 ImageViewVC deinit.")
+        print("🗑 BackdropImageVC deinit.")
     }
 }

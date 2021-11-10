@@ -14,7 +14,6 @@ public final class MovieService: MovieNetworkServiceProtocol {
 	private let movieNetworkService: MovieNetworkService
 
 	private static let sharedMovieService: MovieService = {
-		let managedObjectContext = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
 		return MovieService(movieNetworkService: MovieNetworkService())
 	}()
 
@@ -27,7 +26,7 @@ public final class MovieService: MovieNetworkServiceProtocol {
 	}
 
 	// MARK: - Network Service
-	public func getNewMovies(page: Int) -> AnyPublisher<MoviesApiResponse, NetworkResponse> {
+	public func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
 		return movieNetworkService.getNewMovies(page: page)
 	}
 
@@ -35,28 +34,19 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.movieDetails(movieId: movieId)
     }
 
-	// MARK: - Storage Context
-//	func create(movie: Movie) {
-//		storageManager.create(movie: movie)
-//	}
-//
-//	func fetch() -> [Movie]? {
-//		return storageManager.fetch()
-//	}
-//
-//	func update(movie: Movie) throws {
-//		try storageManager.update(movie: movie)
-//	}
-//
-//	func delete(movie: Movie) throws {
-//		try storageManager.delete(movie: movie)
-//	}
-//
-//	func deleteAll() throws {
-//		try storageManager.deleteAll()
-//	}
-//
-//	func saveAll(movies: [Movie]) throws {
-//		try storageManager.saveAll(movies: movies)
-//	}
+    public func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse> {
+        return movieNetworkService.getImages(movieId: movieId)
+    }
+
+    public func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
+        return movieNetworkService.socialNetworks(movieId: movieId)
+    }
+
+    public func getVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse> {
+        return movieNetworkService.getVideos(movieId: movieId)
+    }
+
+    public func movieCredits(movieId: String) -> AnyPublisher<Credits, NetworkResponse> {
+        return movieNetworkService.movieCredits(movieId: movieId)
+    }
 }

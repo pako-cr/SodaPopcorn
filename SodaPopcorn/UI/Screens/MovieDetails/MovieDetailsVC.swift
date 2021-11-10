@@ -14,19 +14,23 @@ final class MovieDetailsVC: BaseViewController {
 
     // MARK: - Variables
     private var movieInfoSubscription: Cancellable!
+    private var imagesSubscription: Cancellable!
+    private var socialNetworksSubscription: Cancellable!
+    private var castSubscription: Cancellable!
+
+    private var oldMovie: Movie?
     private var movie: Movie? {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let movie = self.movie else { return }
 
                 // Backdrop
-                if let backdropImageUrl = movie.backdropPath {
-//                    self.backdropCollectionView.setUrlString(urlString: backdropImageUrl)
+                if let backdropImageUrl = movie.backdropPath, self.oldMovie?.backdropPath != backdropImageUrl {
                     self.backdropCollectionView.updateCollectionViewData(images: [backdropImageUrl])
                 }
 
                 // Title
-                if let title = movie.title, !title.isEmpty {
+                if let title = movie.title, !title.isEmpty, self.oldMovie?.title != title {
                     self.movieTitleLabel.text = title
                 }
 
@@ -37,7 +41,7 @@ final class MovieDetailsVC: BaseViewController {
                 }
 
                 // Release Date
-                if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
+                if let releaseDate = movie.releaseDate, !releaseDate.isEmpty, self.oldMovie?.releaseDate != releaseDate {
                     self.releaseDateLabel.text = releaseDate
                         .split(separator: Character.init("-"), maxSplits: 1, omittingEmptySubsequences: true).first?.description ?? ""
                 }
@@ -55,12 +59,12 @@ final class MovieDetailsVC: BaseViewController {
                 }
 
                 // Rating
-                if let rating = movie.rating, rating > 0.0 {
+                if let rating = movie.rating, rating > 0.0, self.oldMovie?.rating != rating {
                     self.ratingLabel.text = "﹒ \(movie.rating ?? 0.0)/10 ⭐️"
                 }
 
                 // Overview
-                if let overview = movie.overview, !overview.isEmpty {
+                if let overview = movie.overview, !overview.isEmpty, self.oldMovie?.overview != overview {
                     self.overviewValue.text = overview
                     self.overviewValue.sizeToFit()
                 }
@@ -68,13 +72,6 @@ final class MovieDetailsVC: BaseViewController {
                 // Budget
                 if let budget = movie.budget, let revenue = movie.revenue, budget > 0, revenue > 0 {
                     self.budgetRevenueValue.text = "\(self.formatCurrency(amount: budget)) / \(self.formatCurrency(amount: revenue))"
-                }
-
-                // Homepage
-                if let homepage = movie.homepage, !homepage.isEmpty {
-                    self.homepageValueButton.setTitle(homepage, for: .normal)
-                    self.homepageValueButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body).italic()
-                    self.homepageValueButton.setTitleColor(UIColor.systemBlue, for: .normal)
                 }
 
                 // Production Companies
@@ -85,6 +82,11 @@ final class MovieDetailsVC: BaseViewController {
 
                     self.productionCompaniesValue.sizeToFit()
                 }
+
+                // Website
+                self.socialNetworksCollectionView.setWebsiteUrl(url: movie.homepage)
+
+                self.oldMovie = movie
             }
         }
     }
@@ -94,7 +96,7 @@ final class MovieDetailsVC: BaseViewController {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
-        scrollView.showsVerticalScrollIndicator = true
+        scrollView.showsVerticalScrollIndicator = false
         return scrollView
     }()
 
@@ -105,7 +107,7 @@ final class MovieDetailsVC: BaseViewController {
     }()
 
     private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
         let button = UIButton(type: .system)
         button.setImage(image, for: .normal)
         button.contentMode = .scaleAspectFit
@@ -118,7 +120,22 @@ final class MovieDetailsVC: BaseViewController {
 
     private lazy var backdropCollectionView: BackdropCollectionView = {
         let collectionView = BackdropCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
+    }()
+
+    private lazy var galleryButton: UIButton = {
+        let button = UIButton(type: .roundedRect)
+        button.contentMode = .scaleAspectFit
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(galleryButtonPressed), for: .touchUpInside)
+        button.accessibilityLabel = NSLocalizedString("gallery", comment: "Gallert button")
+        button.tintColor = UIColor(named: "PrimaryColor")
+        button.setTitle(NSLocalizedString("gallery", comment: "Gallert button"), for: .normal)
+        button.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
+        button.layer.cornerRadius = 10
+        button.layer.borderWidth = 1
+        return button
     }()
 
     private let headerStack: UIStackView = {
@@ -318,33 +335,16 @@ final class MovieDetailsVC: BaseViewController {
         return textView
     }()
 
-    private let homepageLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
-        label.sizeToFit()
-        return label
+    private lazy var socialNetworksCollectionView: SocialNetworksCollectionView = {
+        let collectionView = SocialNetworksCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
     }()
 
-    private lazy var homepageValueButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        button.addTarget(self, action: #selector(openMovieWebsite), for: .touchUpInside)
-        button.setTitle(NSLocalizedString("not_applicable", comment: "Not applicable"), for: .normal)
-        button.contentHorizontalAlignment = .left
-        button.setTitleColor(UIColor.gray, for: .normal)
-        button.titleLabel?.numberOfLines = 1
-        button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.maximumContentSizeCategory = .accessibilityMedium
-        button.sizeToFit()
-        button.titleLabel?.lineBreakMode = .byTruncatingTail
-        return button
+    private lazy var castCollectionView: CastCollectionView = {
+        let collectionView = CastCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
     }()
 
     init(viewModel: MovieDetailsVM) {
@@ -372,12 +372,12 @@ final class MovieDetailsVC: BaseViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
 
-        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        scrollView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+        scrollView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
 
-        contentView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        contentView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor).isActive = true
         contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
@@ -388,6 +388,7 @@ final class MovieDetailsVC: BaseViewController {
 
         contentView.addSubview(backdropCollectionView.view)
         contentView.addSubview(closeButton)
+        contentView.addSubview(galleryButton)
         contentView.addSubview(headerStack)
         contentView.addSubview(subHeaderStack)
         contentView.addSubview(overviewLabel)
@@ -398,22 +399,28 @@ final class MovieDetailsVC: BaseViewController {
         contentView.addSubview(productionCompaniesValue)
         contentView.addSubview(budgetRevenueLabel)
         contentView.addSubview(budgetRevenueValue)
-        contentView.addSubview(homepageLabel)
-        contentView.addSubview(homepageValueButton)
+        contentView.addSubview(castCollectionView.view)
+        contentView.addSubview(socialNetworksCollectionView.view)
 
         subHeaderStack.addArrangedSubview(releaseDateLabel)
         subHeaderStack.addArrangedSubview(runtimeLabel)
         subHeaderStack.addArrangedSubview(ratingLabel)
 
         backdropCollectionView.view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        backdropCollectionView.view.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        backdropCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        backdropCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         backdropCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+
+        galleryButton.bottomAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: -10).isActive = true
+        galleryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        galleryButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        galleryButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
         headerStack.topAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: 10).isActive = true
         headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -462,16 +469,16 @@ final class MovieDetailsVC: BaseViewController {
         budgetRevenueValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         budgetRevenueValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
-        homepageLabel.topAnchor.constraint(equalTo: budgetRevenueValue.bottomAnchor, constant: 20).isActive = true
-        homepageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        homepageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        homepageLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
+        castCollectionView.view.topAnchor.constraint(equalTo: budgetRevenueValue.bottomAnchor, constant: 20).isActive = true
+        castCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        castCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        castCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
-        homepageValueButton.topAnchor.constraint(equalTo: homepageLabel.bottomAnchor).isActive = true
-        homepageValueButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
-        homepageValueButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        homepageValueButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
-        homepageValueButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        socialNetworksCollectionView.view.topAnchor.constraint(equalTo: castCollectionView.view.bottomAnchor, constant: 20).isActive = true
+        socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
+        socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
     override func bindViewModel() {
@@ -479,6 +486,23 @@ final class MovieDetailsVC: BaseViewController {
             .sink(receiveValue: { [weak self] (movie) in
                 guard let `self` = self else { return }
                 self.movie = movie
+            })
+
+        imagesSubscription = viewModel.outputs.backdropImagesAction()
+            .sink(receiveValue: { [weak self] backdropImages in
+                guard let `self` = self else { return }
+                let backdrops = backdropImages.map({ $0.filePath ?? ""})
+                self.backdropCollectionView.updateCollectionViewData(images: backdrops)
+            })
+
+        socialNetworksSubscription = viewModel.outputs.socialNetworksAction()
+            .sink(receiveValue: { [weak self] socialNetworks in
+                self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+            })
+
+        castSubscription = viewModel.outputs.castAction()
+            .sink(receiveValue: { [weak self] cast in
+                self?.castCollectionView.updateCollectionViewData(cast: cast)
             })
     }
 
@@ -489,15 +513,10 @@ final class MovieDetailsVC: BaseViewController {
     }
 
     @objc
-    private func openMovieWebsite() {
-        if let homepage = self.homepageValueButton.titleLabel?.text, !homepage.isEmpty,
-           !homepage.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
-           let url = URL(string: homepage) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
+    private func galleryButtonPressed() {
+        viewModel.inputs.galleryButtonPressed()
     }
 
-    // MARK: - Helpers ⚙️
     private func formatRuntime(runtime: Int) -> String {
         guard runtime > 0 else { return "" }
         let stringRuntime = "\((Double.init(runtime) / 60.0).description)"
