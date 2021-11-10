@@ -10,7 +10,7 @@ public final class MovieImages: Hashable {
     public var backdrops: [Backdrop]?
     public var posters: [Poster]?
 
-    private init(id: String? = nil, backdrops: [Backdrop]? = nil, posters: [Poster]? = nil) {
+    init(id: String? = nil, backdrops: [Backdrop]? = nil, posters: [Poster]? = nil) {
         self.id = id
         self.backdrops = backdrops
         self.posters = posters
@@ -20,10 +20,6 @@ public final class MovieImages: Hashable {
         self.init(id: apiResponse.id,
                   backdrops: apiResponse.backdropsApiResponse?.map({ Backdrop(apiResponse: $0) }) ?? [] ,
                   posters: apiResponse.postersApiResponse?.map({ Poster(apiResponse: $0) }) ?? [])
-    }
-
-    convenience init() {
-        self.init(id: nil, backdrops: nil, posters: nil)
     }
 
     public func hash(into hasher: inout Hasher) {

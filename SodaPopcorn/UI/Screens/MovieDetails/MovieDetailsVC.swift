@@ -16,6 +16,7 @@ final class MovieDetailsVC: BaseViewController {
     private var movieInfoSubscription: Cancellable!
     private var imagesSubscription: Cancellable!
     private var socialNetworksSubscription: Cancellable!
+    private var castSubscription: Cancellable!
 
     private var oldMovie: Movie?
     private var movie: Movie? {
@@ -73,13 +74,6 @@ final class MovieDetailsVC: BaseViewController {
                     self.budgetRevenueValue.text = "\(self.formatCurrency(amount: budget)) / \(self.formatCurrency(amount: revenue))"
                 }
 
-                // Homepage
-                if let homepage = movie.homepage, !homepage.isEmpty {
-                    self.homepageValueButton.setTitle(homepage, for: .normal)
-                    self.homepageValueButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body).italic()
-                    self.homepageValueButton.setTitleColor(UIColor.systemBlue, for: .normal)
-                }
-
                 // Production Companies
                 if let productionCompanies = movie.productionCompanies, !productionCompanies.isEmpty {
                     self.productionCompaniesValue.text = productionCompanies.reduce("", { partialResult, productionCompany in
@@ -88,6 +82,9 @@ final class MovieDetailsVC: BaseViewController {
 
                     self.productionCompaniesValue.sizeToFit()
                 }
+
+                // Website
+                self.socialNetworksCollectionView.setWebsiteUrl(url: movie.homepage)
 
                 self.oldMovie = movie
             }
@@ -338,37 +335,14 @@ final class MovieDetailsVC: BaseViewController {
         return textView
     }()
 
-    private let homepageLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
-        label.sizeToFit()
-        return label
-    }()
-
-    private lazy var homepageValueButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        button.addTarget(self, action: #selector(openMovieWebsite), for: .touchUpInside)
-        button.setTitle(NSLocalizedString("not_applicable", comment: "Not applicable"), for: .normal)
-        button.contentHorizontalAlignment = .left
-        button.setTitleColor(UIColor.gray, for: .normal)
-        button.titleLabel?.numberOfLines = 1
-        button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.maximumContentSizeCategory = .accessibilityMedium
-        button.sizeToFit()
-        button.titleLabel?.lineBreakMode = .byTruncatingTail
-        return button
-    }()
-
     private lazy var socialNetworksCollectionView: SocialNetworksCollectionView = {
         let collectionView = SocialNetworksCollectionView(movieDetailsVM: self.viewModel)
+        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+
+    private lazy var castCollectionView: CastCollectionView = {
+        let collectionView = CastCollectionView(movieDetailsVM: self.viewModel)
         collectionView.view.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -425,8 +399,7 @@ final class MovieDetailsVC: BaseViewController {
         contentView.addSubview(productionCompaniesValue)
         contentView.addSubview(budgetRevenueLabel)
         contentView.addSubview(budgetRevenueValue)
-        contentView.addSubview(homepageLabel)
-        contentView.addSubview(homepageValueButton)
+        contentView.addSubview(castCollectionView.view)
         contentView.addSubview(socialNetworksCollectionView.view)
 
         subHeaderStack.addArrangedSubview(releaseDateLabel)
@@ -437,7 +410,7 @@ final class MovieDetailsVC: BaseViewController {
         backdropCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         backdropCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        backdropCollectionView.view.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.3).isActive = true
+        backdropCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
         closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -456,12 +429,12 @@ final class MovieDetailsVC: BaseViewController {
         subHeaderStack.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: 2.5).isActive = true
         subHeaderStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         subHeaderStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        subHeaderStack.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.025).isActive = true
+        subHeaderStack.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.025).isActive = true
 
         overviewLabel.topAnchor.constraint(equalTo: subHeaderStack.bottomAnchor, constant: 20).isActive = true
         overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         overviewLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        overviewLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        overviewLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         overviewValue.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor).isActive = true
         overviewValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -470,17 +443,17 @@ final class MovieDetailsVC: BaseViewController {
         genresLabel.topAnchor.constraint(equalTo: overviewValue.bottomAnchor, constant: 20).isActive = true
         genresLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         genresLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        genresLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        genresLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         genresValue.topAnchor.constraint(equalTo: genresLabel.bottomAnchor).isActive = true
         genresValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         genresValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        genresValue.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        genresValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         productionCompaniesLabel.topAnchor.constraint(equalTo: genresValue.bottomAnchor, constant: 20).isActive = true
         productionCompaniesLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         productionCompaniesLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        productionCompaniesLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        productionCompaniesLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         productionCompaniesValue.topAnchor.constraint(equalTo: productionCompaniesLabel.bottomAnchor).isActive = true
         productionCompaniesValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -489,28 +462,22 @@ final class MovieDetailsVC: BaseViewController {
         budgetRevenueLabel.topAnchor.constraint(equalTo: productionCompaniesValue.bottomAnchor, constant: 20).isActive = true
         budgetRevenueLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         budgetRevenueLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        budgetRevenueLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        budgetRevenueLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         budgetRevenueValue.topAnchor.constraint(equalTo: budgetRevenueLabel.bottomAnchor).isActive = true
         budgetRevenueValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         budgetRevenueValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         budgetRevenueValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
-        homepageLabel.topAnchor.constraint(equalTo: budgetRevenueValue.bottomAnchor, constant: 20).isActive = true
-        homepageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        homepageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        homepageLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+        castCollectionView.view.topAnchor.constraint(equalTo: budgetRevenueValue.bottomAnchor, constant: 20).isActive = true
+        castCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        castCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        castCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
-        homepageValueButton.topAnchor.constraint(equalTo: homepageLabel.bottomAnchor).isActive = true
-        homepageValueButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
-        homepageValueButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        homepageValueButton.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
-
-        socialNetworksCollectionView.view.topAnchor.constraint(equalTo: homepageValueButton.bottomAnchor, constant: 20).isActive = true
-        socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        socialNetworksCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.175).isActive = true
+        socialNetworksCollectionView.view.topAnchor.constraint(equalTo: castCollectionView.view.bottomAnchor, constant: 20).isActive = true
+        socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
         socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
@@ -530,9 +497,12 @@ final class MovieDetailsVC: BaseViewController {
 
         socialNetworksSubscription = viewModel.outputs.socialNetworksAction()
             .sink(receiveValue: { [weak self] socialNetworks in
-                if let networks = socialNetworks.networks {
-                    self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: networks)
-                }
+                self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+            })
+
+        castSubscription = viewModel.outputs.castAction()
+            .sink(receiveValue: { [weak self] cast in
+                self?.castCollectionView.updateCollectionViewData(cast: cast)
             })
     }
 
@@ -545,15 +515,6 @@ final class MovieDetailsVC: BaseViewController {
     @objc
     private func galleryButtonPressed() {
         viewModel.inputs.galleryButtonPressed()
-    }
-
-    @objc
-    private func openMovieWebsite() {
-        if let homepage = self.homepageValueButton.titleLabel?.text, !homepage.isEmpty,
-           !homepage.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
-           let url = URL(string: homepage) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
     }
 
     private func formatRuntime(runtime: Int) -> String {

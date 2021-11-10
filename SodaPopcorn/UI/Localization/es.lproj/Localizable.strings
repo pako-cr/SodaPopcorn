@@ -45,3 +45,6 @@
 "poster_collection_view_cell_no_posters" = "No hay posters";
 "poster_collection_view_cell_no_backdrops" = "No hay fondos";
 "poster_collection_view_cell_no_videos" = "No hay vídeos";
+"movie_list_view_controller_empty_movies_title_label" = "Sin películas 😞";
+"movie_list_view_controller_empty_movies_description_label" = "No hay películas para mostrar 🎬";
+"cast_collection_view_title" = "Elenco";

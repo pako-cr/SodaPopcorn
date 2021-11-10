@@ -13,6 +13,7 @@ public enum MovieApiEndpoint {
     case details(movieId: String)
     case images(movieId: String)
     case socialNetworks(movieId: String)
+    case credits(movieId: String)
 }
 
 extension MovieApiEndpoint: EndPointType {
@@ -52,6 +53,8 @@ extension MovieApiEndpoint: EndPointType {
             return "\(movieId)/images"
         case .socialNetworks(let movieId):
             return "\(movieId)/external_ids"
+        case .credits(let movieId):
+            return "\(movieId)/credits"
         }
     }
 
@@ -83,6 +86,11 @@ extension MovieApiEndpoint: EndPointType {
                                               urlParameters: ["api_key": publicApiKey,
                                                               "language": locale])
         case .videos:
+                    return .requestParameters(bodyParameters: nil,
+                                              bodyEncoding: .urlEncoding,
+                                              urlParameters: ["api_key": publicApiKey,
+                                                              "language": locale])
+        case .credits:
                     return .requestParameters(bodyParameters: nil,
                                               bodyEncoding: .urlEncoding,
                                               urlParameters: ["api_key": publicApiKey,

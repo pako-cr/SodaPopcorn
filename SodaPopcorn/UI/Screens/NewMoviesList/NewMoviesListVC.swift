@@ -314,10 +314,14 @@ final class NewMoviesListVC: BaseViewController {
 		DispatchQueue.main.async { [weak self] in
 			guard let `self` = self else { return }
 			if self.loading && dataSourceItems < 1 {
-				self.movieCollectionView.setEmptyView(title: "Loading", message: "Loading Message", centered: true)
+				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_loading_movies_title_label", comment: "Loading title"),
+                                                      message: NSLocalizedString("movie_list_view_controller_loading_movies_description_label", comment: "Loading Message"),
+                                                      centered: true)
 
 			} else if !self.loading && dataSourceItems < 1 {
-				self.movieCollectionView.setEmptyView(title: "Empty", message: "Empty Message", centered: true)
+				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_empty_movies_title_label", comment: "Empty list title"),
+                                                      message: NSLocalizedString("movie_list_view_controller_empty_movies_description_label", comment: "Empty Message"),
+                                                      centered: true)
 
 			} else {
 				self.movieCollectionView.removeEmptyView()

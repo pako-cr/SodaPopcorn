@@ -16,8 +16,8 @@ final class CustomBackdropImage: UIImageView {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let urlString = self.urlString else { return }
 
-                if let posterImage = cache.value(forKey: "\(self.backdropSize.rawValue)\(urlString)") {
-                    self.image = posterImage
+                if let cacheImage = cache.value(forKey: "\(self.backdropSize.rawValue)\(urlString)") {
+                    self.image = cacheImage
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
@@ -28,6 +28,7 @@ final class CustomBackdropImage: UIImageView {
                         if error != nil {
                             DispatchQueue.main.async { [weak self] in
                                 guard let `self` = self else { return }
+                                self.image = UIImage(named: "no_backdrop")
                                 self.activityIndicatorView.stopAnimating()
                             }
                         }

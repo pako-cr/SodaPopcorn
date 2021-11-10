@@ -9,7 +9,7 @@ public final class Videos: Hashable {
     public var id: String?
     public var results: [Video]?
 
-    private init(id: String?, results: [Video]?) {
+    public init(id: String? = nil, results: [Video]? = nil) {
         self.id = id
         self.results = results
     }
@@ -17,10 +17,6 @@ public final class Videos: Hashable {
     convenience init(apiResponse: VideosApiResponse) {
         self.init(id: apiResponse.id,
                   results: apiResponse.results?.map({ Video(apiResponse: $0) }) ?? [])
-    }
-
-    convenience init() {
-        self.init(id: nil, results: nil)
     }
 
     public func hash(into hasher: inout Hasher) {

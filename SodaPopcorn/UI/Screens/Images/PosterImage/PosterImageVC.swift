@@ -58,8 +58,8 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     private lazy var posterImage: CustomPosterImage = {
         let customImage = CustomPosterImage(frame: .zero)
 
-        if let posterImage = cache.value(forKey: "\(PosterSize.w342.rawValue)\(self.viewModel.imageURL)") {
-            customImage.image = posterImage
+        if let cacheImage = cache.value(forKey: "\(PosterSize.w342.rawValue)\(self.viewModel.imageURL)") {
+            customImage.image = cacheImage
         }
         customImage.contentMode = .scaleAspectFit
 

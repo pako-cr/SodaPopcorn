@@ -15,7 +15,7 @@ public final class SocialNetworks: Hashable {
     public var id: String?
     public var networks: [SocialNetwork]?
 
-    private init(id: String? = nil, networks: [SocialNetwork]?) {
+    init(id: String? = nil, networks: [SocialNetwork]? = nil) {
         self.id = id
         self.networks = networks
     }
@@ -36,10 +36,6 @@ public final class SocialNetworks: Hashable {
         }
 
         self.init(id: apiResponse.id, networks: networks)
-    }
-
-    convenience init() {
-        self.init(id: nil, networks: nil)
     }
 
     public func hash(into hasher: inout Hasher) {

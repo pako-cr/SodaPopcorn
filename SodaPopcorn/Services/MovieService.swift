@@ -45,4 +45,8 @@ public final class MovieService: MovieNetworkServiceProtocol {
     public func getVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse> {
         return movieNetworkService.getVideos(movieId: movieId)
     }
+
+    public func movieCredits(movieId: String) -> AnyPublisher<Credits, NetworkResponse> {
+        return movieNetworkService.movieCredits(movieId: movieId)
+    }
 }

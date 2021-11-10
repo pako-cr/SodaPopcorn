@@ -11,7 +11,7 @@ public final class Movies {
     var numberOfPages: Int?
     var movies: [Movie]?
 
-    private init(page: Int?, numberOfResults: Int?, numberOfPages: Int?, movies: [Movie]?) {
+    init(page: Int? = nil, numberOfResults: Int? = nil, numberOfPages: Int? = nil, movies: [Movie]? = nil) {
         self.page = page
         self.numberOfResults = numberOfResults
         self.numberOfPages = numberOfPages
@@ -23,9 +23,5 @@ public final class Movies {
                   numberOfResults: apiResponse.numberOfResults,
                   numberOfPages: apiResponse.numberOfPages,
                   movies: apiResponse.movies?.map({ Movie(apiResponse: $0) }) ?? [])
-    }
-
-    convenience init() {
-        self.init(page: nil, numberOfResults: nil, numberOfPages: nil, movies: nil)
     }
 }
