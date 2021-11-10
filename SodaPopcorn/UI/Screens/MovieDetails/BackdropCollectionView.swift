@@ -103,7 +103,7 @@ public final class BackdropCollectionView: UICollectionViewController {
 
             snapshot.appendItems(images, toSection: .images)
 
-            print("🔸 Images Snapshot items: \(snapshot.numberOfItems)")
+//            print("🔸 Images Snapshot items: \(snapshot.numberOfItems)")
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }

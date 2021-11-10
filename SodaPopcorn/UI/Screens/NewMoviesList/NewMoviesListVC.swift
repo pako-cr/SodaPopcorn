@@ -32,6 +32,8 @@ final class NewMoviesListVC: BaseViewController {
 	private var reloadingDataSource = false
 	private var dataSource: DataSource!
 
+    private var loadedCount = 0
+
 	private var collectionLayout: CollectionLayout = .columns {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
@@ -131,7 +133,9 @@ final class NewMoviesListVC: BaseViewController {
 			.filter({ !($0?.isEmpty ?? true) })
 			.sink(receiveValue: { [weak self] (movies) in
 				guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
-				self.updateDataSource(movies: movies)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                    self?.updateDataSource(movies: movies)
+                }
 			})
 
 		loadingSubscription = viewModel.outputs.loading()
@@ -168,7 +172,6 @@ final class NewMoviesListVC: BaseViewController {
 		movieCollectionView.showsVerticalScrollIndicator = false
 		movieCollectionView.allowsSelection = true
 		movieCollectionView.isPrefetchingEnabled = true
-		movieCollectionView.prefetchDataSource = self
 		movieCollectionView.refreshControl = refreshControl
 		movieCollectionView.delegate = self
         movieCollectionView.alwaysBounceVertical = true
@@ -250,7 +253,9 @@ final class NewMoviesListVC: BaseViewController {
 
 			self.handleFetchingChange(finishedFetching: false)
 
-			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
+            self.loadedCount = snapshot.numberOfItems
+
+//			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
 			self.movieCollectionView.removeEmptyView()
 			self.dataSource.apply(snapshot, animatingDifferences: true)
 		}
@@ -295,6 +300,14 @@ final class NewMoviesListVC: BaseViewController {
 		self.finishedFetching = finishedFetching
 	}
 
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard loadedCount != 0 else { return }
+
+        if indexPath.row == loadedCount - 1 {
+            self.viewModel.inputs.fetchNewMovies()
+        }
+    }
+
 	private func handleEmptyView() {
 		let dataSourceItems = dataSource.snapshot().numberOfItems
 
@@ -318,19 +331,6 @@ final class NewMoviesListVC: BaseViewController {
 		fetchMoviesSubscription.cancel()
 		loadingSubscription.cancel()
 		finishedFetchingSubscription.cancel()
-	}
-}
-
-extension NewMoviesListVC: UICollectionViewDataSourcePrefetching {
-	func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-		let numberOfItems = dataSource.snapshot().numberOfItems
-		let lastItem = indexPaths.last?.item ?? 0
-
-		if (numberOfItems - 1)...numberOfItems ~= lastItem {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-				self?.viewModel.inputs.fetchNewMovies()
-			}
-		}
 	}
 }
 
