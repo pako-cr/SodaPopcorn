@@ -20,6 +20,12 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when the gallery button is pressed.
     func galleryButtonPressed()
+
+    /// Call when the credits button is pressed.
+    func creditsButtonPressed()
+
+    /// Call when a cast member is selected.
+    func castMemberSelected(cast: Cast)
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -49,6 +55,12 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when the gallery button is pressed.
     func galleryButtonAction() -> PassthroughSubject<Void, Never>
+
+    /// Emits when a cast member is selected.
+    func castMemberAction() -> PassthroughSubject<Cast, Never>
+
+    /// Emits when the credits button is pressed.
+    func creditsButtonAction() -> PassthroughSubject<Credits, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -68,6 +80,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
+    private var credits: Credits?
 
     init(movieService: MovieService, movie: Movie) {
         self.movieService = movieService
@@ -89,6 +102,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         galleryButtonPressedProperty.sink { [weak self] _ in
             guard let `self` = self else { return }
             self.galleryButtonActionProperty.send(())
+        }.store(in: &cancellable)
+
+        castMemberSelectedProperty.sink { [weak self] cast in
+            self?.castMemberActionProperty.send(cast)
+        }.store(in: &cancellable)
+
+        creditsButtonPressedProperty.sink { [weak self] _ in
+            if let credits = self?.credits {
+                self?.creditsButtonActionProperty.send(credits)
+            }
         }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
@@ -216,10 +239,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                         self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
                     default: break
                 }
-            }, receiveValue: { [weak self] movieCredits in
+            }, receiveValue: { [weak self] credits in
                 guard let `self` = self else { return }
 
-                if let cast = movieCredits.cast {
+                self.credits = credits
+                if let cast = credits.cast {
                     self.castActionProperty.send(cast)
                 }
             }).store(in: &cancellable)
@@ -249,6 +273,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let galleryButtonPressedProperty = PassthroughSubject<Void, Never>()
     public func galleryButtonPressed() {
         galleryButtonPressedProperty.send(())
+    }
+
+    private let castMemberSelectedProperty = PassthroughSubject<Cast, Never>()
+    public func castMemberSelected(cast: Cast) {
+        castMemberSelectedProperty.send(cast)
+    }
+
+    private let creditsButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func creditsButtonPressed() {
+        creditsButtonPressedProperty.send(())
     }
 
 	// MARK: - ⬆️ OUTPUTS Definition
@@ -295,6 +329,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let castActionProperty = PassthroughSubject<[Cast], Never>()
     public func castAction() -> PassthroughSubject<[Cast], Never> {
         return castActionProperty
+    }
+
+    private let castMemberActionProperty = PassthroughSubject<Cast, Never>()
+    public func castMemberAction() -> PassthroughSubject<Cast, Never> {
+        return castMemberActionProperty
+    }
+
+    private let creditsButtonActionProperty = PassthroughSubject<Credits, Never>()
+    public func creditsButtonAction() -> PassthroughSubject<Credits, Never> {
+        return creditsButtonActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

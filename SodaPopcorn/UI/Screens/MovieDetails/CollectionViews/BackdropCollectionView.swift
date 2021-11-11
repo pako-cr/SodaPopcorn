@@ -49,7 +49,7 @@ public final class BackdropCollectionView: UICollectionViewController {
         collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
         collectionView.register(BackdropCollectionViewCell.self, forCellWithReuseIdentifier: BackdropCollectionViewCell.reuseIdentifier)
@@ -103,17 +103,17 @@ public final class BackdropCollectionView: UICollectionViewController {
 
             snapshot.appendItems(images, toSection: .images)
 
-//            print("🔸 Images Snapshot items: \(snapshot.numberOfItems)")
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
-    }
-
-    func updateCollectionViewData(images: [String]) {
-        self.updateDataSource(images: images)
     }
 
     override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let imageURL = dataSource.itemIdentifier(for: indexPath) else { return }
         movieDetailsVM?.inputs.backdropImageSelected(imageURL: imageURL)
+    }
+
+    // MARK: - ⚙️ Helpers
+    func updateCollectionViewData(images: [String]) {
+        self.updateDataSource(images: images)
     }
 }

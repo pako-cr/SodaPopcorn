@@ -17,13 +17,29 @@ final class CastCollectionViewCell: UICollectionViewCell {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let cast = self.cast else { return }
 
-                if cast == Cast() {
+                if cast.name == "no_cast" {
                     self.posterImage.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("No Cast", comment: "No cast"))
+                    self.setEmptyView(title: NSLocalizedString("no_cast", comment: "No cast"))
+
+                } else if cast.name == "more_info" {
+                    self.posterImage.isHidden = true
+                    self.castName.isHidden = true
+                    self.setEmptyView(title: NSLocalizedString("more_info", comment: "More info"), centered: true)
 
                 } else {
-                    self.posterImage.setUrlString(urlString: cast.profilePath ?? "")
-                    self.castName.text = cast.name
+                    self.removeEmptyView()
+                    self.posterImage.isHidden = false
+                    self.castName.isHidden = false
+
+                    if let profilePath = cast.profilePath {
+                        self.posterImage.setUrlString(urlString: profilePath)
+                    } else {
+                        self.posterImage.image = UIImage(named: "no_poster")
+                    }
+
+                    if let castName = cast.name {
+                        self.castName.text = castName
+                    }
                 }
             }
         }

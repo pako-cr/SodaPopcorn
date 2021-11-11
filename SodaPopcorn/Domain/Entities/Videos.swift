@@ -2,7 +2,7 @@
 //  Videos.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Zimplifica on 9/11/21.
+//  Created by Francisco Cordoba on 9/11/21.
 //
 
 public final class Videos: Hashable {
