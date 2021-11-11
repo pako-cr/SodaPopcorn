@@ -8,10 +8,10 @@
 import Foundation
 
 public final class SocialNetworksApiResponse: Codable {
-    public var id: String?
-    public var facebookId: String?
-    public var instagramId: String?
-    public var twitterId: String?
+    public let id: String?
+    public let facebookId: String?
+    public let instagramId: String?
+    public let twitterId: String?
 
     private enum SocialNetworksApiResponseCodingKeys: String, CodingKey {
         case id

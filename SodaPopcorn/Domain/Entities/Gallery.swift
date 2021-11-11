@@ -6,7 +6,7 @@
 //
 
 public struct Gallery {
-    public var videos: [Video]?
-    public var backdrops: [Backdrop]?
-    public var posters: [Poster]?
+    let videos: [Video]?
+    let backdrops: [Backdrop]?
+    let posters: [Poster]?
 }

@@ -21,10 +21,10 @@ extension NSDirectionalEdgeInsets {
 	}
 
 	static func medium() -> NSDirectionalEdgeInsets {
-		return .uniform(size: 15)
+		return .uniform(size: 10)
 	}
 
 	static func large() -> NSDirectionalEdgeInsets {
-		return .uniform(size: 30)
+		return .uniform(size: 20)
 	}
 }

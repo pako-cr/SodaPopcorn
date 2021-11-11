@@ -41,7 +41,7 @@
 "gallery" = "Galería";
 "gallery_view_backdrops_header" = "Fondos";
 "gallery_view_posters_header" = "Posters";
-"gallery_view_videos_header" = "Vídeos";
+"gallery_view_videos_header" = "Trailers/Vídeos";
 "poster_collection_view_cell_no_posters" = "No hay posters";
 "poster_collection_view_cell_no_backdrops" = "No hay fondos";
 "poster_collection_view_cell_no_videos" = "No hay vídeos";
@@ -52,4 +52,4 @@
 "credits_vc_cast_header" = "Elenco";
 "credits_vc_crew_header" = "Equipo";
 "no_cast" = "Sin información";
-"more_info" = "Más ➡️";
+"more_info" = "Más...";

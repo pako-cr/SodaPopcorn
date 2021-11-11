@@ -6,8 +6,8 @@
 //
 
 public final class VideosApiResponse: Decodable {
-    public var id: String?
-    public var results: [VideoApiResponse]?
+    public let id: String?
+    public let results: [VideoApiResponse]?
 
     private enum CondingKeys: CodingKey {
         case id

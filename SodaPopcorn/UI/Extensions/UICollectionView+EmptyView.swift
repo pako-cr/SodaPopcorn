@@ -30,7 +30,7 @@ extension UICollectionView {
 			label.adjustsFontSizeToFitWidth = true
 			label.adjustsFontForContentSizeCategory = true
 			label.accessibilityLabel = title
-			label.accessibilityHint = "No movie information title"
+			label.accessibilityHint = "No information title"
 			return label
 		}()
 
@@ -45,7 +45,7 @@ extension UICollectionView {
 			label.adjustsFontForContentSizeCategory = true
 			label.numberOfLines = 2
 			label.accessibilityLabel = message
-			label.accessibilityHint = "No movie information description"
+			label.accessibilityHint = "No information description"
 			return label
 		}()
 
@@ -87,7 +87,7 @@ extension UICollectionViewCell {
             label.adjustsFontForContentSizeCategory = true
             label.translatesAutoresizingMaskIntoConstraints = false
             label.accessibilityLabel = title
-            label.accessibilityHint = "No movie information title"
+            label.accessibilityHint = "No information title"
             return label
         }()
 
@@ -95,13 +95,13 @@ extension UICollectionViewCell {
 
         emptyView.addSubview(titleLabel)
 
-//        titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 5).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 5).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor).isActive = true
         titleLabel.heightAnchor.constraint(equalTo: emptyView.heightAnchor, multiplier: 0.2).isActive = true
 
         if centered {
             titleLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor).isActive = true
+            titleLabel.textAlignment = .center
         } else {
             titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 10).isActive = true
         }

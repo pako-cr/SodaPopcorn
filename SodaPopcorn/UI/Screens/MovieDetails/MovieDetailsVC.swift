@@ -361,6 +361,7 @@ final class MovieDetailsVC: BaseViewController {
         setupUI()
         bindViewModel()
         viewModel.inputs.viewDidLoad()
+        handleGestureRecongnizers()
     }
 
     override func viewWillLayoutSubviews() {
@@ -481,6 +482,12 @@ final class MovieDetailsVC: BaseViewController {
         socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
+    private func handleGestureRecongnizers() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(overviewTapped))
+        tapGesture.numberOfTouchesRequired = 1
+        overviewValue.addGestureRecognizer(tapGesture)
+    }
+
     override func bindViewModel() {
         movieInfoSubscription = viewModel.outputs.movieInfoAction()
             .sink(receiveValue: { [weak self] (movie) in
@@ -500,9 +507,11 @@ final class MovieDetailsVC: BaseViewController {
                 self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
             })
 
-        castSubscription = viewModel.outputs.castAction()
-            .sink(receiveValue: { [weak self] cast in
-                self?.castCollectionView.updateCollectionViewData(cast: cast)
+        castSubscription = viewModel.outputs.creditsAction()
+            .sink(receiveValue: { [weak self] credits in
+                if let cast = credits?.cast {
+                    self?.castCollectionView.updateCollectionViewData(cast: cast)
+                }
             })
     }
 
@@ -528,6 +537,13 @@ final class MovieDetailsVC: BaseViewController {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         return formatter.string(from: (amount ?? 0) as NSNumber) ?? "$0.00"
+    }
+
+    @objc
+    private func overviewTapped(sender: UIGestureRecognizer) {
+        if let overview = overviewValue.text {
+            viewModel.inputs.overviewTextPressed(overview: overview)
+        }
     }
 
     // MARK: - 🗑 Deinit

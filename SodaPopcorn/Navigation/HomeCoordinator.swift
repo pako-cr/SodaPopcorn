@@ -58,40 +58,49 @@ final class HomeCoordinator: Coordinator {
 		newMoviesListVM.outputs.movieSelectedAction()
 			.sink { [weak self] movie in
 				guard let `self` = self else { return }
-				self.showMovieDetails(movie: movie)
+                self.showMovieDetails(movie: movie, on: self.homeVC!)
 			}.store(in: &cancellable)
 	}
 
-	private func showMovieDetails(movie: Movie) {
+	private func showMovieDetails(movie: Movie, on navigationController: UIViewController) {
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
-		homeVC?.present(viewController, animated: true, completion: nil)
+        navigationController.present(viewController, animated: true, completion: nil)
 
 		viewModel.outputs.closeButtonAction()
-			.sink { [weak self] _ in
-				guard let `self` = self else { return }
-				self.homeVC?.dismiss(animated: true, completion: nil)
+			.sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
 			}.store(in: &cancellable)
 
         viewModel.outputs.backdropImageAction()
             .sink { [weak self] (imageURL) in
-                self?.showBackdropImageView(with: imageURL, on: viewController)
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showBackdropImageView(with: imageURL, on: presentedVC)
             }.store(in: &cancellable)
 
         viewModel.outputs.galleryButtonAction()
             .sink { [weak self] _ in
-                self?.showGalleryView(with: movie, on: viewController)
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showGalleryView(with: movie, on: presentedVC)
             }.store(in: &cancellable)
 
-        viewModel.outputs.castMemberAction()
-            .sink { [weak self] cast in
-                print(cast.name ?? "")
+        viewModel.outputs.overviewTextAction()
+            .sink { [weak self] overview in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showCustomTextView(with: overview, on: presentedVC)
             }.store(in: &cancellable)
 
         viewModel.outputs.creditsButtonAction()
             .sink { [weak self] credits in
-                self?.showCreditsView(with: credits, on: viewController)
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showCreditsView(with: credits, on: presentedVC)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.castMemberAction()
+            .sink { [weak self] cast in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                print(cast.name ?? "")
             }.store(in: &cancellable)
 	}
 
@@ -132,12 +141,14 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.backdropImageAction()
             .sink { [weak self] imageUrl in
-                self?.showBackdropImageView(with: imageUrl, on: viewController)
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showBackdropImageView(with: imageUrl, on: presentedVC)
             }.store(in: &cancellable)
 
         viewModel.outputs.posterImageAction()
             .sink { [weak self] imageUrl in
-                self?.showPosterImageView(with: imageUrl, on: viewController)
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showPosterImageView(with: imageUrl, on: presentedVC)
             }.store(in: &cancellable)
     }
 
@@ -154,7 +165,20 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.castMemberAction()
             .sink { [weak self] cast in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
                 print(cast.name ?? "")
+            }.store(in: &cancellable)
+    }
+
+    public func showCustomTextView(with text: String, on navigationController: UIViewController) {
+        let viewModel = CustomTextVM(text: text)
+        let viewController = CustomTextVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
             }.store(in: &cancellable)
     }
 }

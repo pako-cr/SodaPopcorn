@@ -86,6 +86,7 @@ final class NewMoviesListVC: BaseViewController {
 	private lazy var refreshControl: UIRefreshControl = {
 		let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.reloadCollectionView), for: .valueChanged)
+        refreshControl.tintColor = UIColor(named: "PrimaryColor")
 		return refreshControl
 	}()
 
@@ -133,7 +134,7 @@ final class NewMoviesListVC: BaseViewController {
 			.filter({ !($0?.isEmpty ?? true) })
 			.sink(receiveValue: { [weak self] (movies) in
 				guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
                     self?.updateDataSource(movies: movies)
                 }
 			})

@@ -5,22 +5,12 @@
 //  Created by Francisco Cordoba on 3/9/21.
 //
 
-public final class Movie: Hashable {
-    public var id: String?
-    public var title: String?
-    public var overview: String?
-    public var rating: Double?
-    public var posterPath: String?
-    public var backdropPath: String?
-    public var releaseDate: String?
-    public var genres: [Genre]?
-    public var homepage: String?
-    public var runtime: Int?
-    public var voteCount: Int?
-    public var budget: Int?
-    public var revenue: Int?
-    public var tagline: String?
-    public var productionCompanies: [ProductionCompany]?
+public struct Movie: Hashable {
+    let rating: Double?
+    let genres: [Genre]?
+    let productionCompanies: [ProductionCompany]?
+    let runtime, voteCount, budget, revenue: Int?
+    let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline: String?
 
     private init(id: String?, title: String?, overview: String?, rating: Double?, posterPath: String?, backdropPath: String?, releaseDate: String?, genres: [Genre]?, homepage: String?, runtime: Int?, voteCount: Int?, budget: Int?, revenue: Int?, tagline: String?, productionCompanies: [ProductionCompany]?) {
         self.id = id
@@ -40,7 +30,7 @@ public final class Movie: Hashable {
         self.productionCompanies = productionCompanies
     }
 
-    convenience init(apiResponse: MovieApiResponse) {
+    init(apiResponse: MovieApiResponse) {
         self.init(id: apiResponse.id,
                   title: apiResponse.title,
                   overview: apiResponse.overview,

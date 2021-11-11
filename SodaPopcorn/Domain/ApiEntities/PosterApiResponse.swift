@@ -8,7 +8,7 @@
 import Foundation
 
 public final class PosterApiResponse: Codable {
-    public var filePath: String?
+    public let filePath: String?
 
     private enum PosterApiResponseCodingKeys: String, CodingKey {
         case filePath = "file_path"

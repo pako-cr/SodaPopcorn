@@ -29,6 +29,8 @@ final class GalleryVC: BaseViewController {
     private var showErrorSubscription: Cancellable!
 
     // MARK: UI Elements
+    private var customCollectionView: UICollectionView!
+
     private lazy var closeButton: UIButton = {
         let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
         let button = UIButton(type: .system)
@@ -40,8 +42,6 @@ final class GalleryVC: BaseViewController {
         button.tintColor = UIColor(named: "PrimaryColor")
         return button
     }()
-
-    private var customCollectionView: UICollectionView!
 
     init(viewModel: GalleryVM) {
         self.viewModel = viewModel
@@ -90,7 +90,7 @@ final class GalleryVC: BaseViewController {
             })
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         customCollectionView.register(BackdropCollectionViewCell.self, forCellWithReuseIdentifier: BackdropCollectionViewCell.reuseIdentifier)
@@ -254,9 +254,9 @@ final class GalleryVC: BaseViewController {
     }
 
     private func setInitialData() {
-        var snapshot = self.dataSource.snapshot()
+        var snapshot = dataSource.snapshot()
         snapshot.appendSections(Section.allCases)
-        self.dataSource.apply(snapshot, animatingDifferences: false)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 
     private func updateDataSource(gallery: Gallery, animatingDifferences: Bool = true) {
@@ -297,6 +297,11 @@ final class GalleryVC: BaseViewController {
         if let url = URL(string: "https://www.youtube.com/watch?v=\(videoURL)") {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
+    }
+
+    // MARK: - 🗑 Deinit
+    deinit {
+        print("🗑", "GalleryVC deinit.")
     }
 }
 

@@ -5,10 +5,10 @@
 //  Created by Francisco Cordoba on 5/11/21.
 //
 
-public final class MovieImages: Hashable {
-    public var id: String?
-    public var backdrops: [Backdrop]?
-    public var posters: [Poster]?
+public struct MovieImages: Hashable {
+    let id: String?
+    let backdrops: [Backdrop]?
+    let posters: [Poster]?
 
     init(id: String? = nil, backdrops: [Backdrop]? = nil, posters: [Poster]? = nil) {
         self.id = id
@@ -16,7 +16,7 @@ public final class MovieImages: Hashable {
         self.posters = posters
     }
 
-    convenience init(apiResponse: ImagesApiResponse) {
+    init(apiResponse: ImagesApiResponse) {
         self.init(id: apiResponse.id,
                   backdrops: apiResponse.backdropsApiResponse?.map({ Backdrop(apiResponse: $0) }) ?? [] ,
                   posters: apiResponse.postersApiResponse?.map({ Poster(apiResponse: $0) }) ?? [])

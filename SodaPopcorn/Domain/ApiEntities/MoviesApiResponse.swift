@@ -6,10 +6,10 @@
 //
 
 public final class MoviesApiResponse: Decodable {
-    public var page: Int?
-    public var numberOfResults: Int?
-    public var numberOfPages: Int?
-    public var movies: [MovieApiResponse]?
+    public let page: Int?
+    public let numberOfResults: Int?
+    public let numberOfPages: Int?
+    public let movies: [MovieApiResponse]?
 
     private enum MoviesApiResponseCodingKeys: String, CodingKey {
         case page

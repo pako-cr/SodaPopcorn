@@ -11,7 +11,7 @@ public enum SocialNetwork: Hashable {
     case twitter(userId: String)
 }
 
-public final class SocialNetworks: Hashable {
+public struct SocialNetworks: Hashable {
     public var id: String?
     public var networks: [SocialNetwork]?
 
@@ -20,7 +20,7 @@ public final class SocialNetworks: Hashable {
         self.networks = networks
     }
 
-    convenience init(apiResponse: SocialNetworksApiResponse) {
+    init(apiResponse: SocialNetworksApiResponse) {
         var networks: [SocialNetwork] = []
 
         if let instagramId = apiResponse.instagramId, !instagramId.isEmpty {

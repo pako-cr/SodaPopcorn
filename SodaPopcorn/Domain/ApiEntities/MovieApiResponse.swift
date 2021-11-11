@@ -6,21 +6,21 @@
 //
 
 public final class MovieApiResponse: Codable {
-    public var id: String?
-    public var title: String?
-    public var overview: String?
-    public var rating: Double?
-    public var posterPath: String?
-    public var backdropPath: String?
-    public var releaseDate: String?
-    public var genres: [GenreApiResponse]?
-    public var homepage: String?
-    public var runtime: Int?
-    public var voteCount: Int?
-    public var budget: Int?
-    public var revenue: Int?
-    public var tagline: String?
-    public var productionCompanies: [ProductionCompanyApiResponse]?
+    public let id: String?
+    public let title: String?
+    public let overview: String?
+    public let rating: Double?
+    public let posterPath: String?
+    public let backdropPath: String?
+    public let releaseDate: String?
+    public let genres: [GenreApiResponse]?
+    public let homepage: String?
+    public let runtime: Int?
+    public let voteCount: Int?
+    public let budget: Int?
+    public let revenue: Int?
+    public let tagline: String?
+    public let productionCompanies: [ProductionCompanyApiResponse]?
 
     private enum MovieApiResponseCodingKeys: String, CodingKey {
         case id

@@ -26,6 +26,9 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when a cast member is selected.
     func castMemberSelected(cast: Cast)
+
+    /// Call when the movie's overview is pressed.
+    func overviewTextPressed(overview: String)
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -47,8 +50,8 @@ public protocol MovieDetailsVMOutputs: AnyObject {
     /// Emits when the backdrop images are fetched.
     func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never>
 
-    /// Emits when the cast information is fetched.
-    func castAction() -> PassthroughSubject<[Cast], Never>
+    /// Emits when the credits information is fetched.
+    func creditsAction() -> CurrentValueSubject<Credits?, Never>
 
     /// Emits when the social networks are fetched.
     func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
@@ -61,6 +64,9 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when the credits button is pressed.
     func creditsButtonAction() -> PassthroughSubject<Credits, Never>
+
+    /// Emits when the movie's overview is pressed.
+    func overviewTextAction() -> PassthroughSubject<String, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -79,8 +85,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
-	private var page = 0
-    private var credits: Credits?
 
     init(movieService: MovieService, movie: Movie) {
         self.movieService = movieService
@@ -109,9 +113,13 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         }.store(in: &cancellable)
 
         creditsButtonPressedProperty.sink { [weak self] _ in
-            if let credits = self?.credits {
+            if let credits = self?.creditsActionProperty.value {
                 self?.creditsButtonActionProperty.send(credits)
             }
+        }.store(in: &cancellable)
+
+        overviewTextPressedProperty.sink { [weak self] (overview) in
+            self?.overviewTextActionProperty.send(overview)
         }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
@@ -241,11 +249,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 }
             }, receiveValue: { [weak self] credits in
                 guard let `self` = self else { return }
+                self.creditsActionProperty.value = credits
 
-                self.credits = credits
-                if let cast = credits.cast {
-                    self.castActionProperty.send(cast)
-                }
             }).store(in: &cancellable)
 	}
 
@@ -283,6 +288,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let creditsButtonPressedProperty = PassthroughSubject<Void, Never>()
     public func creditsButtonPressed() {
         creditsButtonPressedProperty.send(())
+    }
+
+    private let overviewTextPressedProperty = PassthroughSubject<String, Never>()
+    public func overviewTextPressed(overview: String) {
+        overviewTextPressedProperty.send(overview)
     }
 
 	// MARK: - ⬆️ OUTPUTS Definition
@@ -326,9 +336,9 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return galleryButtonActionProperty
     }
 
-    private let castActionProperty = PassthroughSubject<[Cast], Never>()
-    public func castAction() -> PassthroughSubject<[Cast], Never> {
-        return castActionProperty
+    private let creditsActionProperty = CurrentValueSubject<Credits?, Never>(nil)
+    public func creditsAction() -> CurrentValueSubject<Credits?, Never> {
+        return creditsActionProperty
     }
 
     private let castMemberActionProperty = PassthroughSubject<Cast, Never>()
@@ -341,12 +351,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return creditsButtonActionProperty
     }
 
+    private let overviewTextActionProperty = PassthroughSubject<String, Never>()
+    public func overviewTextAction() -> PassthroughSubject<String, Never> {
+        return overviewTextActionProperty
+    }
+
 	// MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
         var localizedErrorString: String
 
         switch networkResponse {
-
             case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
             case .badRequest: localizedErrorString = "network_response_error_bad_request"
             case .outdated: localizedErrorString = "network_response_error_outdated"

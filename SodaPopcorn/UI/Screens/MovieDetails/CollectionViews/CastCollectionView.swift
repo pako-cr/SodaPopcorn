@@ -31,6 +31,7 @@ public final class CastCollectionView: UICollectionViewController {
         label.maximumContentSizeCategory = .accessibilityMedium
         label.text = NSLocalizedString("cast_collection_view_title", comment: "Cast Label")
         label.sizeToFit()
+        label.isHidden = true
         return label
     }()
 
@@ -143,14 +144,10 @@ public final class CastCollectionView: UICollectionViewController {
 
             var snapshot = self.dataSource.snapshot()
 
-            if !cast.isEmpty {
-                self.moreInfoButton.isHidden = false
-                snapshot.appendItems(cast, toSection: .cast)
-
-                snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
-            } else {
-                snapshot.appendItems([Cast(name: "no_cast")], toSection: .cast)
-            }
+            self.moreInfoButton.isHidden = false
+            self.collectionLabel.isHidden = false
+            snapshot.appendItems(cast, toSection: .cast)
+            snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }

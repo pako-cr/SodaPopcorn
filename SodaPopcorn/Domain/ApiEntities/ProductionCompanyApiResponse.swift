@@ -8,10 +8,10 @@
 import Foundation
 
 public final class ProductionCompanyApiResponse: Codable {
-    public var id: Int?
-    public var logoPath: String?
-    public var name: String?
-    public var originCountry: String?
+    public let id: Int?
+    public let logoPath: String?
+    public let name: String?
+    public let originCountry: String?
 
     private enum ProductionCompanyApiResponseCodingKeys: String, CodingKey {
         case id

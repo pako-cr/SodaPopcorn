@@ -8,9 +8,9 @@
 import Foundation
 
 public final class ImagesApiResponse: Codable {
-    public var id: String?
-    public var backdropsApiResponse: [BackdropApiResponse]?
-    public var postersApiResponse: [PosterApiResponse]?
+    public let id: String?
+    public let backdropsApiResponse: [BackdropApiResponse]?
+    public let postersApiResponse: [PosterApiResponse]?
 
     private enum ImagesApiResponseCodingKeys: String, CodingKey {
         case id

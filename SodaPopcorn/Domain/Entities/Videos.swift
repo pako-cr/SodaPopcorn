@@ -5,16 +5,16 @@
 //  Created by Francisco Cordoba on 9/11/21.
 //
 
-public final class Videos: Hashable {
+public struct Videos: Hashable {
     public var id: String?
     public var results: [Video]?
 
-    public init(id: String? = nil, results: [Video]? = nil) {
+    init(id: String? = nil, results: [Video]? = nil) {
         self.id = id
         self.results = results
     }
 
-    convenience init(apiResponse: VideosApiResponse) {
+    init(apiResponse: VideosApiResponse) {
         self.init(id: apiResponse.id,
                   results: apiResponse.results?.map({ Video(apiResponse: $0) }) ?? [])
     }

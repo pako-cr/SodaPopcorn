@@ -8,8 +8,8 @@
 import Foundation
 
 public final class GenreApiResponse: Codable {
-    public var id: Int?
-    public var name: String?
+    public let id: Int?
+    public let name: String?
 
     private enum GenreCodingKeys: String, CodingKey {
         case id

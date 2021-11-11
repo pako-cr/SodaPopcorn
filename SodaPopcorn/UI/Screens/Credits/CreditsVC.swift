@@ -145,7 +145,7 @@ final class CreditsVC: BaseViewController {
                                                   heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .uniform(size: 5.0)
+            item.contentInsets = .uniform(size: 2.0)
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -165,7 +165,7 @@ final class CreditsVC: BaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top)
 
-            sectionHeader.contentInsets = .uniform(size: 5.0)
+            sectionHeader.contentInsets = .medium()
             section.boundarySupplementaryItems = [sectionHeader]
 
             return section
@@ -204,6 +204,11 @@ final class CreditsVC: BaseViewController {
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
+    }
+
+    // MARK: - 🗑 Deinit
+    deinit {
+        print("🗑", "CreditsVC deinit.")
     }
 }
 

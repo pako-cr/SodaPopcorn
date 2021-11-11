@@ -8,7 +8,7 @@
 import Foundation
 
 public final class BackdropApiResponse: Codable {
-    public var filePath: String?
+    public let filePath: String?
 
     private enum BackdropApiResponseCodingKeys: String, CodingKey {
         case filePath = "file_path"

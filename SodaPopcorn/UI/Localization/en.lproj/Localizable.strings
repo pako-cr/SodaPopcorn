@@ -41,7 +41,7 @@
 "gallery" = "Gallery";
 "gallery_view_backdrops_header" = "Backdrops";
 "gallery_view_posters_header" = "Posters";
-"gallery_view_videos_header" = "Videos";
+"gallery_view_videos_header" = "Trailers/Videos";
 "poster_collection_view_cell_no_posters" = "No posters";
 "poster_collection_view_cell_no_backdrops" = "No backdrops";
 "poster_collection_view_cell_no_videos" = "No videos";
@@ -52,4 +52,4 @@
 "credits_vc_cast_header" = "Cast";
 "credits_vc_crew_header" = "Crew";
 "no_cast" = "No info";
-"more_info" = "More ➡️";
+"more_info" = "More...";
