@@ -2,7 +2,7 @@
 //  CreditsApiResponse.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Zimplifica on 10/11/21.
+//  Created by Francisco Cordoba on 10/11/21.
 //
 
 import Foundation

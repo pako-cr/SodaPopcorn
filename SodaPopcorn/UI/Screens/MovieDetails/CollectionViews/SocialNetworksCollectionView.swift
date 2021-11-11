@@ -87,7 +87,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
         collectionView.register(SocialNetworksCollectionViewCell.self, forCellWithReuseIdentifier: SocialNetworksCollectionViewCell.reuseIdentifier)
@@ -148,6 +148,12 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         }
     }
 
+    override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let socialNetwork = dataSource.itemIdentifier(for: indexPath) else { return }
+        self.openSocialNetwork(socialNetwork: socialNetwork)
+    }
+
+    // MARK: - ⚙️ Helpers
     func updateCollectionViewData(socialNetworks: SocialNetworks) {
         self.updateDataSource(socialNetworks: socialNetworks.networks)
     }
@@ -167,11 +173,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         if let url = URL(string: homeUrl) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
-    }
-
-    override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let socialNetwork = dataSource.itemIdentifier(for: indexPath) else { return }
-        self.openSocialNetwork(socialNetwork: socialNetwork)
     }
 
     func setWebsiteUrl(url: String?) {

@@ -255,7 +255,6 @@ final class NewMoviesListVC: BaseViewController {
 
             self.loadedCount = snapshot.numberOfItems
 
-//			print("🔸 Snapshot items: \(snapshot.numberOfItems)")
 			self.movieCollectionView.removeEmptyView()
 			self.dataSource.apply(snapshot, animatingDifferences: true)
 		}

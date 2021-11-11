@@ -95,10 +95,16 @@ extension UICollectionViewCell {
 
         emptyView.addSubview(titleLabel)
 
-        titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 5).isActive = true
+//        titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 5).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 5).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor).isActive = true
         titleLabel.heightAnchor.constraint(equalTo: emptyView.heightAnchor, multiplier: 0.2).isActive = true
+
+        if centered {
+            titleLabel.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor).isActive = true
+        } else {
+            titleLabel.topAnchor.constraint(equalTo: emptyView.topAnchor, constant: 10).isActive = true
+        }
     }
 
     /// Restore the collection view when a datasource is fetched.

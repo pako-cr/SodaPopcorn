@@ -283,7 +283,6 @@ final class GalleryVC: BaseViewController {
                 snapshot.appendItems(gallery.videos?.map({ $0.key ?? ""}) ?? [], toSection: .videos)
             }
 
-            print("🔸 Gallery Snapshot items: \(snapshot.numberOfItems)")
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }

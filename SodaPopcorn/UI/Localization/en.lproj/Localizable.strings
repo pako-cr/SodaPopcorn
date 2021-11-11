@@ -48,3 +48,8 @@
 "movie_list_view_controller_empty_movies_title_label" = "No movies 😞";
 "movie_list_view_controller_empty_movies_description_label" = "No movies to display here 🎬";
 "cast_collection_view_title" = "Cast";
+"more" = "More";
+"credits_vc_cast_header" = "Cast";
+"credits_vc_crew_header" = "Crew";
+"no_cast" = "No info";
+"more_info" = "More ➡️";

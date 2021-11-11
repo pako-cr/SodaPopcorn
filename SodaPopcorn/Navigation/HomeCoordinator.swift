@@ -83,6 +83,16 @@ final class HomeCoordinator: Coordinator {
             .sink { [weak self] _ in
                 self?.showGalleryView(with: movie, on: viewController)
             }.store(in: &cancellable)
+
+        viewModel.outputs.castMemberAction()
+            .sink { [weak self] cast in
+                print(cast.name ?? "")
+            }.store(in: &cancellable)
+
+        viewModel.outputs.creditsButtonAction()
+            .sink { [weak self] credits in
+                self?.showCreditsView(with: credits, on: viewController)
+            }.store(in: &cancellable)
 	}
 
     private func showBackdropImageView(with imageURL: String, on navigationController: UIViewController) {
@@ -128,6 +138,23 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.posterImageAction()
             .sink { [weak self] imageUrl in
                 self?.showPosterImageView(with: imageUrl, on: viewController)
+            }.store(in: &cancellable)
+    }
+
+    private func showCreditsView(with credits: Credits, on navigationController: UIViewController) {
+        let viewModel = CreditsVM(movieService: movieService, credits: credits)
+        let viewController = CreditsVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.castMemberAction()
+            .sink { [weak self] cast in
+                print(cast.name ?? "")
             }.store(in: &cancellable)
     }
 }
