@@ -28,6 +28,20 @@ final class CustomTextVC: BaseViewController {
         return button
     }()
 
+    private let titleLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .largeTitle).bold()
+        label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
+        label.adjustsFontForContentSizeCategory = true
+        label.sizeToFit()
+        label.text = NSLocalizedString("description", comment: "Description")
+        label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     private var textView: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +50,7 @@ final class CustomTextVC: BaseViewController {
         textView.isSelectable = false
         textView.isEditable = false
         textView.backgroundColor = .clear
-        textView.isScrollEnabled = false
+        textView.isScrollEnabled = true
         textView.text = NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview")
         textView.sizeToFit()
         textView.adjustsFontForContentSizeCategory = true
@@ -54,8 +68,7 @@ final class CustomTextVC: BaseViewController {
     }
 
     override func viewDidLoad() {
-        setupUI()
-        bindViewModel()
+        super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
     }
 
@@ -67,16 +80,22 @@ final class CustomTextVC: BaseViewController {
     override func setupUI() {
         view.addSubview(textView)
         view.addSubview(closeButton)
+        view.addSubview(titleLabel)
 
         closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        textView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 10).isActive = true
-        textView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        textView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        textView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: closeButton.bottomAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
+        titleLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+
+        textView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
+        textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
+        textView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
     }
 
     override func bindViewModel() {

@@ -7,13 +7,10 @@
 
 import Foundation
 
-public final class SocialNetworksApiResponse: Codable {
-    public let id: String?
-    public let facebookId: String?
-    public let instagramId: String?
-    public let twitterId: String?
+public struct SocialNetworksApiResponse: Codable {
+    let id, facebookId, instagramId, twitterId: String?
 
-    private enum SocialNetworksApiResponseCodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case id
         case facebookId     = "facebook_id"
         case instagramId    = "instagram_id"
@@ -21,7 +18,7 @@ public final class SocialNetworksApiResponse: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: SocialNetworksApiResponseCodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try String(container.decode(Int.self, forKey: .id))
         facebookId = try container.decodeIfPresent(String.self, forKey: .facebookId)

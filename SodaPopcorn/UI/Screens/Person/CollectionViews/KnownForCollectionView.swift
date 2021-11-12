@@ -1,24 +1,24 @@
 //
-//  CastCollectionView.swift
+//  KnownForCollectionView.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 10/11/21.
+//  Created by Francisco Cordoba on 11/11/21.
 //
 
 import UIKit
 
-public final class CastCollectionView: UICollectionViewController {
+public final class KnownForCollectionView: UICollectionViewController {
     enum Section: CaseIterable {
-        case cast
+        case movies
     }
 
     // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, Cast>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Cast>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, Movie>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var movieDetailsVM: MovieDetailsVM?
+    private var personDetailsVM: PersonDetailsVM?
 
     // MARK: - UI Elements
     private let collectionLabel: UILabel = {
@@ -29,14 +29,14 @@ public final class CastCollectionView: UICollectionViewController {
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("cast_collection_view_title", comment: "Cast Label")
+        label.text = NSLocalizedString("known_for_collection_view_title", comment: "Know for label")
         label.sizeToFit()
         label.isHidden = true
         return label
     }()
 
-    init(movieDetailsVM: MovieDetailsVM) {
-        self.movieDetailsVM = movieDetailsVM
+    init(personDetailsVM: PersonDetailsVM) {
+        self.personDetailsVM = personDetailsVM
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
 
@@ -52,6 +52,8 @@ public final class CastCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
+        view.translatesAutoresizingMaskIntoConstraints = false
+
         view.addSubview(collectionLabel)
         view.addSubview(collectionView)
 
@@ -69,7 +71,7 @@ public final class CastCollectionView: UICollectionViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
-        collectionView.register(CastCollectionViewCell.self, forCellWithReuseIdentifier: CastCollectionViewCell.reuseIdentifier)
+        collectionView.register(KnownForCollectionViewCell.self, forCellWithReuseIdentifier: KnownForCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
@@ -80,7 +82,7 @@ public final class CastCollectionView: UICollectionViewController {
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.25), heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3333), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = .small()
@@ -99,12 +101,12 @@ public final class CastCollectionView: UICollectionViewController {
     }
 
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<CastCollectionViewCell, Cast> { cell, _, cast in
-            cell.configure(with: cast)
+        let cellRegistration = UICollectionView.CellRegistration<KnownForCollectionViewCell, Movie> { cell, _, movie in
+            cell.configure(with: movie)
         }
 
-        let dataSource = UICollectionViewDiffableDataSource<Section, Cast>(collectionView: collectionView) { (collectionView, indexPath, imageURL) in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: imageURL)
+        let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: collectionView) { (collectionView, indexPath, movie) in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
         }
 
         self.dataSource = dataSource
@@ -116,16 +118,16 @@ public final class CastCollectionView: UICollectionViewController {
         self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func updateDataSource(cast: [Cast], animatingDifferences: Bool = true) {
+    private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
 
-            if !cast.isEmpty {
+            if !movies.isEmpty {
                 self.collectionLabel.isHidden = false
-                snapshot.appendItems(Array(cast.prefix(11)), toSection: .cast)
-                snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
+                snapshot.appendItems(Array(movies.prefix(11)), toSection: .movies)
+                snapshot.appendItems([Movie(title: "more_info")], toSection: .movies)
             }
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
@@ -133,17 +135,17 @@ public final class CastCollectionView: UICollectionViewController {
     }
 
     override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cast = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
 
-        if cast.name == "more_info" {
-            self.movieDetailsVM?.inputs.creditsButtonPressed()
+        if movie.title == "more_info" {
+            self.personDetailsVM?.inputs.personMoviesButtonPressed()
         } else {
-            self.movieDetailsVM?.inputs.castMemberSelected(cast: cast)
+            self.personDetailsVM?.inputs.movieSelected(movie: movie)
         }
     }
 
     // MARK: - ⚙️ Helpers
-    func updateCollectionViewData(cast: [Cast]) {
-        self.updateDataSource(cast: cast)
+    func updateCollectionViewData(movies: [Movie]) {
+        self.updateDataSource(movies: movies)
     }
 }

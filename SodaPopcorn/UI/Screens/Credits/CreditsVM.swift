@@ -33,7 +33,7 @@ public protocol CreditsVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 
     /// Emits when a cast member is selected.
-    func castMemberAction() -> PassthroughSubject<Cast, Never>
+    func castMemberAction() -> PassthroughSubject<Person, Never>
 }
 
 public protocol CreditsVMTypes: AnyObject {
@@ -68,7 +68,8 @@ public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, C
         }.store(in: &cancellable)
 
         castMemberSelectedProperty.sink { [weak self] cast in
-            self?.castMemberActionProperty.send(cast)
+            let person = Person(name: cast.name, id: cast.id)
+            self?.castMemberActionProperty.send(person)
         }.store(in: &cancellable)
     }
 
@@ -109,8 +110,8 @@ public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, C
         return showErrorProperty
     }
 
-    private let castMemberActionProperty = PassthroughSubject<Cast, Never>()
-    public func castMemberAction() -> PassthroughSubject<Cast, Never> {
+    private let castMemberActionProperty = PassthroughSubject<Person, Never>()
+    public func castMemberAction() -> PassthroughSubject<Person, Never> {
         return castMemberActionProperty
     }
 

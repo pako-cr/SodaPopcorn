@@ -89,7 +89,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
             .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.getImages(movieId: self.movie.id ?? "")
+                return movieService.movieImages(movieId: self.movie.id ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [GalleryVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -104,7 +104,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
             .flatMap { [weak self] _ -> AnyPublisher<Videos, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.getVideos(movieId: self.movie.id ?? "")
+                return movieService.movieVideos(movieId: self.movie.id ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [GalleryVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 

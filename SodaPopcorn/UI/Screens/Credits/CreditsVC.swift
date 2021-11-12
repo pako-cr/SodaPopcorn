@@ -55,8 +55,7 @@ final class CreditsVC: BaseViewController {
         configureCollectionView()
         configureDataSource()
         setInitialData()
-        setupUI()
-        bindViewModel()
+        super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
     }
 

@@ -67,7 +67,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
                 self.loadingProperty.value = true
-                return movieService.getNewMovies(page: self.page)
+                return movieService.moviesNowPlaying(page: self.page)
                     .retry(2)
 					.mapError({ [weak self] networkResponse -> NetworkResponse in
 						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")

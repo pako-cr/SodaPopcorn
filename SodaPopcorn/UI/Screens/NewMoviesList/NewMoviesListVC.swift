@@ -103,8 +103,7 @@ final class NewMoviesListVC: BaseViewController {
 		configureCollectionView()
 		configureDataSource()
 		setInitialData()
-		setupUI()
-		bindViewModel()
+        super.viewDidLoad()
 		viewModel.inputs.fetchNewMovies()
 	}
 

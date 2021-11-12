@@ -56,8 +56,7 @@ final class GalleryVC: BaseViewController {
         configureCollectionView()
         configureDataSource()
         setInitialData()
-        setupUI()
-        bindViewModel()
+        super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
     }
 

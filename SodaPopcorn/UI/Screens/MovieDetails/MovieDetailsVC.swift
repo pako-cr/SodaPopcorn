@@ -277,6 +277,7 @@ final class MovieDetailsVC: BaseViewController {
         textView.sizeToFit()
         textView.adjustsFontForContentSizeCategory = true
         textView.maximumContentSizeCategory = .accessibilityMedium
+        textView.textContainer.lineBreakMode = .byTruncatingTail
         return textView
     }()
 
@@ -335,11 +336,7 @@ final class MovieDetailsVC: BaseViewController {
         return textView
     }()
 
-    private lazy var socialNetworksCollectionView: SocialNetworksCollectionView = {
-        let collectionView = SocialNetworksCollectionView(movieDetailsVM: self.viewModel)
-        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
-        return collectionView
-    }()
+    private let socialNetworksCollectionView = SocialNetworksCollectionView()
 
     private lazy var castCollectionView: CastCollectionView = {
         let collectionView = CastCollectionView(movieDetailsVM: self.viewModel)
@@ -358,8 +355,6 @@ final class MovieDetailsVC: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
         viewModel.inputs.viewDidLoad()
         handleGestureRecongnizers()
     }
@@ -440,6 +435,7 @@ final class MovieDetailsVC: BaseViewController {
         overviewValue.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor).isActive = true
         overviewValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         overviewValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        overviewValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
         genresLabel.topAnchor.constraint(equalTo: overviewValue.bottomAnchor, constant: 20).isActive = true
         genresLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -541,8 +537,8 @@ final class MovieDetailsVC: BaseViewController {
 
     @objc
     private func overviewTapped(sender: UIGestureRecognizer) {
-        if let overview = overviewValue.text {
-            viewModel.inputs.overviewTextPressed(overview: overview)
+        if !overviewValue.text.isEmpty {
+            viewModel.inputs.overviewTextPressed()
         }
     }
 

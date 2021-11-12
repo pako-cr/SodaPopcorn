@@ -77,8 +77,6 @@ final class BackdropImageVC: BaseViewController, UIScrollViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
         viewModel.inputs.viewDidLoad()
     }
 

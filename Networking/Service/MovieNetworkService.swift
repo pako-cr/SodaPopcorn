@@ -9,28 +9,30 @@ import Combine
 import Foundation
 
 public protocol MovieNetworkServiceProtocol {
-	func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse>
+	func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse>
     func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse>
-    func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse>
-    func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse>
-    func getVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse>
+    func movieImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse>
+    func movieExternalIds(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse>
+    func movieVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse>
     func movieCredits(movieId: String) -> AnyPublisher<Credits, NetworkResponse>
     func personDetails(personId: String) -> AnyPublisher<Person, NetworkResponse>
+    func personMovieCredits(personId: String) -> AnyPublisher<[Movie], NetworkResponse>
+    func personExternalIds(personId: String) -> AnyPublisher<SocialNetworks, NetworkResponse>
 }
 
 final class MovieNetworkService: MovieNetworkServiceProtocol {
 	private let networkManager = NetworkManager<MovieApiEndpoint>()
 	
-	func getNewMovies(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
+	func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
 		return AnyPublisher<Movies, NetworkResponse>.create { [weak self] promise in
 			guard let `self` = self else { return Disposable {} }
 
-			self.networkManager.request(.newMovies(page: page), completion: { [weak self] data, response, error in
+			self.networkManager.request(.moviesNowPlaying(page: page), completion: { [weak self] data, response, error in
 				guard let `self` = self else { return }
 
 				if error != nil {
 					let errorDescription = error?.localizedDescription ?? ""
-					print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(errorDescription)")
+					print("🔴 [MovieNetworkService] [moviesNowPlaying] An error occurred: \(errorDescription)")
 					promise.onError(NetworkResponse.failed(errorDescription))
 					promise.onComplete()
 				}
@@ -53,12 +55,12 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 								promise.onComplete()
 
 							} catch let exception {
-								print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(exception.localizedDescription)")
+								print("🔴 [MovieNetworkService] [moviesNowPlaying] An error occurred: \(exception.localizedDescription)")
 								promise.onError(NetworkResponse.unableToDecode)
 								promise.onComplete()
 							}
 						case .failure(let networkFailureError):
-							print("🔴 [MovieNetworkService] [getMovies] An error occurred: \(networkFailureError)")
+							print("🔴 [MovieNetworkService] [moviesNowPlaying] An error occurred: \(networkFailureError)")
 							promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
 							promise.onComplete()
 					}
@@ -72,7 +74,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         return AnyPublisher<Movie, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
-            self.networkManager.request(.details(movieId: movieId), completion: { [weak self] data, response, error in
+            self.networkManager.request(.movieDetails(movieId: movieId), completion: { [weak self] data, response, error in
                 guard let `self` = self else { return }
 
                 if error != nil {
@@ -115,16 +117,16 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         }
     }
 
-    func getImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse> {
+    func movieImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse> {
         return AnyPublisher<MovieImages, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
-            self.networkManager.request(.images(movieId: movieId), completion: { [weak self] data, response, error in
+            self.networkManager.request(.movieImages(movieId: movieId), completion: { [weak self] data, response, error in
                 guard let `self` = self else { return }
 
                 if error != nil {
                     let errorDescription = error?.localizedDescription ?? ""
-                    print("🔴 [MovieNetworkService] [images] An error occurred: \(errorDescription)")
+                    print("🔴 [MovieNetworkService] [movieImages] An error occurred: \(errorDescription)")
                     promise.onError(NetworkResponse.failed(errorDescription))
                     promise.onComplete()
                 }
@@ -147,12 +149,12 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                                 promise.onComplete()
 
                             } catch let exception {
-                                print("🔴 [MovieNetworkService] [images] An error occurred: \(exception.localizedDescription)")
+                                print("🔴 [MovieNetworkService] [movieImages] An error occurred: \(exception.localizedDescription)")
                                 promise.onError(NetworkResponse.unableToDecode)
                                 promise.onComplete()
                             }
                         case .failure(let networkFailureError):
-                            print("🔴 [MovieNetworkService] [images] An error occurred: \(networkFailureError)")
+                            print("🔴 [MovieNetworkService] [movieImages] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }
@@ -162,16 +164,16 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         }
     }
 
-    func socialNetworks(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
+    func movieExternalIds(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
         return AnyPublisher<SocialNetworks, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
-            self.networkManager.request(.socialNetworks(movieId: movieId), completion: { [weak self] data, response, error in
+            self.networkManager.request(.movieExternalIds(movieId: movieId), completion: { [weak self] data, response, error in
                 guard let `self` = self else { return }
 
                 if error != nil {
                     let errorDescription = error?.localizedDescription ?? ""
-                    print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(errorDescription)")
+                    print("🔴 [MovieNetworkService] [movieExternalIds] An error occurred: \(errorDescription)")
                     promise.onError(NetworkResponse.failed(errorDescription))
                     promise.onComplete()
                 }
@@ -194,12 +196,12 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                                 promise.onComplete()
 
                             } catch let exception {
-                                print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(exception.localizedDescription)")
+                                print("🔴 [MovieNetworkService] [movieExternalIds] An error occurred: \(exception.localizedDescription)")
                                 promise.onError(NetworkResponse.unableToDecode)
                                 promise.onComplete()
                             }
                         case .failure(let networkFailureError):
-                            print("🔴 [MovieNetworkService] [socialNetworks] An error occurred: \(networkFailureError)")
+                            print("🔴 [MovieNetworkService] [movieExternalIds] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }
@@ -209,16 +211,16 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         }
     }
 
-    func getVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse> {
+    func movieVideos(movieId: String) -> AnyPublisher<Videos, NetworkResponse> {
         return AnyPublisher<Videos, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
-            self.networkManager.request(.videos(movieId: movieId), completion: { [weak self] data, response, error in
+            self.networkManager.request(.movieVideos(movieId: movieId), completion: { [weak self] data, response, error in
                 guard let `self` = self else { return }
 
                 if error != nil {
                     let errorDescription = error?.localizedDescription ?? ""
-                    print("🔴 [MovieNetworkService] [getVideos] An error occurred: \(errorDescription)")
+                    print("🔴 [MovieNetworkService] [movieVideos] An error occurred: \(errorDescription)")
                     promise.onError(NetworkResponse.failed(errorDescription))
                     promise.onComplete()
                 }
@@ -241,12 +243,12 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                                 promise.onComplete()
 
                             } catch let exception {
-                                print("🔴 [MovieNetworkService] [getVideos] An error occurred: \(exception.localizedDescription)")
+                                print("🔴 [MovieNetworkService] [movieVideos] An error occurred: \(exception.localizedDescription)")
                                 promise.onError(NetworkResponse.unableToDecode)
                                 promise.onComplete()
                             }
                         case .failure(let networkFailureError):
-                            print("🔴 [MovieNetworkService] [getVideos] An error occurred: \(networkFailureError)")
+                            print("🔴 [MovieNetworkService] [movieVideos] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }
@@ -260,7 +262,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
         return AnyPublisher<Credits, NetworkResponse>.create { [weak self] promise in
             guard let `self` = self else { return Disposable {} }
 
-            self.networkManager.request(.credits(movieId: movieId), completion: { [weak self] data, response, error in
+            self.networkManager.request(.movieCredits(movieId: movieId), completion: { [weak self] data, response, error in
                 guard let `self` = self else { return }
 
                 if error != nil {
@@ -312,7 +314,7 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 
                 if error != nil {
                     let errorDescription = error?.localizedDescription ?? ""
-                    print("🔴 [MovieNetworkService] [personDetails] An error occurred: \(errorDescription)")
+                    print("🔴 [MovieNetworkService] [person] An error occurred: \(errorDescription)")
                     promise.onError(NetworkResponse.failed(errorDescription))
                     promise.onComplete()
                 }
@@ -341,6 +343,103 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
                             }
                         case .failure(let networkFailureError):
                             print("🔴 [MovieNetworkService] [personDetails] An error occurred: \(networkFailureError)")
+                            promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
+                            promise.onComplete()
+                    }
+                }
+            })
+            return Disposable {}
+        }
+    }
+
+    func personMovieCredits(personId: String) -> AnyPublisher<[Movie], NetworkResponse> {
+        return AnyPublisher<[Movie], NetworkResponse>.create { [weak self] promise in
+            guard let `self` = self else { return Disposable {} }
+
+            self.networkManager.request(.personMovieCredits(personId: personId), completion: { [weak self] data, response, error in
+                guard let `self` = self else { return }
+
+                if error != nil {
+                    let errorDescription = error?.localizedDescription ?? ""
+                    print("🔴 [MovieNetworkService] [personMovieCredits] An error occurred: \(errorDescription)")
+                    promise.onError(NetworkResponse.failed(errorDescription))
+                    promise.onComplete()
+                }
+
+                if let response = response as? HTTPURLResponse {
+                    let result = self.networkManager.handleNetworkResponse(response)
+                    switch result {
+                        case .success:
+                            guard let responseData = data else {
+                                promise.onError(NetworkResponse.noData)
+                                promise.onComplete()
+                                return
+                            }
+                            do {
+                                let apiResponse = try JSONDecoder().decode(PersonInMovieApiResponse.self, from: responseData)
+
+                                let response = PersonInMovie(apiResponse: apiResponse)
+
+                                if let movies = response.cast {
+                                    promise.onNext(movies)
+                                }
+                                
+                                promise.onComplete()
+
+                            } catch let exception {
+                                print("🔴 [MovieNetworkService] [personMovieCredits] An error occurred: \(exception.localizedDescription)")
+                                promise.onError(NetworkResponse.unableToDecode)
+                                promise.onComplete()
+                            }
+                        case .failure(let networkFailureError):
+                            print("🔴 [MovieNetworkService] [personMovieCredits] An error occurred: \(networkFailureError)")
+                            promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
+                            promise.onComplete()
+                    }
+                }
+            })
+            return Disposable {}
+        }
+    }
+
+    func personExternalIds(personId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
+        return AnyPublisher<SocialNetworks, NetworkResponse>.create { [weak self] promise in
+            guard let `self` = self else { return Disposable {} }
+
+            self.networkManager.request(.personExternalIds(personId: personId), completion: { [weak self] data, response, error in
+                guard let `self` = self else { return }
+
+                if error != nil {
+                    let errorDescription = error?.localizedDescription ?? ""
+                    print("🔴 [MovieNetworkService] [personExternalIds] An error occurred: \(errorDescription)")
+                    promise.onError(NetworkResponse.failed(errorDescription))
+                    promise.onComplete()
+                }
+
+                if let response = response as? HTTPURLResponse {
+                    let result = self.networkManager.handleNetworkResponse(response)
+                    switch result {
+                        case .success:
+                            guard let responseData = data else {
+                                promise.onError(NetworkResponse.noData)
+                                promise.onComplete()
+                                return
+                            }
+                            do {
+                                let apiResponse = try JSONDecoder().decode(SocialNetworksApiResponse.self, from: responseData)
+
+                                let response = SocialNetworks(apiResponse: apiResponse)
+
+                                promise.onNext(response)
+                                promise.onComplete()
+
+                            } catch let exception {
+                                print("🔴 [MovieNetworkService] [personExternalIds] An error occurred: \(exception.localizedDescription)")
+                                promise.onError(NetworkResponse.unableToDecode)
+                                promise.onComplete()
+                            }
+                        case .failure(let networkFailureError):
+                            print("🔴 [MovieNetworkService] [personExternalIds] An error occurred: \(networkFailureError)")
                             promise.onError(NetworkResponse.failed(networkFailureError.localizedDescription))
                             promise.onComplete()
                     }

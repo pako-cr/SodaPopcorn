@@ -11,7 +11,7 @@ public struct Person: Hashable {
     let biography, birthday, deathday, homepage, imdbID, knownForDepartment, name, placeOfBirth, profilePath: String?
     let id, gender: Int?
     let popularity: Double?
-    
+
     init(adult: Bool? = nil, alsoKnownAs: [String]? = nil, biography: String? = nil, birthday: String? = nil, deathday: String? = nil, homepage: String? = nil, imdbID: String? = nil, knownForDepartment: String? = nil, name: String? = nil, placeOfBirth: String? = nil, profilePath: String? = nil, id: Int? = nil, gender: Int? = nil, popularity: Double? = nil) {
         self.adult = adult
         self.alsoKnownAs = alsoKnownAs

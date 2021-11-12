@@ -18,7 +18,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var movieDetailsVM: MovieDetailsVM?
 
     // MARK: - UI Elements
     private let collectionLabel: UILabel = {
@@ -50,8 +49,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         return button
     }()
 
-    init(movieDetailsVM: MovieDetailsVM) {
-        self.movieDetailsVM = movieDetailsVM
+    init() {
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
 
@@ -67,6 +65,8 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
+        view.translatesAutoresizingMaskIntoConstraints = false
+
         view.addSubview(collectionView)
         view.addSubview(collectionLabel)
         view.addSubview(websiteUrlButton)

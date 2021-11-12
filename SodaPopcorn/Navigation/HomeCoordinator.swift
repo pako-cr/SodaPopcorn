@@ -98,9 +98,9 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
-            .sink { [weak self] cast in
+            .sink { [weak self] person in
                 guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
-                print(cast.name ?? "")
+                self.showPersonDetailsView(with: person, on: presentedVC)
             }.store(in: &cancellable)
 	}
 
@@ -164,9 +164,9 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
-            .sink { [weak self] cast in
+            .sink { [weak self] person in
                 guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
-                print(cast.name ?? "")
+                self.showPersonDetailsView(with: person, on: presentedVC)
             }.store(in: &cancellable)
     }
 
@@ -179,6 +179,36 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.closeButtonAction()
             .sink { _ in
                 navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+    }
+
+    public func showPersonDetailsView(with person: Person, on navigationController: UIViewController) {
+        let viewModel = PersonDetailsVM(movieService: movieService, person: person)
+        let viewController = PersonDetailsVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.biographyTextAction()
+            .sink { [weak self] biography in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showCustomTextView(with: biography, on: presentedVC)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showMovieDetails(movie: movie, on: presentedVC)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.personMoviesButtonAction()
+            .sink { [weak self] movies in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                print("Showing all person movies: \n \(movies)")
             }.store(in: &cancellable)
     }
 }

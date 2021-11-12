@@ -7,21 +7,18 @@
 
 import Foundation
 
-public final class ProductionCompanyApiResponse: Codable {
-    public let id: Int?
-    public let logoPath: String?
-    public let name: String?
-    public let originCountry: String?
+public struct ProductionCompanyApiResponse: Codable {
+    let id: Int?
+    let logoPath, name, originCountry: String?
 
-    private enum ProductionCompanyApiResponseCodingKeys: String, CodingKey {
-        case id
-        case name
+    private enum CodingKeys: String, CodingKey {
+        case id, name
         case logoPath       = "logo_path"
         case originCountry  = "origin_country"
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: ProductionCompanyApiResponseCodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try container.decodeIfPresent(Int.self, forKey: .id)
         name = try container.decodeIfPresent(String.self, forKey: .name)

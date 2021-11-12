@@ -5,12 +5,8 @@
 //  Created by Francisco Cordoba on 9/11/21.
 //
 
-public final class VideoApiResponse: Decodable {
-    public let id: String?
-    public let name: String?
-    public let key: String?
-    public let site: String?
-    public let type: String?
+public struct VideoApiResponse: Decodable {
+    let id, name, key, site, type: String?
 
     private enum CodingKeys: CodingKey {
         case id, name, key, site, type

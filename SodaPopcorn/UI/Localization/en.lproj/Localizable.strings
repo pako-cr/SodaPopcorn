@@ -53,3 +53,9 @@
 "credits_vc_crew_header" = "Crew";
 "no_cast" = "No info";
 "more_info" = "More...";
+"person_years_old" = " (%@ years old)";
+"birthdate" = "Birthdate";
+"place_of_birth" = "Place of Birth";
+"description" = "Description";
+"no_biography_found" = "No biography found";
+"known_for_collection_view_title" = "Known for";

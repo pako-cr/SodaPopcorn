@@ -7,15 +7,15 @@
 
 import Foundation
 
-public final class PosterApiResponse: Codable {
-    public let filePath: String?
+public struct PosterApiResponse: Codable {
+    let filePath: String?
 
-    private enum PosterApiResponseCodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case filePath = "file_path"
     }
 
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: PosterApiResponseCodingKeys.self)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         filePath = try container.decodeIfPresent(String.self, forKey: .filePath)
     }
 }

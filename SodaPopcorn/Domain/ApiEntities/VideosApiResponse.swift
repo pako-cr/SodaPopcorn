@@ -5,13 +5,12 @@
 //  Created by Francisco Cordoba on 9/11/21.
 //
 
-public final class VideosApiResponse: Decodable {
-    public let id: String?
-    public let results: [VideoApiResponse]?
+public struct VideosApiResponse: Decodable {
+    let id: String?
+    let results: [VideoApiResponse]?
 
     private enum CondingKeys: CodingKey {
-        case id
-        case results
+        case id, results
     }
 
     public init(from decoder: Decoder) throws {

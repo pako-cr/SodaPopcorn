@@ -8,20 +8,34 @@
 import Foundation
 
 public enum MovieApiEndpoint {
-	case newMovies(page: Int)
-	case videos(movieId: String)
-    case details(movieId: String)
-    case images(movieId: String)
-    case socialNetworks(movieId: String)
-    case credits(movieId: String)
+    case moviesNowPlaying(page: Int)
+	case movieVideos(movieId: String)
+    case movieDetails(movieId: String)
+    case movieImages(movieId: String)
+    case movieExternalIds(movieId: String)
+    case movieCredits(movieId: String)
     case person(personId: String)
+    case personMovieCredits(personId: String)
+    case personExternalIds(personId: String)
 }
 
 extension MovieApiEndpoint: EndPointType {
 	private var environmentBaseURL: String {
 		do {
 			let environment = try PlistReaderManager.shared.read(fromOptionName: "Environment") as? String
-			return try PlistReaderManager.shared.read(fromContainer: ConfigKeys.baseUrl.rawValue, with: environment ?? "staging") as? String ?? ""
+
+            var base = try PlistReaderManager.shared.read(fromContainer: ConfigKeys.baseUrl.rawValue, with: environment ?? "staging") as? String ?? ""
+
+            switch self {
+            case .person, .personMovieCredits, .personExternalIds:
+                base.append(contentsOf: "person")
+                break
+            default:
+                base.append(contentsOf: "movie")
+                break
+            }
+
+			return base
 
 		} catch let error {
 			print("❌ [Networking] [MovieApiEndpoint] Error reading base url from configuration file. Error description: \(error)")
@@ -44,20 +58,24 @@ extension MovieApiEndpoint: EndPointType {
 
     var path: String {
         switch self {
-        case .newMovies:
+        case .moviesNowPlaying:
             return "now_playing"
-        case .videos(let movieId):
+        case .movieVideos(let movieId):
             return "\(movieId)/videos"
-        case .details(let movieId):
+        case .movieDetails(let movieId):
             return "\(movieId)"
-        case .images(let movieId):
+        case .movieImages(let movieId):
             return "\(movieId)/images"
-        case .socialNetworks(let movieId):
+        case .movieExternalIds(let movieId):
             return "\(movieId)/external_ids"
-        case .credits(let movieId):
+        case .movieCredits(let movieId):
             return "\(movieId)/credits"
         case .person(let personId):
-            return "person/\(personId)"
+            return "\(personId)"
+        case .personMovieCredits(let personId):
+            return "\(personId)/movie_credits"
+        case .personExternalIds(let personId):
+            return "\(personId)/external_ids"
         }
     }
 
@@ -67,42 +85,17 @@ extension MovieApiEndpoint: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .newMovies(let page):
+        case .moviesNowPlaying(let page):
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["page": page,
                                                       "api_key": publicApiKey,
                                                       "language": locale])
-        case .details:
+        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .person, .personMovieCredits, .personExternalIds:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,
                                                       "language": locale])
-        case .images:
-            return .requestParameters(bodyParameters: nil,
-                                      bodyEncoding: .urlEncoding,
-                                      urlParameters: ["api_key": publicApiKey,
-                                                      "language": locale])
-        case .socialNetworks:
-                    return .requestParameters(bodyParameters: nil,
-                                              bodyEncoding: .urlEncoding,
-                                              urlParameters: ["api_key": publicApiKey,
-                                                              "language": locale])
-        case .videos:
-                    return .requestParameters(bodyParameters: nil,
-                                              bodyEncoding: .urlEncoding,
-                                              urlParameters: ["api_key": publicApiKey,
-                                                              "language": locale])
-        case .credits:
-                    return .requestParameters(bodyParameters: nil,
-                                              bodyEncoding: .urlEncoding,
-                                              urlParameters: ["api_key": publicApiKey,
-                                                              "language": locale])
-        case .person:
-                    return .requestParameters(bodyParameters: nil,
-                                              bodyEncoding: .urlEncoding,
-                                              urlParameters: ["api_key": publicApiKey,
-                                                              "language": locale])
         }
     }
 

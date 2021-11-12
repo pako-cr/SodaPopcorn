@@ -16,10 +16,13 @@ public protocol PersonDetailsVMInputs: AnyObject {
     func closeButtonPressed()
 
     /// Call when a movie is selected from the person details.
-    func movieSelected(movieId: String)
+    func movieSelected(movie: Movie)
 
     /// Call when the person's biography is pressed.
-    func biographyTextPressed(biography: String)
+    func biographyTextPressed()
+
+    /// Call when user press more movies button.
+    func personMoviesButtonPressed()
 }
 
 public protocol PersonDetailsVMOutputs: AnyObject {
@@ -27,7 +30,7 @@ public protocol PersonDetailsVMOutputs: AnyObject {
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
     /// Emits to get return the movie information.
-    func personInfoAction() -> PassthroughSubject<Person, Never>
+    func personInfoAction() -> CurrentValueSubject<Person, Never>
 
     /// Emits when loading.
     func loading() -> CurrentValueSubject<Bool, Never>
@@ -37,6 +40,18 @@ public protocol PersonDetailsVMOutputs: AnyObject {
 
     /// Emits when the person's biography is pressed.
     func biographyTextAction() -> PassthroughSubject<String, Never>
+
+    /// Emits to get the person's movies.
+    func fetchPersonMoviesAction() -> CurrentValueSubject<[Movie], Never>
+
+    /// Emits when user press more movies button.
+    func personMoviesButtonAction() -> PassthroughSubject<[Movie], Never>
+
+    /// Emits when a movie is selected.
+    func movieSelectedAction() -> PassthroughSubject<Movie, Never>
+
+    /// Emits when the social networks are fetched.
+    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
 }
 
 public protocol PersonDetailsVMTypes: AnyObject {
@@ -47,7 +62,7 @@ public protocol PersonDetailsVMTypes: AnyObject {
 public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetailsVMInputs, PersonDetailsVMOutputs, PersonDetailsVMTypes {
     // MARK: Constants
     private let movieService: MovieService
-    private let personId: String
+    private let person: Person
 
     // MARK: Variables
     public var inputs: PersonDetailsVMInputs { return self }
@@ -56,16 +71,32 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
 
-    init(movieService: MovieService, personId: String) {
+    init(movieService: MovieService, person: Person) {
         self.movieService = movieService
-        self.personId = personId
+        self.person = person
 
-//        movieSelectedProperty.sink { [weak self] (movieId) in
-//
-//        }.store(in: &cancellable)
-//
-        biographyTextPressedProperty.sink { [weak self] (biography) in
-            self?.biographyTextActionProperty.send(biography)
+        movieSelectedProperty.sink { [weak self] (movie) in
+            self?.movieSelectedActionProperty.send(movie)
+        }.store(in: &cancellable)
+
+        closeButtonPressedProperty.sink { [weak self] _ in
+            self?.closeButtonActionProperty.send(())
+        }.store(in: &cancellable)
+
+        biographyTextPressedProperty.sink { [weak self] (_) in
+            guard let `self` = self else { return }
+            if let biography = self.personInfoActionProperty.value.biography {
+                self.biographyTextActionProperty.send(biography)
+            }
+        }.store(in: &cancellable)
+
+        personMoviesButtonPressedProperty.sink { [weak self] _ in
+            guard let `self` = self else { return }
+
+            let movies = self.fetchPersonMoviesActionProperty.value
+            if !movies.isEmpty {
+                self.personMoviesButtonActionProperty.send(movies)
+            }
         }.store(in: &cancellable)
 
         let personDetailsEvent = viewDidLoadProperty
@@ -74,7 +105,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
 
                 self.loadingProperty.value = true
 
-                return movieService.personDetails(personId: self.personId)
+                return movieService.personDetails(personId: String(self.person.id ?? 0))
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
                         self?.loadingProperty.value = false
@@ -101,86 +132,69 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 guard let `self` = self else { return }
 
                 self.loadingProperty.value = false
-                self.personInfoActionProperty.send(personDetails)
+                self.personInfoActionProperty.value = personDetails
             }).store(in: &cancellable)
 
-//        let imagesEvent = viewDidLoadProperty
-//            .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
-//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-//
-//                return movieService.getImages(movieId: self.movie.id ?? "")
-//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-//                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-//
-//                        self?.handleNetworkResponseError(networkResponse)
-//                        return networkResponse
-//                    })
-//                    .replaceError(with: MovieImages())
-//                    .eraseToAnyPublisher()
-//            }.share()
-//
-//        imagesEvent
-//            .sink(receiveCompletion: { [weak self] completionReceived in
-//                guard let `self` = self else { return }
-//
-//                switch completionReceived {
-//                    case .failure(let error):
-//                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-//                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
-//                    default: break
-//                }
-//            }, receiveValue: { [weak self] movieImages in
-//                guard let `self` = self else { return }
-//
-//                if let backdrops = movieImages.backdrops, !backdrops.isEmpty {
-//                    self.backdropImagesActionProperty.send(backdrops.filter({ $0.filePath != self.movie.backdropPath }))
-//                }
-//            }).store(in: &cancellable)
+        let personCreditsEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<[Movie], Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-//        let socialNetworksEvent = viewDidLoadProperty
-//            .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
-//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-//
-//                return movieService.socialNetworks(movieId: self.movie.id ?? "")
-//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-//                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-//
-//                        self?.handleNetworkResponseError(networkResponse)
-//                        return networkResponse
-//                    })
-//                    .replaceError(with: SocialNetworks())
-//                    .eraseToAnyPublisher()
-//            }.share()
-//
-//        socialNetworksEvent
-//            .sink(receiveCompletion: { [weak self] completionReceived in
-//                guard let `self` = self else { return }
-//
-//                switch completionReceived {
-//                    case .failure(let error):
-//                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-//                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
-//                    default: break
-//                }
-//            }, receiveValue: { [weak self] socialNetworks in
-//                guard let `self` = self else { return }
-//                self.socialNetworksActionProperty.send(socialNetworks)
-//            }).store(in: &cancellable)
-//
-//        let creditsEvent = viewDidLoadProperty
-//            .flatMap { [weak self] _ -> AnyPublisher<Credits, Never> in
-//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-//
-//                return movieService.movieCredits(movieId: self.movie.id ?? "")
-//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-//                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-//
-//                        self?.handleNetworkResponseError(networkResponse)
-//                        return networkResponse
-//                    })
-//                    .replaceError(with: Credits())
-//                    .eraseToAnyPublisher()
-//            }.share()
+                return movieService.personMovieCredits(personId: (self.person.id ?? 0).description)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: [Movie]())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        personCreditsEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] movies in
+                guard let `self` = self else { return }
+                self.fetchPersonMoviesActionProperty.value = movies
+
+            }).store(in: &cancellable)
+
+        let socialNetworksEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.personExternalIds(personId: (self.person.id ?? 0).description)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: SocialNetworks())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        socialNetworksEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] socialNetworks in
+                guard let `self` = self else { return }
+                self.socialNetworksActionProperty.send(socialNetworks)
+            }).store(in: &cancellable)
     }
 
     // MARK: - ⬇️ INPUTS Definition
@@ -194,14 +208,19 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         closeButtonPressedProperty.send(())
     }
 
-    private let movieSelectedProperty = PassthroughSubject<String, Never>()
-    public func movieSelected(movieId: String) {
-        movieSelectedProperty.send(movieId)
+    private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
+    public func movieSelected(movie: Movie) {
+        movieSelectedProperty.send(movie)
     }
 
-    private let biographyTextPressedProperty = PassthroughSubject<String, Never>()
-    public func biographyTextPressed(biography: String) {
-        biographyTextPressedProperty.send(biography)
+    private let biographyTextPressedProperty = PassthroughSubject<Void, Never>()
+    public func biographyTextPressed() {
+        biographyTextPressedProperty.send(())
+    }
+
+    private let personMoviesButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func personMoviesButtonPressed() {
+        personMoviesButtonPressedProperty.send(())
     }
 
     // MARK: - ⬆️ OUTPUTS Definition
@@ -210,8 +229,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return closeButtonActionProperty
     }
 
-    private let personInfoActionProperty = PassthroughSubject<Person, Never>()
-    public func personInfoAction() -> PassthroughSubject<Person, Never> {
+    private let personInfoActionProperty = CurrentValueSubject<Person, Never>(Person())
+    public func personInfoAction() -> CurrentValueSubject<Person, Never> {
         return personInfoActionProperty
     }
 
@@ -228,6 +247,26 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
     private let biographyTextActionProperty = PassthroughSubject<String, Never>()
     public func biographyTextAction() -> PassthroughSubject<String, Never> {
         return biographyTextActionProperty
+    }
+
+    private let fetchPersonMoviesActionProperty = CurrentValueSubject<[Movie], Never>([])
+    public func fetchPersonMoviesAction() -> CurrentValueSubject<[Movie], Never> {
+        return fetchPersonMoviesActionProperty
+    }
+
+    private let personMoviesButtonActionProperty = PassthroughSubject<[Movie], Never>()
+    public func personMoviesButtonAction() -> PassthroughSubject<[Movie], Never> {
+        return personMoviesButtonActionProperty
+    }
+
+    private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()
+    public func movieSelectedAction() -> PassthroughSubject<Movie, Never> {
+        return movieSelectedActionProperty
+    }
+
+    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
+    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+        return socialNetworksActionProperty
     }
 
     // MARK: - ⚙️ Helpers

@@ -7,15 +7,15 @@
 
 import Foundation
 
-public final class BackdropApiResponse: Codable {
-    public let filePath: String?
+public struct BackdropApiResponse: Codable {
+    let filePath: String?
 
-    private enum BackdropApiResponseCodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case filePath = "file_path"
     }
 
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: BackdropApiResponseCodingKeys.self)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         filePath = try container.decodeIfPresent(String.self, forKey: .filePath)
     }
 }

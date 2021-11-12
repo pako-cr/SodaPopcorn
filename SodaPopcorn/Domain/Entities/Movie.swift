@@ -10,9 +10,9 @@ public struct Movie: Hashable {
     let genres: [Genre]?
     let productionCompanies: [ProductionCompany]?
     let runtime, voteCount, budget, revenue: Int?
-    let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline: String?
+    let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline, character: String?
 
-    private init(id: String?, title: String?, overview: String?, rating: Double?, posterPath: String?, backdropPath: String?, releaseDate: String?, genres: [Genre]?, homepage: String?, runtime: Int?, voteCount: Int?, budget: Int?, revenue: Int?, tagline: String?, productionCompanies: [ProductionCompany]?) {
+    init(id: String? = nil, title: String? = nil, overview: String? = nil, rating: Double? = nil, posterPath: String? = nil, backdropPath: String? = nil, releaseDate: String? = nil, genres: [Genre]? = nil, homepage: String? = nil, runtime: Int? = nil, voteCount: Int? = nil, budget: Int? = nil, revenue: Int? = nil, tagline: String? = nil, productionCompanies: [ProductionCompany]? = nil, character: String? = nil) {
         self.id = id
         self.title = title
         self.overview = overview
@@ -28,6 +28,7 @@ public struct Movie: Hashable {
         self.revenue = revenue
         self.tagline = tagline
         self.productionCompanies = productionCompanies
+        self.character = character
     }
 
     init(apiResponse: MovieApiResponse) {
@@ -45,7 +46,9 @@ public struct Movie: Hashable {
                   budget: apiResponse.budget,
                   revenue: apiResponse.revenue,
                   tagline: apiResponse.tagline,
-                  productionCompanies: apiResponse.productionCompanies?.map({ ProductionCompany(apiResponse: $0) }))
+                  productionCompanies: apiResponse.productionCompanies?.map({ ProductionCompany(apiResponse: $0) }),
+                  character: apiResponse.character
+        )
     }
 
     public func hash(into hasher: inout Hasher) {

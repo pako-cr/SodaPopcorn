@@ -5,33 +5,15 @@
 //  Created by Francisco Cordoba on 3/9/21.
 //
 
-public final class MovieApiResponse: Codable {
-    public let id: String?
-    public let title: String?
-    public let overview: String?
-    public let rating: Double?
-    public let posterPath: String?
-    public let backdropPath: String?
-    public let releaseDate: String?
-    public let genres: [GenreApiResponse]?
-    public let homepage: String?
-    public let runtime: Int?
-    public let voteCount: Int?
-    public let budget: Int?
-    public let revenue: Int?
-    public let tagline: String?
-    public let productionCompanies: [ProductionCompanyApiResponse]?
+public struct MovieApiResponse: Decodable {
+    let rating: Double?
+    let genres: [GenreApiResponse]?
+    let runtime, voteCount, budget, revenue: Int?
+    let productionCompanies: [ProductionCompanyApiResponse]?
+    let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline, character: String?
 
-    private enum MovieApiResponseCodingKeys: String, CodingKey {
-        case id
-        case title
-        case overview
-        case genres
-        case homepage
-        case runtime
-        case budget
-        case revenue
-        case tagline
+    private enum CodingKeys: String, CodingKey {
+        case id, title, overview, genres, homepage, runtime, budget, revenue, tagline, character
         case rating               = "vote_average"
         case posterPath           = "poster_path"
         case backdropPath         = "backdrop_path"
@@ -40,8 +22,8 @@ public final class MovieApiResponse: Codable {
         case productionCompanies  = "production_companies"
     }
 
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: MovieApiResponseCodingKeys.self)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try String(container.decode(Int.self, forKey: .id))
         title = try container.decodeIfPresent(String.self, forKey: .title)
@@ -58,5 +40,6 @@ public final class MovieApiResponse: Codable {
         revenue = try container.decodeIfPresent(Int.self, forKey: .revenue)
         tagline = try container.decodeIfPresent(String.self, forKey: .tagline)
         productionCompanies = try container.decodeIfPresent([ProductionCompanyApiResponse].self, forKey: .productionCompanies)
+        character = try container.decodeIfPresent(String.self, forKey: .character)
     }
 }
