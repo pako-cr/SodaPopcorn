@@ -25,7 +25,7 @@ public final class KnownForCollectionView: UICollectionViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium

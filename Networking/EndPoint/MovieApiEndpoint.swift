@@ -17,6 +17,7 @@ public enum MovieApiEndpoint {
     case person(personId: String)
     case personMovieCredits(personId: String)
     case personExternalIds(personId: String)
+    case personImages(personId: String)
 }
 
 extension MovieApiEndpoint: EndPointType {
@@ -27,7 +28,7 @@ extension MovieApiEndpoint: EndPointType {
             var base = try PlistReaderManager.shared.read(fromContainer: ConfigKeys.baseUrl.rawValue, with: environment ?? "staging") as? String ?? ""
 
             switch self {
-            case .person, .personMovieCredits, .personExternalIds:
+            case .person, .personMovieCredits, .personExternalIds, .personImages:
                 base.append(contentsOf: "person")
                 break
             default:
@@ -76,6 +77,8 @@ extension MovieApiEndpoint: EndPointType {
             return "\(personId)/movie_credits"
         case .personExternalIds(let personId):
             return "\(personId)/external_ids"
+        case .personImages(let personId):
+            return "\(personId)/images"
         }
     }
 
@@ -91,7 +94,7 @@ extension MovieApiEndpoint: EndPointType {
                                       urlParameters: ["page": page,
                                                       "api_key": publicApiKey,
                                                       "language": locale])
-        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .person, .personMovieCredits, .personExternalIds:
+        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .person, .personMovieCredits, .personExternalIds, .personImages:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,

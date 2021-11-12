@@ -40,14 +40,14 @@ final class HomeCoordinator: Coordinator {
 		}
 	}
 
-	func start() {
+    func start() {
 		self.homeVC = HomeVC()
 
-		let newMoviesListVM = NewMoviesListVM(movieService: movieService)
-		let newMoviesListViewController = NavigationController(rootViewController: NewMoviesListVC(viewModel: newMoviesListVM))
-		newMoviesListViewController.tabBarItem = UITabBarItem(title: "New Movies", image: UIImage(systemName: "film.fill"), tag: 0)
+		let viewModel = NewMoviesListVM(movieService: movieService)
+		let viewController = NavigationController(rootViewController: NewMoviesListVC(viewModel: viewModel))
+		viewController.tabBarItem = UITabBarItem(title: "New Movies", image: UIImage(systemName: "film.fill"), tag: 0)
 
-		homeVC?.viewControllers = [newMoviesListViewController]
+		homeVC?.viewControllers = [viewController]
 		homeVC?.selectedIndex = 0
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
@@ -55,7 +55,7 @@ final class HomeCoordinator: Coordinator {
 		parentViewController.view.addSubview(homeVC!.view)
 		homeVC!.didMove(toParent: parentViewController)
 
-		newMoviesListVM.outputs.movieSelectedAction()
+		viewModel.outputs.movieSelectedAction()
 			.sink { [weak self] movie in
 				guard let `self` = self else { return }
                 self.showMovieDetails(movie: movie, on: self.homeVC!)
@@ -170,7 +170,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    public func showCustomTextView(with text: String, on navigationController: UIViewController) {
+    private func showCustomTextView(with text: String, on navigationController: UIViewController) {
         let viewModel = CustomTextVM(text: text)
         let viewController = CustomTextVC(viewModel: viewModel)
 
@@ -182,7 +182,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    public func showPersonDetailsView(with person: Person, on navigationController: UIViewController) {
+    private func showPersonDetailsView(with person: Person, on navigationController: UIViewController) {
         let viewModel = PersonDetailsVM(movieService: movieService, person: person)
         let viewController = PersonDetailsVC(viewModel: viewModel)
 
@@ -208,7 +208,27 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.personMoviesButtonAction()
             .sink { [weak self] movies in
                 guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
-                print("Showing all person movies: \n \(movies)")
+                self.showMovieList(with: movies, on: presentedVC)
+            }.store(in: &cancellable)
+    }
+
+    private func showMovieList(with movies: [Movie], on navigationController: UIViewController) {
+        guard !movies.isEmpty else { return }
+
+        let viewModel = MoviesListVM(movies: movies)
+        let viewController = MoviesListVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
+                self.showMovieDetails(movie: movie, on: presentedVC)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
             }.store(in: &cancellable)
     }
 }

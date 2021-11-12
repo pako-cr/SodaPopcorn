@@ -229,7 +229,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -242,7 +242,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -255,7 +255,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -267,7 +267,7 @@ final class MovieDetailsVC: BaseViewController {
     private let overviewValue: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .body).italic()
+        textView.font = UIFont.preferredFont(forTextStyle: .subheadline).italic()
         textView.textAlignment = .natural
         textView.isSelectable = false
         textView.isEditable = false
@@ -285,7 +285,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -298,7 +298,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -311,7 +311,7 @@ final class MovieDetailsVC: BaseViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -323,7 +323,7 @@ final class MovieDetailsVC: BaseViewController {
     private let productionCompaniesValue: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        textView.font = UIFont.preferredFont(forTextStyle: .subheadline)
         textView.textAlignment = .natural
         textView.isSelectable = false
         textView.isEditable = false
@@ -435,7 +435,7 @@ final class MovieDetailsVC: BaseViewController {
         overviewValue.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor).isActive = true
         overviewValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         overviewValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        overviewValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
+        overviewValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
 
         genresLabel.topAnchor.constraint(equalTo: overviewValue.bottomAnchor, constant: 20).isActive = true
         genresLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true

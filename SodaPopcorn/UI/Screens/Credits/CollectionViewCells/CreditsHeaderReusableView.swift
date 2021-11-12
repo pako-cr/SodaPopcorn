@@ -16,7 +16,7 @@ final class CreditsHeaderReusableView: UICollectionReusableView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title1).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium

@@ -195,6 +195,39 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 guard let `self` = self else { return }
                 self.socialNetworksActionProperty.send(socialNetworks)
             }).store(in: &cancellable)
+
+        let imagesEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<PersonImages, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.personImages(personId: (self.person.id ?? 0).description)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: PersonImages())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        imagesEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] personImages in
+                guard let `self` = self else { return }
+
+                if let images = personImages.images, !images.isEmpty {
+                    print(images)
+                }
+            }).store(in: &cancellable)
     }
 
     // MARK: - ⬇️ INPUTS Definition

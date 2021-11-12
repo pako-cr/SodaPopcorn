@@ -24,7 +24,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -37,7 +37,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     private lazy var websiteUrlButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
         button.addTarget(self, action: #selector(openMovieWebsite), for: .touchUpInside)
         button.contentHorizontalAlignment = .left
         button.setTitleColor(UIColor.gray, for: .normal)
@@ -76,15 +76,15 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
-        websiteUrlButton.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
-        websiteUrlButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        websiteUrlButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        websiteUrlButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
-
-        collectionView.topAnchor.constraint(equalTo: websiteUrlButton.bottomAnchor, constant: 10.0).isActive = true
+        collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.45).isActive = true
+
+        websiteUrlButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 0.0).isActive = true
+        websiteUrlButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        websiteUrlButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        websiteUrlButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
     // MARK: - Collection

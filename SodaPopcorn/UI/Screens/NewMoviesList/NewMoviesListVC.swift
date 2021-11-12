@@ -161,7 +161,7 @@ final class NewMoviesListVC: BaseViewController {
 			})
 	}
 
-	// MARK: - ⚙️ Helpers
+	// MARK: - Collection
 	private func configureCollectionView() {
 		movieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
 		movieCollectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
@@ -328,12 +328,11 @@ final class NewMoviesListVC: BaseViewController {
 		}
 	}
 
+    // MARK: - ⚙️ Helpers
+
 	// MARK: - 🗑 Deinit
 	deinit {
 		print("🗑 NewMoviesListVC deinit.")
-		fetchMoviesSubscription.cancel()
-		loadingSubscription.cancel()
-		finishedFetchingSubscription.cancel()
 	}
 }
 

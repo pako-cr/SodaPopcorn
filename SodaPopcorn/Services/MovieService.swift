@@ -61,4 +61,8 @@ public final class MovieService: MovieNetworkServiceProtocol {
     public func personExternalIds(personId: String) -> AnyPublisher<SocialNetworks, NetworkResponse> {
         return movieNetworkService.personExternalIds(personId: personId)
     }
+
+    public func personImages(personId: String) -> AnyPublisher<PersonImages, NetworkResponse> {
+        return movieNetworkService.personImages(personId: personId)
+    }
 }

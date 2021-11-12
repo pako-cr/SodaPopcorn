@@ -72,7 +72,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
 		label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
-		label.numberOfLines = 1
+		label.numberOfLines = 2
 		label.setContentCompressionResistancePriority(UILayoutPriority.fittingSizeLevel, for: .horizontal)
 		label.textAlignment = .left
         label.lineBreakMode = .byTruncatingTail
@@ -84,12 +84,14 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		let textView = UITextView()
 		textView.translatesAutoresizingMaskIntoConstraints = false
 		textView.font = UIFont.preferredFont(forTextStyle: .footnote)
-        textView.textAlignment = .left
+        textView.textAlignment = .natural
         textView.isUserInteractionEnabled = false
         textView.isEditable = false
+        textView.isScrollEnabled = false
         textView.adjustsFontForContentSizeCategory = true
         textView.maximumContentSizeCategory = .accessibilityMedium
         textView.sizeToFit()
+        textView.textContainer.lineBreakMode = .byTruncatingTail
 		return textView
 	}()
 
@@ -124,15 +126,15 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		posterImageLeadingAnchor?.isActive = true
 		posterImageCenterXAnchor?.isActive = false
 
-		movieTitle.topAnchor.constraint(equalTo: separatorView.bottomAnchor).isActive = true
+		movieTitle.topAnchor.constraint(equalTo: separatorView.bottomAnchor, constant: 10).isActive = true
 		movieTitle.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5).isActive = true
-		movieTitle.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.3).isActive = true
+		movieTitle.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.2).isActive = true
 		movieTitleLeadingAnchor = movieTitle.leadingAnchor.constraint(equalTo: leadingAnchor, constant: frame.width * 0.275)
 		movieTitleLeadingAnchor?.isActive = true
 
-		movieOverview.topAnchor.constraint(equalTo: movieTitle.bottomAnchor, constant: 5).isActive = true
+		movieOverview.topAnchor.constraint(equalTo: movieTitle.bottomAnchor).isActive = true
 		movieOverview.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5).isActive = true
-		movieOverview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
+		movieOverview.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
 		movieOverviewLeadingAnchor = movieOverview.leadingAnchor.constraint(equalTo: leadingAnchor, constant: frame.width * 0.275)
 		movieOverviewLeadingAnchor?.isActive = true
 	}

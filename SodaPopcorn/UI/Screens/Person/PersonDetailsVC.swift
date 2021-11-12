@@ -183,7 +183,7 @@ final class PersonDetailsVC: BaseViewController {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
+        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
         label.textAlignment = .natural
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
@@ -195,7 +195,7 @@ final class PersonDetailsVC: BaseViewController {
     private let biographyValue: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .body).italic()
+        textView.font = UIFont.preferredFont(forTextStyle: .subheadline).italic()
         textView.textAlignment = .natural
         textView.isSelectable = false
         textView.isEditable = false
@@ -285,7 +285,7 @@ final class PersonDetailsVC: BaseViewController {
         biographyValue.topAnchor.constraint(equalTo: biographyLabel.bottomAnchor).isActive = true
         biographyValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         biographyValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        biographyValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        biographyValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
 
         knownForCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
         knownForCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true

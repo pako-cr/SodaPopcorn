@@ -7,7 +7,7 @@
  */
 
 "app_name" = "SodaPopcorn";
-"app_name_with_icon" = "SodaPopcorn 🍿";
+"app_name_with_icon" = "Soda&Popcorn 🍿";
 "movie_list_view_controller_no_movies_to_show_title_label" = "No hay películas 🙁";
 "movie_list_view_controller_no_movies_to_show_description_label" = "Verifica tu conexión y recarga \n la pantalla ↕️";
 "movie_list_view_controller_loading_movies_title_label" = "Cargando películas... ⏰";
