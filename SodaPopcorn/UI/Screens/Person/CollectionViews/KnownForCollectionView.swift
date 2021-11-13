@@ -48,7 +48,6 @@ public final class KnownForCollectionView: UICollectionViewController {
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
         collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 2.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true

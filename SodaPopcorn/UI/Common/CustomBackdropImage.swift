@@ -76,6 +76,10 @@ final class CustomBackdropImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in
+            self?.activityIndicatorView.stopAnimating()
+        }
     }
 
     required init?(coder: NSCoder) {

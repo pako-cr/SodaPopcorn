@@ -64,3 +64,6 @@
 "no_person_movies" = "No movies to display";
 "no_person_images" = "No images to display";
 "person_appears_on" = "%@ appears on";
+"website" = "Website";
+"no_information" = "No information";
+"person_gallery" = "%@'s gallery";

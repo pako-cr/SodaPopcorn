@@ -1,5 +1,5 @@
 //
-//  CustomTextVC.swift
+//  CustomLongTextVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 11/11/21.
@@ -8,10 +8,9 @@
 import Combine
 import UIKit
 
-// TODO: Change the name of this VC and VM to CustomLongTextVC
-final class CustomTextVC: BaseViewController {
+final class CustomLongTextVC: BaseViewController {
     // MARK: Consts
-    private let viewModel: CustomTextVM
+    private let viewModel: CustomLongTextVM
 
     // MARK: - Variables
     private var textSubscription: Cancellable!
@@ -45,7 +44,7 @@ final class CustomTextVC: BaseViewController {
 
     private var textView = CustomTextView(customText: NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview"))
 
-    init(viewModel: CustomTextVM) {
+    init(viewModel: CustomLongTextVM) {
         self.viewModel = viewModel
         super.init()
     }
@@ -83,6 +82,8 @@ final class CustomTextVC: BaseViewController {
         textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
         textView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+
+        textView.isScrollEnabled = true
     }
 
     override func bindViewModel() {
@@ -101,6 +102,6 @@ final class CustomTextVC: BaseViewController {
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "CustomTextVC deinit.")
+        print("🗑", "CustomLongTextVC deinit.")
     }
 }

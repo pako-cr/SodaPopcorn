@@ -54,7 +54,10 @@ final class PersonDetailsVC: BaseViewController {
                 }
 
                 // Website
-                self.socialNetworksCollectionView.setWebsiteUrl(url: person.homepage)
+                if let website = person.homepage {
+                    self.websiteInformation.setSubheaderValue(subheader: website)
+                    self.websiteInformation.isUserInteractionEnabled = true
+                }
             }
         }
     }
@@ -76,20 +79,6 @@ final class PersonDetailsVC: BaseViewController {
     }()
 
     private let posterImage = CustomPosterImage(frame: .zero)
-
-    private lazy var galleryButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(galleryButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("gallery", comment: "Gallert button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        button.setTitle(NSLocalizedString("gallery", comment: "Gallert button"), for: .normal)
-        button.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
-        button.layer.cornerRadius = 10
-        button.layer.borderWidth = 1
-        return button
-    }()
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -178,6 +167,8 @@ final class PersonDetailsVC: BaseViewController {
 
     private let socialNetworksCollectionView = SocialNetworksCollectionView()
 
+    private let websiteInformation = CustomHeaderSubheaderView(header: NSLocalizedString("website", comment: "Website"))
+
     init(viewModel: PersonDetailsVM) {
         self.viewModel = viewModel
         super.init()
@@ -227,6 +218,7 @@ final class PersonDetailsVC: BaseViewController {
         contentView.addSubview(personGalleryCollectionView.view)
         contentView.addSubview(knownForCollectionView.view)
         contentView.addSubview(socialNetworksCollectionView.view)
+        contentView.addSubview(websiteInformation)
 
         posterImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -241,7 +233,6 @@ final class PersonDetailsVC: BaseViewController {
         biographyLabel.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 20).isActive = true
         biographyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         biographyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        biographyLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         biographyValue.topAnchor.constraint(equalTo: biographyLabel.bottomAnchor).isActive = true
         biographyValue.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -261,8 +252,13 @@ final class PersonDetailsVC: BaseViewController {
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: knownForCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
-        socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
+
+        websiteInformation.topAnchor.constraint(equalTo: socialNetworksCollectionView.view.bottomAnchor, constant: 20).isActive = true
+        websiteInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
+        websiteInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+        websiteInformation.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
     private func setupNavigationBar() {
@@ -297,8 +293,8 @@ final class PersonDetailsVC: BaseViewController {
         imagesSubscription = viewModel.outputs.personImagesAction()
             .sink(receiveValue: { [weak self] personImages in
                 guard let `self` = self else { return }
-                if let personImages = personImages {
-                    self.personGalleryCollectionView.updateCollectionViewData(images: personImages.images)
+                if let images = personImages {
+                    self.personGalleryCollectionView.updateCollectionViewData(images: images)
                 } else {
                     self.personGalleryCollectionView.setupEmptyView()
                 }

@@ -22,21 +22,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     // MARK: - UI Elements
     private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label"))
 
-    private lazy var websiteUrlButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        button.addTarget(self, action: #selector(openMovieWebsite), for: .touchUpInside)
-        button.contentHorizontalAlignment = .left
-        button.setTitleColor(UIColor.gray, for: .normal)
-        button.titleLabel?.numberOfLines = 1
-        button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.maximumContentSizeCategory = .accessibilityMedium
-        button.sizeToFit()
-        button.titleLabel?.lineBreakMode = .byTruncatingTail
-        return button
-    }()
-
     init() {
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
@@ -57,22 +42,15 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
 
         view.addSubview(collectionView)
         view.addSubview(collectionLabel)
-        view.addSubview(websiteUrlButton)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
         collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.45).isActive = true
-
-        websiteUrlButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 0.0).isActive = true
-        websiteUrlButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        websiteUrlButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        websiteUrlButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
     // MARK: - Collection
@@ -158,23 +136,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         }
 
         if let url = URL(string: homeUrl) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
-    }
-
-    func setWebsiteUrl(url: String?) {
-        if let url = url, !url.isEmpty {
-            self.collectionLabel.isHidden = false
-            self.websiteUrlButton.setTitle(url, for: .normal)
-            self.websiteUrlButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body).italic()
-            self.websiteUrlButton.setTitleColor(UIColor.systemBlue, for: .normal)
-        }
-    }
-
-    @objc func openMovieWebsite() {
-        if let websiteUrl = self.websiteUrlButton.titleLabel?.text, !websiteUrl.isEmpty,
-           !websiteUrl.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
-           let url = URL(string: websiteUrl) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }

@@ -64,3 +64,6 @@
 "no_person_movies" = "Sin información de películas";
 "no_person_images" = "Sin información de imágenes";
 "person_appears_on" = "%@ aparece en";
+"website" = "Página Web";
+"no_information" = "Sin información";
+"person_gallery" = "Galería de  %@";

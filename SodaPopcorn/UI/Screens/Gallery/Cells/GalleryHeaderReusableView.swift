@@ -22,10 +22,9 @@ final class GalleryHeaderReusableView: UICollectionReusableView {
         addSubview(headerLabel)
 
         NSLayoutConstraint.activate([
-            headerLabel.topAnchor.constraint(equalTo: topAnchor, constant: 20),
             headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0)
+            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 

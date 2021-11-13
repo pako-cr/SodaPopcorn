@@ -26,6 +26,9 @@ public protocol PersonDetailsVMInputs: AnyObject {
 
     /// Call when a person image is selected.
     func personImageSelected(personImage: PersonImage)
+
+    /// Call when the user selects person gallery.
+    func personGallerySelected()
 }
 
 public protocol PersonDetailsVMOutputs: AnyObject {
@@ -57,7 +60,10 @@ public protocol PersonDetailsVMOutputs: AnyObject {
     func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never>
 
     /// Emits to return the person images.
-    func personImagesAction() -> CurrentValueSubject<PersonImages?, Never>
+    func personImagesAction() -> CurrentValueSubject<[PersonImage]?, Never>
+
+    /// Emits when the user selects person gallery.
+    func personGallerySelectedAction() -> PassthroughSubject<(Person, [PersonImage]), Never>
 
     /// Emits when a person image is selected.
     func personImageAction() -> PassthroughSubject<PersonImage, Never>
@@ -110,6 +116,12 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
 
         personImageSelectedProperty.sink { [weak self] personImage in
             self?.personImageActionProperty.send(personImage)
+        }.store(in: &cancellable)
+
+        personGallerySelectedProperty.sink { [weak self] _ in
+            if let personGallery = self?.personImagesActionProperty.value, let person = self?.person {
+                self?.personGallerySelectedActionProperty.send((person, personGallery))
+            }
         }.store(in: &cancellable)
 
         let personDetailsEvent = viewDidLoadProperty
@@ -237,7 +249,9 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 }
             }, receiveValue: { [weak self] personImages in
                 guard let `self` = self else { return }
-                self.personImagesActionProperty.value = personImages
+                if let images = personImages.images {
+                    self.personImagesActionProperty.value = images
+                }
 
             }).store(in: &cancellable)
     }
@@ -271,6 +285,11 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
     private let personImageSelectedProperty = PassthroughSubject<PersonImage, Never>()
     public func personImageSelected(personImage: PersonImage) {
         personImageSelectedProperty.send(personImage)
+    }
+
+    private let personGallerySelectedProperty = PassthroughSubject<Void, Never>()
+    public func personGallerySelected() {
+        personGallerySelectedProperty.send(())
     }
 
     // MARK: - ⬆️ OUTPUTS Definition
@@ -319,14 +338,19 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return socialNetworksActionProperty
     }
 
-    private let personImagesActionProperty = CurrentValueSubject<PersonImages?, Never>(nil)
-    public func personImagesAction() -> CurrentValueSubject<PersonImages?, Never> {
+    private let personImagesActionProperty = CurrentValueSubject<[PersonImage]?, Never>([])
+    public func personImagesAction() -> CurrentValueSubject<[PersonImage]?, Never> {
         return personImagesActionProperty
     }
 
     private let personImageActionProperty = PassthroughSubject<PersonImage, Never>()
     public func personImageAction() -> PassthroughSubject<PersonImage, Never> {
         return personImageActionProperty
+    }
+
+    private let personGallerySelectedActionProperty = PassthroughSubject<(Person, [PersonImage]), Never>()
+    public func personGallerySelectedAction() -> PassthroughSubject<(Person, [PersonImage]), Never> {
+        return personGallerySelectedActionProperty
     }
 
     // MARK: - ⚙️ Helpers

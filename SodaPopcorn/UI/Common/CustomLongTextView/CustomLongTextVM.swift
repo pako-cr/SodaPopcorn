@@ -1,5 +1,5 @@
 //
-//  CustomTextVM.swift
+//  CustomLongTextVM.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 11/11/21.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol CustomTextVMInputs: AnyObject {
+public protocol CustomLongTextVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
@@ -16,7 +16,7 @@ public protocol CustomTextVMInputs: AnyObject {
     func closeButtonPressed()
 }
 
-public protocol CustomTextVMOutputs: AnyObject {
+public protocol CustomLongTextVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
@@ -24,17 +24,17 @@ public protocol CustomTextVMOutputs: AnyObject {
     func textAction() -> PassthroughSubject<String, Never>
 }
 
-public protocol CustomTextVMTypes: AnyObject {
-    var inputs: CustomTextVMInputs { get }
-    var outputs: CustomTextVMOutputs { get }
+public protocol CustomLongTextVMTypes: AnyObject {
+    var inputs: CustomLongTextVMInputs { get }
+    var outputs: CustomLongTextVMOutputs { get }
 }
 
-public final class CustomTextVM: ObservableObject, Identifiable, CustomTextVMInputs, CustomTextVMOutputs, CustomTextVMTypes {
+public final class CustomLongTextVM: ObservableObject, Identifiable, CustomLongTextVMInputs, CustomLongTextVMOutputs, CustomLongTextVMTypes {
     // MARK: Constants
 
     // MARK: Variables
-    public var inputs: CustomTextVMInputs { return self }
-    public var outputs: CustomTextVMOutputs { return self }
+    public var inputs: CustomLongTextVMInputs { return self }
+    public var outputs: CustomLongTextVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
@@ -75,6 +75,6 @@ public final class CustomTextVM: ObservableObject, Identifiable, CustomTextVMInp
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "CustomTextVM deinit.")
+        print("🗑", "CustomLongTextVM deinit.")
     }
 }

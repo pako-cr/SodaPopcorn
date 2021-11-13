@@ -17,12 +17,7 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let imageURL = self.imageURL else { return }
 
-                // TODO: This is not doing anything. Check this fisrt condition.
-                 if imageURL.elementsEqual("no_backdrop") {
-                    self.backdropImage.isHidden = false
-                    self.backdropImage.image = UIImage(named: "no_backdrop")
-
-                } else if imageURL.elementsEqual("no_backdrops") {
+                if imageURL.elementsEqual("no_backdrops") {
                     self.backdropImage.isHidden = true
                     self.setEmptyView(title: NSLocalizedString("poster_collection_view_cell_no_backdrops", comment: "No Backdrops"))
 

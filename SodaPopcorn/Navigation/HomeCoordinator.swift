@@ -43,11 +43,11 @@ final class HomeCoordinator: Coordinator {
     func start() {
 		self.homeVC = HomeVC()
 
-		let viewModel = NewMoviesListVM(movieService: movieService)
-		let viewController = NewMoviesListVC(viewModel: viewModel)
+		let viewModel = NowPlayingMoviesVM(movieService: movieService)
+		let viewController = NowPlayingMoviesVC(viewModel: viewModel)
         let navigationController = NavigationController(rootViewController: viewController)
 
-        navigationController.tabBarItem = UITabBarItem(title: "New Movies", image: UIImage(systemName: "film.fill"), tag: 0)
+        navigationController.tabBarItem = UITabBarItem(title: "Now Playing", image: UIImage(systemName: "film.fill"), tag: 0)
 
 		homeVC?.viewControllers = [navigationController]
 		homeVC?.selectedIndex = 0
@@ -76,12 +76,6 @@ final class HomeCoordinator: Coordinator {
                 baseViewController.dismiss(animated: true, completion: nil)
 			}.store(in: &cancellable)
 
-        viewModel.outputs.backdropImageAction()
-            .sink { [weak self] (imageURL) in
-                guard let `self` = self else { return }
-                self.showBackdropImageView(with: imageURL, on: navigationController)
-            }.store(in: &cancellable)
-
         viewModel.outputs.galleryButtonAction()
             .sink { [weak self] _ in
                 guard let `self` = self else { return }
@@ -91,13 +85,13 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.overviewTextAction()
             .sink { [weak self] overview in
                 guard let `self` = self else { return }
-                self.showCustomTextView(with: overview, on: navigationController)
+                self.showCustomLongTextView(with: overview, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.creditsButtonAction()
-            .sink { [weak self] credits in
+            .sink { [weak self] (movie, credits) in
                 guard let `self` = self else { return }
-                self.showCreditsView(with: credits, on: navigationController)
+                self.showCreditsView(with: credits, of: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
@@ -107,7 +101,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 	}
 
-    private func showBackdropImageView(with imageURL: String, on navigationController: UIViewController) {
+    private func showBackdropImagesView(with imageURL: String, on navigationController: UIViewController) {
         let viewModel = BackdropImageVM(imageURL: imageURL)
         let viewController = BackdropImageVC(viewModel: viewModel)
 
@@ -131,40 +125,38 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showGalleryView(with movie: Movie, on navigationController: UIViewController) {
+    private func showGalleryView(with movie: Movie, on navigationController: UINavigationController) {
         let viewModel = GalleryVM(movieService: movieService, movie: movie)
         let viewController = GalleryVC(viewModel: viewModel)
 
-        navigationController.present(viewController, animated: true, completion: nil)
-
-        viewModel.outputs.closeButtonAction()
-            .sink { _ in
-                navigationController.dismiss(animated: true, completion: nil)
-            }.store(in: &cancellable)
-
-        viewModel.outputs.backdropImageAction()
-            .sink { [weak self] imageUrl in
-                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
-                self.showBackdropImageView(with: imageUrl, on: presentedVC)
-            }.store(in: &cancellable)
-
-        viewModel.outputs.posterImageAction()
-            .sink { [weak self] imageUrl in
-                guard let `self` = self, let presentedVC = navigationController.presentedViewController else { return }
-                self.showPosterImageView(with: imageUrl, on: presentedVC)
-            }.store(in: &cancellable)
-    }
-
-    private func showCreditsView(with credits: Credits, on navigationController: UINavigationController) {
-        let viewModel = CreditsVM(movieService: movieService, credits: credits)
-        let viewController = CreditsVC(viewModel: viewModel)
-
-//        navigationController.present(viewController, animated: true, completion: nil)
         navigationController.pushViewController(viewController, animated: true)
 
         viewModel.outputs.closeButtonAction()
             .sink { _ in
-//                navigationController.dismiss(animated: true, completion: nil)
+                navigationController.popViewController(animated: true)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.backdropImageAction()
+            .sink { [weak self] image in
+                guard let `self` = self else { return }
+                self.showBackdropImagesView(with: image, on: navigationController)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.posterImageAction()
+            .sink { [weak self] imageUrl in
+                guard let `self` = self else { return }
+                self.showPosterImageView(with: imageUrl, on: navigationController)
+            }.store(in: &cancellable)
+    }
+
+    private func showCreditsView(with credits: Credits, of movie: Movie, on navigationController: UINavigationController) {
+        let viewModel = CreditsVM(movie: movie, credits: credits)
+        let viewController = CreditsVC(viewModel: viewModel)
+
+        navigationController.pushViewController(viewController, animated: true)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
                 navigationController.popViewController(animated: true)
             }.store(in: &cancellable)
 
@@ -175,9 +167,9 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showCustomTextView(with text: String, on navigationController: UIViewController) {
-        let viewModel = CustomTextVM(text: text)
-        let viewController = CustomTextVC(viewModel: viewModel)
+    private func showCustomLongTextView(with text: String, on navigationController: UIViewController) {
+        let viewModel = CustomLongTextVM(text: text)
+        let viewController = CustomLongTextVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 
@@ -201,19 +193,19 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.biographyTextAction()
             .sink { [weak self] biography in
                 guard let `self` = self else { return }
-                self.showCustomTextView(with: biography, on: navigationController)
+                self.showCustomLongTextView(with: biography, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.movieSelectedAction()
             .sink { [weak self] movie in
                 guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: navigationController)
+                self.showMovieDetails(movie: movie, with: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personMoviesButtonAction()
             .sink { [weak self] (movies, person) in
                 guard let `self` = self else { return }
-                self.showMovieList(with: movies, and: person, on: navigationController)
+                self.showPersonMovieList(with: movies, and: person, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personImageAction()
@@ -221,13 +213,18 @@ final class HomeCoordinator: Coordinator {
                 guard let `self` = self, let imagePath = personImage.filePath else { return }
                 self.showPosterImageView(with: imagePath, on: navigationController)
             }.store(in: &cancellable)
+
+        viewModel.outputs.personGallerySelectedAction()
+            .sink { [weak self] (person, images) in
+                self?.showPersonGallery(person: person, images: images, with: navigationController)
+            }.store(in: &cancellable)
     }
 
-    private func showMovieList(with movies: [Movie], and person: Person, on navigationController: UINavigationController) {
+    private func showPersonMovieList(with movies: [Movie], and person: Person, on navigationController: UINavigationController) {
         guard !movies.isEmpty else { return }
 
-        let viewModel = MoviesListVM(movies: movies, person: person)
-        let viewController = MoviesListVC(viewModel: viewModel)
+        let viewModel = PersonMovieListVM(movies: movies, person: person)
+        let viewController = PersonMovieListVC(viewModel: viewModel)
 
         navigationController.pushViewController(viewController, animated: true)
 
@@ -254,12 +251,6 @@ final class HomeCoordinator: Coordinator {
                 navigationController.popViewController(animated: true)
             }.store(in: &cancellable)
 
-        viewModel.outputs.backdropImageAction()
-            .sink { [weak self] (imageURL) in
-                guard let `self` = self else { return }
-                self.showBackdropImageView(with: imageURL, on: navigationController)
-            }.store(in: &cancellable)
-
         viewModel.outputs.galleryButtonAction()
             .sink { [weak self] _ in
                 guard let `self` = self else { return }
@@ -269,19 +260,36 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.overviewTextAction()
             .sink { [weak self] overview in
                 guard let `self` = self else { return }
-                self.showCustomTextView(with: overview, on: navigationController)
+                self.showCustomLongTextView(with: overview, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.creditsButtonAction()
-            .sink { [weak self] credits in
+            .sink { [weak self] (movie, credits) in
                 guard let `self` = self else { return }
-                self.showCreditsView(with: credits, on: navigationController)
+                self.showCreditsView(with: credits, of: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
             .sink { [weak self] person in
                 guard let `self` = self else { return }
                 self.showPersonDetailsView(with: person, on: navigationController)
+            }.store(in: &cancellable)
+    }
+
+    private func showPersonGallery(person: Person, images: [PersonImage], with navigationController: UINavigationController) {
+        let viewModel = PersonGalleryVM(person: person, personImages: images)
+        let viewController = PersonGalleryVC(viewModel: viewModel)
+
+        navigationController.pushViewController(viewController, animated: true)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.popViewController(animated: true)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.imageAction()
+            .sink { [weak self] image in
+                self?.showPosterImageView(with: image, on: navigationController)
             }.store(in: &cancellable)
     }
 }

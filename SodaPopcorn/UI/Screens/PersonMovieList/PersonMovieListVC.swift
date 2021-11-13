@@ -1,5 +1,5 @@
 //
-//  MovieListVC.swift
+//  PersonMovieListVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 11/11/21.
@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-final class MoviesListVC: BaseViewController {
+final class PersonMovieListVC: BaseViewController {
     enum Section: CaseIterable {
         case movies
     }
@@ -18,7 +18,7 @@ final class MoviesListVC: BaseViewController {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
 
     // MARK: - Consts
-    private let viewModel: MoviesListVM
+    private let viewModel: PersonMovieListVM
 
     // MARK: - Variables
     private var moviesSubscription: Cancellable!
@@ -28,7 +28,7 @@ final class MoviesListVC: BaseViewController {
     // MARK: - UI Elements
     private var movieCollectionView: UICollectionView!
 
-    init(viewModel: MoviesListVM) {
+    init(viewModel: PersonMovieListVM) {
         self.viewModel = viewModel
         super.init()
     }
@@ -85,7 +85,6 @@ final class MoviesListVC: BaseViewController {
     private func configureCollectionView() {
         movieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         movieCollectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
-        movieCollectionView.register(SectionFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier)
         movieCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         movieCollectionView.translatesAutoresizingMaskIntoConstraints = false
         movieCollectionView.isScrollEnabled = true
@@ -138,12 +137,6 @@ final class MoviesListVC: BaseViewController {
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
         }
 
-        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard kind == UICollectionView.elementKindSectionFooter else { return nil }
-
-            return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
-        }
-
         self.dataSource = dataSource
     }
 
@@ -173,11 +166,11 @@ final class MoviesListVC: BaseViewController {
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑 MoviesListVC deinit.")
+        print("🗑 PersonMovieListVC deinit.")
     }
 }
 
-extension MoviesListVC: UICollectionViewDelegate {
+extension PersonMovieListVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
         viewModel.inputs.movieSelected(movie: movie)

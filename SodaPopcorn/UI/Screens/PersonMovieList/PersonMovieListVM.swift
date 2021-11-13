@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol MoviesListVMInputs: AnyObject {
+public protocol PersonMovieListVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
@@ -19,7 +19,7 @@ public protocol MoviesListVMInputs: AnyObject {
     func movieSelected(movie: Movie)
 }
 
-public protocol MoviesListVMOutputs: AnyObject {
+public protocol PersonMovieListVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
@@ -33,19 +33,19 @@ public protocol MoviesListVMOutputs: AnyObject {
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
 }
 
-public protocol MoviesListVMTypes: AnyObject {
-    var inputs: MoviesListVMInputs { get }
-    var outputs: MoviesListVMOutputs { get }
+public protocol PersonMovieListVMTypes: AnyObject {
+    var inputs: PersonMovieListVMInputs { get }
+    var outputs: PersonMovieListVMOutputs { get }
 }
 
-public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInputs, MoviesListVMOutputs, MoviesListVMTypes {
+public final class PersonMovieListVM: ObservableObject, Identifiable, PersonMovieListVMInputs, PersonMovieListVMOutputs, PersonMovieListVMTypes {
     // MARK: Constants
     private let movies: [Movie]
     private let person: Person
 
     // MARK: Variables
-    public var inputs: MoviesListVMInputs { return self }
-    public var outputs: MoviesListVMOutputs { return self }
+    public var inputs: PersonMovieListVMInputs { return self }
+    public var outputs: PersonMovieListVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
@@ -107,6 +107,6 @@ public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInp
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "MoviesListVM deinit.")
+        print("🗑", "PersonMovieListVM deinit.")
     }
 }

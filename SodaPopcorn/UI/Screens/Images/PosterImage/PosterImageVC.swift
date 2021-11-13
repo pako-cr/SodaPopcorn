@@ -132,7 +132,7 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(presentImageOptionsActionSheet))
         longPressRecognizer.minimumPressDuration = 1.0
 
-        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomOutAction))
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomAction))
         doubleTapRecognizer.numberOfTapsRequired = 2
 
         posterImage.isUserInteractionEnabled = true
@@ -147,8 +147,9 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     }
 
     @objc
-    private func tapGestureZoomOutAction(recognizer: UITapGestureRecognizer) {
-        scrollView.setZoomScale(1.0, animated: true)
+    private func tapGestureZoomAction(recognizer: UITapGestureRecognizer) {
+        let zoomScale = scrollView.zoomScale > 5.0 ? 1.0 : 10.0
+        scrollView.setZoomScale(zoomScale, animated: true)
     }
 
     @objc

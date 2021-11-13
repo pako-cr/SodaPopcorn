@@ -1,5 +1,5 @@
 //
-//  NewMoviesListVM.swift
+//  NowPlayingMoviesVM.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol NewMoviesListVMInputs: AnyObject {
+public protocol NowPlayingMoviesVMInputs: AnyObject {
 	/// Call to get the new movies.
 	func fetchNewMovies()
 
@@ -19,7 +19,7 @@ public protocol NewMoviesListVMInputs: AnyObject {
 	func movieSelected(movie: Movie)
 }
 
-public protocol NewMoviesListVMOutputs: AnyObject {
+public protocol NowPlayingMoviesVMOutputs: AnyObject {
 	/// Emits to get the new movies.
 	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
@@ -36,18 +36,18 @@ public protocol NewMoviesListVMOutputs: AnyObject {
 	func showError() -> PassthroughSubject<String, Never>
 }
 
-public protocol NewMoviesListVMTypes: AnyObject {
-	var inputs: NewMoviesListVMInputs { get }
-	var outputs: NewMoviesListVMOutputs { get }
+public protocol NowPlayingMoviesVMTypes: AnyObject {
+	var inputs: NowPlayingMoviesVMInputs { get }
+	var outputs: NowPlayingMoviesVMOutputs { get }
 }
 
-public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesListVMInputs, NewMoviesListVMOutputs, NewMoviesListVMTypes {
+public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayingMoviesVMInputs, NowPlayingMoviesVMOutputs, NowPlayingMoviesVMTypes {
 	// MARK: Constants
 	private let movieService: MovieService
 
 	// MARK: Variables
-	public var inputs: NewMoviesListVMInputs { return self }
-	public var outputs: NewMoviesListVMOutputs { return self }
+	public var inputs: NowPlayingMoviesVMInputs { return self }
+	public var outputs: NowPlayingMoviesVMOutputs { return self }
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
@@ -70,7 +70,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
                 return movieService.moviesNowPlaying(page: self.page)
                     .retry(2)
 					.mapError({ [weak self] networkResponse -> NetworkResponse in
-						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+						print("🔴 [NowPlayingMoviesVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
                         self?.loadingProperty.value = false
 						self?.handleNetworkResponseError(networkResponse)
 						return networkResponse
@@ -86,7 +86,7 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 				self.loadingProperty.value = false
 				switch completionReceived {
 					case .failure(let error):
-						print("🔴 [NewMoviesListVM] [init] Received completion error. Error: \(error.localizedDescription)")
+						print("🔴 [NowPlayingMoviesVM] [init] Received completion error. Error: \(error.localizedDescription)")
 						self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
 					default: break
 				}
@@ -168,6 +168,6 @@ public final class NewMoviesListVM: ObservableObject, Identifiable, NewMoviesLis
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑", "NewMoviesListVM deinit.")
+		print("🗑", "NowPlayingMoviesVM deinit.")
 	}
 }

@@ -19,8 +19,8 @@ final class PersonGalleryCollectionViewCell: UICollectionViewCell {
 
                 if personImage.filePath == "more_info" {
 
-                    let config = UIImage.SymbolConfiguration(font: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.caption1), scale: UIImage.SymbolScale.small)
-                    let image = UIImage(systemName: "plus", withConfiguration: config)?
+                    let config = UIImage.SymbolConfiguration(pointSize: 0.1, weight: .ultraLight, scale: .small)
+                    let image = UIImage(systemName: "ellipsis.circle", withConfiguration: config)?
                         .withRenderingMode(.alwaysOriginal)
                         .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
 

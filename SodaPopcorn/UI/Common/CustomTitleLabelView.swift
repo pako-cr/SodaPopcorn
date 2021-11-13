@@ -26,6 +26,7 @@ public final class CustomTitleLabelView: UILabel {
         separatorView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
 
         translatesAutoresizingMaskIntoConstraints = false
+        heightAnchor.constraint(equalToConstant: 30).isActive = true
         numberOfLines = 1
         font = UIFont.preferredFont(forTextStyle: .headline)
         textAlignment = .left
