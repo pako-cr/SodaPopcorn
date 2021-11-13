@@ -20,19 +20,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     private var dataSource: DataSource!
 
     // MARK: - UI Elements
-    private let collectionLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
-        label.sizeToFit()
-        label.isHidden = true
-        return label
-    }()
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label"))
 
     private lazy var websiteUrlButton: UIButton = {
         let button = UIButton()
@@ -72,7 +60,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         view.addSubview(websiteUrlButton)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
@@ -108,7 +96,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
                                                    heightDimension: .absolute(60.0))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
             let section = NSCollectionLayoutSection(group: group)
 
             return section
@@ -140,7 +127,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
             var snapshot = self.dataSource.snapshot()
 
             if let socialNetworks = socialNetworks, !socialNetworks.isEmpty {
-                self.collectionLabel.isHidden = false
+                self.collectionView.removeEmptyView()
                 snapshot.appendItems(socialNetworks, toSection: .socialNetworks)
             }
 
@@ -189,6 +176,13 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
            !websiteUrl.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
            let url = URL(string: websiteUrl) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+
+    func setupEmptyView() {
+        DispatchQueue.main.async { [weak self] in
+            guard let `self` = self else { return }
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_social_networks", comment: "No social networks info"), centeredX: false)
         }
     }
 }

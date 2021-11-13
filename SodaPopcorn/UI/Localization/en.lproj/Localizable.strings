@@ -51,7 +51,7 @@
 "more" = "More";
 "credits_vc_cast_header" = "Cast";
 "credits_vc_crew_header" = "Crew";
-"no_cast" = "No info";
+"no_cast" = "No cast to display";
 "more_info" = "More...";
 "person_years_old" = " (%@ years old)";
 "birthdate" = "Birthdate";
@@ -59,3 +59,8 @@
 "description" = "Description";
 "no_biography_found" = "No biography found";
 "known_for_collection_view_title" = "Known for";
+"biography" = "Biography";
+"no_social_networks" = "No social networks to display";
+"no_person_movies" = "No movies to display";
+"no_person_images" = "No images to display";
+"person_appears_on" = "%@ appears on";

@@ -18,24 +18,22 @@ final class CastCollectionViewCell: UICollectionViewCell {
                 guard let `self` = self, let cast = self.cast else { return }
 
                 if cast.name == "more_info" {
-                    self.posterImage.isHidden = true
+
+                    let config = UIImage.SymbolConfiguration(font: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.caption1), scale: UIImage.SymbolScale.small)
+                    let image = UIImage(systemName: "plus", withConfiguration: config)?
+                        .withRenderingMode(.alwaysOriginal)
+                        .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
+
+                    self.posterImage.image = image
+                    self.posterImage.contentMode = .scaleAspectFit
                     self.castName.isHidden = true
                     self.characterName.isHidden = true
-                    self.layer.borderWidth = 1
-                    self.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
-                    self.layer.cornerRadius = 10
-
-                    self.setEmptyView(title: NSLocalizedString("more_info", comment: "More info"), centered: true)
 
                 } else {
-                    self.removeEmptyView()
-                    self.posterImage.isHidden = false
                     self.castName.isHidden = false
                     self.characterName.isHidden = false
-                    self.layer.borderWidth = 0
-                    self.layer.borderWidth = 1
-                    self.layer.borderColor = UIColor.clear.cgColor
 
+                    self.posterImage.contentMode = .scaleAspectFill
                     if let profilePath = cast.profilePath {
                         self.posterImage.setUrlString(urlString: profilePath)
                     } else {
@@ -61,6 +59,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
         posterImage.layer.cornerRadius = 10
         posterImage.layer.borderWidth = 0
         posterImage.layer.masksToBounds = true
+        posterImage.contentMode = .scaleAspectFill
         return posterImage
     }()
 

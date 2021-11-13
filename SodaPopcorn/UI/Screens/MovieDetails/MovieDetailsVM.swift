@@ -54,7 +54,7 @@ public protocol MovieDetailsVMOutputs: AnyObject {
     func creditsAction() -> CurrentValueSubject<Credits?, Never>
 
     /// Emits when the social networks are fetched.
-    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
+    func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never>
 
     /// Emits when the gallery button is pressed.
     func galleryButtonAction() -> PassthroughSubject<Void, Never>
@@ -221,7 +221,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 }
             }, receiveValue: { [weak self] socialNetworks in
                 guard let `self` = self else { return }
-                self.socialNetworksActionProperty.send(socialNetworks)
+                self.socialNetworksActionProperty.value = socialNetworks
+
             }).store(in: &cancellable)
 
         let creditsEvent = viewDidLoadProperty
@@ -328,8 +329,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return backdropImagesActionProperty
     }
 
-    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
-    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+    private let socialNetworksActionProperty = CurrentValueSubject<SocialNetworks?, Never>(nil)
+    public func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never> {
         return socialNetworksActionProperty
     }
 

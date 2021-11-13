@@ -12,17 +12,7 @@ final class CreditsHeaderReusableView: UICollectionReusableView {
         return String(describing: CreditsHeaderReusableView.self)
     }
 
-    private let headerLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.sizeToFit()
-        return label
-    }()
+    private let headerLabel = CustomTitleLabelView(titleText: "")
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,10 +22,10 @@ final class CreditsHeaderReusableView: UICollectionReusableView {
         addSubview(headerLabel)
 
         NSLayoutConstraint.activate([
-            headerLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            headerLabel.topAnchor.constraint(equalTo: topAnchor),
-            headerLabel.widthAnchor.constraint(equalTo: widthAnchor),
-            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0)
+            headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerLabel.topAnchor.constraint(equalTo: topAnchor, constant: 20),
+            headerLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
+            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 

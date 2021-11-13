@@ -177,14 +177,14 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(horizontal: 5.0, vertical: 0.0)
+        sectionHeader.contentInsets = .init(header: 20.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -208,14 +208,14 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .uniform(size: 5.0)
+        sectionHeader.contentInsets = .init(header: 20.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -239,14 +239,14 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .uniform(size: 5.0)
+        sectionHeader.contentInsets = .init(header: 20.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section

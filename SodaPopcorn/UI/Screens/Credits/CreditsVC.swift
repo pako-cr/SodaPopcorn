@@ -157,14 +157,14 @@ final class CreditsVC: BaseViewController {
             // Supplementary header view setup
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(45))
+                heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top)
 
-            sectionHeader.contentInsets = .medium()
+            sectionHeader.contentInsets = .init(header: 20.0)
             section.boundarySupplementaryItems = [sectionHeader]
 
             return section

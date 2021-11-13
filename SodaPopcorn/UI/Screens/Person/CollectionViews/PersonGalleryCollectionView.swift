@@ -1,27 +1,27 @@
 //
-//  KnownForCollectionView.swift
+//  PersonGalleryCollectionView.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 11/11/21.
+//  Created by Francisco Cordoba on 12/11/21.
 //
 
 import UIKit
 
-public final class KnownForCollectionView: UICollectionViewController {
+public final class PersonGalleryCollectionView: UICollectionViewController {
     enum Section: CaseIterable {
-        case movies
+        case images
     }
 
     // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, Movie>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, PersonImage>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, PersonImage>
 
     // MARK: - Variables
     private var dataSource: DataSource!
     private var viewModel: PersonDetailsVM?
 
     // MARK: - UI Elements
-    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("known_for_collection_view_title", comment: "Know for label"))
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("gallery", comment: "Gallery Label"))
 
     init(viewModel: PersonDetailsVM) {
         self.viewModel = viewModel
@@ -59,7 +59,7 @@ public final class KnownForCollectionView: UICollectionViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
-        collectionView.register(KnownForCollectionViewCell.self, forCellWithReuseIdentifier: KnownForCollectionViewCell.reuseIdentifier)
+        collectionView.register(PersonGalleryCollectionViewCell.self, forCellWithReuseIdentifier: PersonGalleryCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
@@ -70,7 +70,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3333), heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.25), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = .small()
@@ -81,7 +81,6 @@ public final class KnownForCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-
             section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
 
             return section
@@ -89,12 +88,12 @@ public final class KnownForCollectionView: UICollectionViewController {
     }
 
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<KnownForCollectionViewCell, Movie> { cell, _, movie in
-            cell.configure(with: movie)
+        let cellRegistration = UICollectionView.CellRegistration<PersonGalleryCollectionViewCell, PersonImage> { cell, _, personImage in
+            cell.configure(with: personImage)
         }
 
-        let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: collectionView) { (collectionView, indexPath, movie) in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
+        let dataSource = UICollectionViewDiffableDataSource<Section, PersonImage>(collectionView: collectionView) { (collectionView, indexPath, personImage) in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: personImage)
         }
 
         self.dataSource = dataSource
@@ -106,16 +105,16 @@ public final class KnownForCollectionView: UICollectionViewController {
         self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
+    private func updateDataSource(images: [PersonImage]?, animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
 
-            if !movies.isEmpty {
+            if let images = images, !images.isEmpty {
                 self.collectionView.removeEmptyView()
-                snapshot.appendItems(Array(movies.prefix(11)), toSection: .movies)
-                snapshot.appendItems([Movie(title: "more_info")], toSection: .movies)
+                snapshot.appendItems(Array(images.prefix(11)), toSection: .images)
+                snapshot.appendItems([PersonImage(filePath: "more_info")], toSection: .images)
             }
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
@@ -123,23 +122,24 @@ public final class KnownForCollectionView: UICollectionViewController {
     }
 
     override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let personImage = dataSource.itemIdentifier(for: indexPath) else { return }
 
-        if movie.title == "more_info" {
-            self.viewModel?.inputs.personMoviesButtonPressed()
+        if personImage.filePath == "more_info" {
+            print("Present person gallery (more_info)")
+//            self.movieDetailsVM?.inputs.creditsButtonPressed()
         } else {
-            self.viewModel?.inputs.movieSelected(movie: movie)
+            self.viewModel?.inputs.personImageSelected(personImage: personImage)
         }
     }
 
     // MARK: - ⚙️ Helpers
-    func updateCollectionViewData(movies: [Movie]) {
-        self.updateDataSource(movies: movies)
+    func updateCollectionViewData(images: [PersonImage]?) {
+        self.updateDataSource(images: images)
     }
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_movies", comment: "No person movies"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_images", comment: "No images to display"), centeredX: false)
         }
     }
 }

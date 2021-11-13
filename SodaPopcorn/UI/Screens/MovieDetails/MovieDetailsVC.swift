@@ -25,8 +25,8 @@ final class MovieDetailsVC: BaseViewController {
                 guard let `self` = self, let movie = self.movie else { return }
 
                 // Backdrop
-                if let backdropImageUrl = movie.backdropPath, self.oldMovie?.backdropPath != backdropImageUrl {
-                    self.backdropCollectionView.updateCollectionViewData(images: [backdropImageUrl])
+                if self.oldMovie?.backdropPath != movie.backdropPath {
+                    self.backdropCollectionView.updateCollectionViewData(images: [movie.backdropPath ?? ""])
                 }
 
                 // Title
@@ -92,11 +92,12 @@ final class MovieDetailsVC: BaseViewController {
     }
 
     // MARK: UI Elements
-    private let scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.delegate = self
         return scrollView
     }()
 
@@ -106,37 +107,13 @@ final class MovieDetailsVC: BaseViewController {
         return contentView
     }()
 
-    private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        let button = UIButton(type: .system)
-        button.setImage(image, for: .normal)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        return button
-    }()
-
     private lazy var backdropCollectionView: BackdropCollectionView = {
         let collectionView = BackdropCollectionView(movieDetailsVM: self.viewModel)
         collectionView.view.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
 
-    private lazy var galleryButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(galleryButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("gallery", comment: "Gallert button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        button.setTitle(NSLocalizedString("gallery", comment: "Gallert button"), for: .normal)
-        button.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
-        button.layer.cornerRadius = 10
-        button.layer.borderWidth = 1
-        return button
-    }()
+    private let galleryButton = CustomButton(buttonTitle: NSLocalizedString("gallery", comment: "Gallery button"))
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -225,18 +202,7 @@ final class MovieDetailsVC: BaseViewController {
         return label
     }()
 
-    private let genresLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_genre_label", comment: "Genre Label")
-        label.sizeToFit()
-        return label
-    }()
+    private let genresLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_genre_label", comment: "Genre Label"))
 
     private let genresValue: UILabel = {
         let label = UILabel(frame: .zero)
@@ -251,48 +217,11 @@ final class MovieDetailsVC: BaseViewController {
         return label
     }()
 
-    private let overviewLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_overview_label", comment: "Overview Label")
-        label.sizeToFit()
-        return label
-    }()
+    private let overviewLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_overview_label", comment: "Overview Label"))
 
-    private let overviewValue: UITextView = {
-        let textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .subheadline).italic()
-        textView.textAlignment = .natural
-        textView.isSelectable = false
-        textView.isEditable = false
-        textView.backgroundColor = .clear
-        textView.isScrollEnabled = false
-        textView.text = NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview")
-        textView.sizeToFit()
-        textView.adjustsFontForContentSizeCategory = true
-        textView.maximumContentSizeCategory = .accessibilityMedium
-        textView.textContainer.lineBreakMode = .byTruncatingTail
-        return textView
-    }()
+    private let overviewValue = CustomTextView(customText: NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview"))
 
-    private let budgetRevenueLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_budget_revenue_label", comment: "Budget/revenue label")
-        label.sizeToFit()
-        return label
-    }()
+    private let budgetRevenueLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_budget_revenue_label", comment: "Budget/revenue label"))
 
     private let budgetRevenueValue: UILabel = {
         let label = UILabel()
@@ -307,18 +236,7 @@ final class MovieDetailsVC: BaseViewController {
         return label
     }()
 
-    private let productionCompaniesLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_production_companies_label", comment: "Production companies label")
-        label.sizeToFit()
-        return label
-    }()
+    private let productionCompaniesLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_production_companies_label", comment: "Production companies label"))
 
     private let productionCompaniesValue: UITextView = {
         let textView = UITextView()
@@ -338,11 +256,7 @@ final class MovieDetailsVC: BaseViewController {
 
     private let socialNetworksCollectionView = SocialNetworksCollectionView()
 
-    private lazy var castCollectionView: CastCollectionView = {
-        let collectionView = CastCollectionView(movieDetailsVM: self.viewModel)
-        collectionView.view.translatesAutoresizingMaskIntoConstraints = false
-        return collectionView
-    }()
+    private lazy var castCollectionView = CastCollectionView(movieDetailsVM: self.viewModel)
 
     init(viewModel: MovieDetailsVM) {
         self.viewModel = viewModel
@@ -357,6 +271,7 @@ final class MovieDetailsVC: BaseViewController {
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
         handleGestureRecongnizers()
+        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
@@ -383,7 +298,6 @@ final class MovieDetailsVC: BaseViewController {
         headerStack.addArrangedSubview(taglineLabel)
 
         contentView.addSubview(backdropCollectionView.view)
-        contentView.addSubview(closeButton)
         contentView.addSubview(galleryButton)
         contentView.addSubview(headerStack)
         contentView.addSubview(subHeaderStack)
@@ -408,11 +322,6 @@ final class MovieDetailsVC: BaseViewController {
         backdropCollectionView.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         backdropCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
-        closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
         galleryButton.bottomAnchor.constraint(equalTo: backdropCollectionView.view.bottomAnchor, constant: -10).isActive = true
         galleryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         galleryButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
@@ -428,7 +337,7 @@ final class MovieDetailsVC: BaseViewController {
         subHeaderStack.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.025).isActive = true
 
         overviewLabel.topAnchor.constraint(equalTo: subHeaderStack.bottomAnchor, constant: 20).isActive = true
-        overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         overviewLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         overviewLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
@@ -438,7 +347,7 @@ final class MovieDetailsVC: BaseViewController {
         overviewValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
 
         genresLabel.topAnchor.constraint(equalTo: overviewValue.bottomAnchor, constant: 20).isActive = true
-        genresLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        genresLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         genresLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         genresLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
@@ -448,7 +357,7 @@ final class MovieDetailsVC: BaseViewController {
         genresValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
         productionCompaniesLabel.topAnchor.constraint(equalTo: genresValue.bottomAnchor, constant: 20).isActive = true
-        productionCompaniesLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        productionCompaniesLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         productionCompaniesLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         productionCompaniesLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
@@ -457,7 +366,7 @@ final class MovieDetailsVC: BaseViewController {
         productionCompaniesValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
 
         budgetRevenueLabel.topAnchor.constraint(equalTo: productionCompaniesValue.bottomAnchor, constant: 20).isActive = true
-        budgetRevenueLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        budgetRevenueLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         budgetRevenueLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         budgetRevenueLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
@@ -478,10 +387,19 @@ final class MovieDetailsVC: BaseViewController {
         socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
+    private func setupNavigationBar() {
+        let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
+    }
+
     private func handleGestureRecongnizers() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(overviewTapped))
         tapGesture.numberOfTouchesRequired = 1
         overviewValue.addGestureRecognizer(tapGesture)
+
+        galleryButton.addTarget(self, action: #selector(galleryButtonPressed), for: .touchUpInside)
     }
 
     override func bindViewModel() {
@@ -500,13 +418,21 @@ final class MovieDetailsVC: BaseViewController {
 
         socialNetworksSubscription = viewModel.outputs.socialNetworksAction()
             .sink(receiveValue: { [weak self] socialNetworks in
-                self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+                guard let `self` = self else { return }
+
+                if let socialNetworks = socialNetworks, !(socialNetworks.networks?.isEmpty ?? true) {
+                    self.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+                } else {
+                    self.socialNetworksCollectionView.setupEmptyView()
+                }
             })
 
         castSubscription = viewModel.outputs.creditsAction()
             .sink(receiveValue: { [weak self] credits in
-                if let cast = credits?.cast {
+                if let cast = credits?.cast, !cast.isEmpty {
                     self?.castCollectionView.updateCollectionViewData(cast: cast)
+                } else {
+                    self?.castCollectionView.setupEmptyView()
                 }
             })
     }
@@ -545,5 +471,15 @@ final class MovieDetailsVC: BaseViewController {
     // MARK: - 🗑 Deinit
     deinit {
         print("🗑 MovieDetailsVC deinit.")
+    }
+}
+
+extension MovieDetailsVC: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.convert(headerStack.frame.origin, to: self.view).y <= 60 {
+            navigationController?.navigationBar.topItem?.title = movie?.title ?? ""
+        } else {
+            navigationController?.navigationBar.topItem?.title = ""
+        }
     }
 }

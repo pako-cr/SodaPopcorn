@@ -21,19 +21,7 @@ public final class CastCollectionView: UICollectionViewController {
     private var movieDetailsVM: MovieDetailsVM?
 
     // MARK: - UI Elements
-    private let collectionLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("cast_collection_view_title", comment: "Cast Label")
-        label.sizeToFit()
-        label.isHidden = true
-        return label
-    }()
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("cast_collection_view_title", comment: "Cast Label"))
 
     init(movieDetailsVM: MovieDetailsVM) {
         self.movieDetailsVM = movieDetailsVM
@@ -52,11 +40,13 @@ public final class CastCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
+        view.translatesAutoresizingMaskIntoConstraints = false
+
         view.addSubview(collectionLabel)
         view.addSubview(collectionView)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
@@ -91,7 +81,6 @@ public final class CastCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-
             section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
 
             return section
@@ -123,7 +112,7 @@ public final class CastCollectionView: UICollectionViewController {
             var snapshot = self.dataSource.snapshot()
 
             if !cast.isEmpty {
-                self.collectionLabel.isHidden = false
+                self.collectionView.removeEmptyView()
                 snapshot.appendItems(Array(cast.prefix(11)), toSection: .cast)
                 snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
             }
@@ -139,6 +128,13 @@ public final class CastCollectionView: UICollectionViewController {
             self.movieDetailsVM?.inputs.creditsButtonPressed()
         } else {
             self.movieDetailsVM?.inputs.castMemberSelected(cast: cast)
+        }
+    }
+
+    func setupEmptyView() {
+        DispatchQueue.main.async { [weak self] in
+            guard let `self` = self else { return }
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_cast", comment: "No cast information"), centeredX: false)
         }
     }
 

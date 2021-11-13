@@ -22,22 +22,11 @@ final class MoviesListVC: BaseViewController {
 
     // MARK: - Variables
     private var moviesSubscription: Cancellable!
+    private var personSubscription: Cancellable!
     private var dataSource: DataSource!
 
     // MARK: - UI Elements
     private var movieCollectionView: UICollectionView!
-
-    private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        let button = UIButton(type: .system)
-        button.setImage(image, for: .normal)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        return button
-    }()
 
     init(viewModel: MoviesListVM) {
         self.viewModel = viewModel
@@ -54,6 +43,7 @@ final class MoviesListVC: BaseViewController {
         setInitialData()
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
+        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
@@ -63,18 +53,19 @@ final class MoviesListVC: BaseViewController {
     }
 
     override func setupUI() {
-        view.addSubview(closeButton)
         view.addSubview(movieCollectionView)
 
-        closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        movieCollectionView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 10).isActive = true
+        movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         movieCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         movieCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+
+    private func setupNavigationBar() {
+        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     override func bindViewModel() {
@@ -82,6 +73,11 @@ final class MoviesListVC: BaseViewController {
             .sink(receiveValue: { [weak self] (movies) in
                 guard let `self` = self else { return }
                 self.updateDataSource(movies: movies)
+            })
+
+        personSubscription = viewModel.outputs.personAction()
+            .sink(receiveValue: { [weak self] person in
+                self?.title = String(format: NSLocalizedString("person_appears_on", comment: "Appears on"), person.name ?? "")
             })
     }
 

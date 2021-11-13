@@ -8,7 +8,7 @@
 import UIKit
 
 public class NavigationController: UINavigationController {
-	let rootViewController: UIViewController
+	private let rootViewController: UIViewController
 
 	override init(rootViewController: UIViewController) {
 		self.rootViewController = rootViewController

@@ -5,12 +5,12 @@
 //  Created by Francisco Cordoba on 11/11/21.
 //
 
-struct PersonImage: Hashable {
+public struct PersonImage: Hashable {
     let filePath: String?
     let voteCount, width, height: Int?
     let aspectRatio, voteAverage: Double?
 
-    init(filePath: String?, voteCount: Int?, width: Int?, height: Int?, aspectRatio: Double?, voteAverage: Double?) {
+    init(filePath: String? = nil, voteCount: Int? = nil, width: Int? = nil, height: Int? = nil, aspectRatio: Double? = nil, voteAverage: Double? = nil) {
         self.filePath = filePath
         self.voteCount = voteCount
         self.width = width

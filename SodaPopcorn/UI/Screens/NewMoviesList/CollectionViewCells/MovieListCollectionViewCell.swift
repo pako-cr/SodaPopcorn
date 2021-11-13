@@ -80,20 +80,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 		return label
 	}()
 
-	private let movieOverview: UITextView = {
-		let textView = UITextView()
-		textView.translatesAutoresizingMaskIntoConstraints = false
-		textView.font = UIFont.preferredFont(forTextStyle: .footnote)
-        textView.textAlignment = .natural
-        textView.isUserInteractionEnabled = false
-        textView.isEditable = false
-        textView.isScrollEnabled = false
-        textView.adjustsFontForContentSizeCategory = true
-        textView.maximumContentSizeCategory = .accessibilityMedium
-        textView.sizeToFit()
-        textView.textContainer.lineBreakMode = .byTruncatingTail
-		return textView
-	}()
+	private let movieOverview = CustomTextView()
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)

@@ -110,11 +110,11 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
         closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        posterImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        posterImage.topAnchor.constraint(equalTo: closeButton.bottomAnchor).isActive = true
         posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         posterImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         posterImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
+        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.9).isActive = true
 
         handleGestureRecongnizers()
     }

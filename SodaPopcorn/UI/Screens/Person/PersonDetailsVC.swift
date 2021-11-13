@@ -60,11 +60,12 @@ final class PersonDetailsVC: BaseViewController {
     }
 
     // MARK: UI Elements
-    private let scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.alwaysBounceVertical = true
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.delegate = self
         return scrollView
     }()
 
@@ -72,18 +73,6 @@ final class PersonDetailsVC: BaseViewController {
         let contentView = UIView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         return contentView
-    }()
-
-    private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        let button = UIButton(type: .system)
-        button.setImage(image, for: .normal)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        return button
     }()
 
     private let posterImage = CustomPosterImage(frame: .zero)
@@ -179,37 +168,13 @@ final class PersonDetailsVC: BaseViewController {
         return label
     }()
 
-    private let biographyLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_overview_label", comment: "Overview Label")
-        label.sizeToFit()
-        return label
-    }()
+    private let biographyLabel = CustomTitleLabelView(titleText: NSLocalizedString("biography", comment: "Overview Label"))
 
-    private let biographyValue: UITextView = {
-        let textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .subheadline).italic()
-        textView.textAlignment = .natural
-        textView.isSelectable = false
-        textView.isEditable = false
-        textView.backgroundColor = .clear
-        textView.isScrollEnabled = false
-        textView.text = NSLocalizedString("no_biography_found", comment: "No biograpghy")
-        textView.sizeToFit()
-        textView.adjustsFontForContentSizeCategory = true
-        textView.maximumContentSizeCategory = .accessibilityMedium
-        textView.textContainer.lineBreakMode = .byTruncatingTail
-        return textView
-    }()
+    private let biographyValue = CustomTextView(customText: NSLocalizedString("no_biography_found", comment: "No biograpghy"))
 
-    private lazy var knownForCollectionView = KnownForCollectionView(personDetailsVM: self.viewModel)
+    private lazy var personGalleryCollectionView = PersonGalleryCollectionView(viewModel: self.viewModel)
+
+    private lazy var knownForCollectionView = KnownForCollectionView(viewModel: self.viewModel)
 
     private let socialNetworksCollectionView = SocialNetworksCollectionView()
 
@@ -226,6 +191,7 @@ final class PersonDetailsVC: BaseViewController {
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
         handleGestureRecongnizers()
+        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
@@ -255,30 +221,25 @@ final class PersonDetailsVC: BaseViewController {
         headerStack.addArrangedSubview(placeOfBirthValue)
 
         contentView.addSubview(posterImage)
-        contentView.addSubview(closeButton)
         contentView.addSubview(headerStack)
         contentView.addSubview(biographyLabel)
         contentView.addSubview(biographyValue)
+        contentView.addSubview(personGalleryCollectionView.view)
         contentView.addSubview(knownForCollectionView.view)
         contentView.addSubview(socialNetworksCollectionView.view)
 
-        closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        posterImage.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 2).isActive = true
+        posterImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         posterImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.3333).isActive = true
         posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
 
-        headerStack.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 2).isActive = true
+        headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         headerStack.leadingAnchor.constraint(equalTo: posterImage.trailingAnchor, constant: 10).isActive = true
         headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         headerStack.bottomAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 0).isActive = true
 
         biographyLabel.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 20).isActive = true
-        biographyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        biographyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         biographyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         biographyLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05).isActive = true
 
@@ -287,16 +248,28 @@ final class PersonDetailsVC: BaseViewController {
         biographyValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         biographyValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
 
-        knownForCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
+        personGalleryCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
+        personGalleryCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        personGalleryCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        personGalleryCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+
+        knownForCollectionView.view.topAnchor.constraint(equalTo: personGalleryCollectionView.view.bottomAnchor, constant: 20).isActive = true
         knownForCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         knownForCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        knownForCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        knownForCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.35).isActive = true
 
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: knownForCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
         socialNetworksCollectionView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+    }
+
+    private func setupNavigationBar() {
+        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     private func handleGestureRecongnizers() {
@@ -314,19 +287,32 @@ final class PersonDetailsVC: BaseViewController {
 
         moviesSubscription = viewModel.outputs.fetchPersonMoviesAction()
             .sink(receiveValue: { [weak self] movies in
-                self?.knownForCollectionView.updateCollectionViewData(movies: movies)
+                if !movies.isEmpty {
+                    self?.knownForCollectionView.updateCollectionViewData(movies: movies)
+                } else {
+                    self?.knownForCollectionView.setupEmptyView()
+                }
             })
 
-//        imagesSubscription = viewModel.outputs.backdropImagesAction()
-//            .sink(receiveValue: { [weak self] backdropImages in
-//                guard let `self` = self else { return }
-//                let backdrops = backdropImages.map({ $0.filePath ?? ""})
-//                self.backdropCollectionView.updateCollectionViewData(images: backdrops)
-//            })
+        imagesSubscription = viewModel.outputs.personImagesAction()
+            .sink(receiveValue: { [weak self] personImages in
+                guard let `self` = self else { return }
+                if let personImages = personImages {
+                    self.personGalleryCollectionView.updateCollectionViewData(images: personImages.images)
+                } else {
+                    self.personGalleryCollectionView.setupEmptyView()
+                }
+
+            })
 
         socialNetworksSubscription = viewModel.outputs.socialNetworksAction()
             .sink(receiveValue: { [weak self] socialNetworks in
-                self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+                if let socialNetworks = socialNetworks, !(socialNetworks.networks?.isEmpty ?? true) {
+                    self?.socialNetworksCollectionView.updateCollectionViewData(socialNetworks: socialNetworks)
+
+                } else {
+                    self?.socialNetworksCollectionView.setupEmptyView()
+                }
             })
     }
 
@@ -364,5 +350,15 @@ final class PersonDetailsVC: BaseViewController {
     // MARK: - 🗑 Deinit
     deinit {
         print("🗑 PersonDetailsVC deinit.")
+    }
+}
+
+extension PersonDetailsVC: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.convert(headerStack.frame.origin, to: self.view).y <= 60 {
+            navigationController?.navigationBar.topItem?.title = person?.name ?? ""
+        } else {
+            navigationController?.navigationBar.topItem?.title = ""
+        }
     }
 }

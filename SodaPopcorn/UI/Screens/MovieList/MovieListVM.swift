@@ -26,6 +26,9 @@ public protocol MoviesListVMOutputs: AnyObject {
     /// Emits to return the movies.
     func moviesAction() -> CurrentValueSubject<[Movie], Never>
 
+    /// Emits to return the person.
+    func personAction() -> CurrentValueSubject<Person, Never>
+
     /// Emits when a movie is selected.
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
 }
@@ -38,6 +41,7 @@ public protocol MoviesListVMTypes: AnyObject {
 public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInputs, MoviesListVMOutputs, MoviesListVMTypes {
     // MARK: Constants
     private let movies: [Movie]
+    private let person: Person
 
     // MARK: Variables
     public var inputs: MoviesListVMInputs { return self }
@@ -46,8 +50,9 @@ public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInp
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
 
-    public init(movies: [Movie]) {
+    public init(movies: [Movie], person: Person) {
         self.movies = movies
+        self.person = person
 
         self.movieSelectedProperty
             .sink { [weak self] movie in
@@ -59,11 +64,6 @@ public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInp
             .sink { [weak self] _ in
                 self?.closeButtonActionProperty.send(())
             }.store(in: &cancellable)
-
-//        self.viewDidLoadProperty
-//            .sink { [weak self] _ in
-//                self?.moviesActionProperty.value = movies
-//            }.store(in: &cancellable)
     }
 
     // MARK: - ⬇️ INPUTS Definition
@@ -96,6 +96,11 @@ public final class MoviesListVM: ObservableObject, Identifiable, MoviesListVMInp
     private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()
     public func movieSelectedAction() -> PassthroughSubject<Movie, Never> {
         return movieSelectedActionProperty
+    }
+
+    private lazy var personActionProperty = CurrentValueSubject<Person, Never>(self.person)
+    public func personAction() -> CurrentValueSubject<Person, Never> {
+        return personActionProperty
     }
 
     // MARK: - ⚙️ Helpers

@@ -95,13 +95,18 @@ public final class BackdropCollectionView: UICollectionViewController {
         self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func updateDataSource(images: [String], animatingDifferences: Bool = true) {
+    private func updateDataSource(images: [String]?, animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
 
-            snapshot.appendItems(images, toSection: .images)
+            if let images = images, !images.isEmpty {
+                snapshot.appendItems(images, toSection: .images)
+            } else {
+                // TODO: This is not doing anything. Check this fisrt condition.
+                snapshot.appendItems(["no_backdrop"], toSection: .images)
+            }
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
@@ -113,7 +118,7 @@ public final class BackdropCollectionView: UICollectionViewController {
     }
 
     // MARK: - ⚙️ Helpers
-    func updateCollectionViewData(images: [String]) {
+    func updateCollectionViewData(images: [String]?) {
         self.updateDataSource(images: images)
     }
 }

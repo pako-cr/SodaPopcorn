@@ -16,6 +16,10 @@ extension NSDirectionalEdgeInsets {
 		self.init(top: vertical, leading: horizontal, bottom: vertical, trailing: horizontal)
 	}
 
+    init(header: CGFloat) {
+        self.init(top: header, leading: header, bottom: .zero, trailing: .zero)
+    }
+
 	static func small() -> NSDirectionalEdgeInsets {
 		return .uniform(size: 5)
 	}

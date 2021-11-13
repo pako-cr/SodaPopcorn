@@ -23,6 +23,9 @@ public protocol PersonDetailsVMInputs: AnyObject {
 
     /// Call when user press more movies button.
     func personMoviesButtonPressed()
+
+    /// Call when a person image is selected.
+    func personImageSelected(personImage: PersonImage)
 }
 
 public protocol PersonDetailsVMOutputs: AnyObject {
@@ -45,13 +48,19 @@ public protocol PersonDetailsVMOutputs: AnyObject {
     func fetchPersonMoviesAction() -> CurrentValueSubject<[Movie], Never>
 
     /// Emits when user press more movies button.
-    func personMoviesButtonAction() -> PassthroughSubject<[Movie], Never>
+    func personMoviesButtonAction() -> PassthroughSubject<([Movie], Person), Never>
 
     /// Emits when a movie is selected.
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
 
     /// Emits when the social networks are fetched.
-    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
+    func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never>
+
+    /// Emits to return the person images.
+    func personImagesAction() -> CurrentValueSubject<PersonImages?, Never>
+
+    /// Emits when a person image is selected.
+    func personImageAction() -> PassthroughSubject<PersonImage, Never>
 }
 
 public protocol PersonDetailsVMTypes: AnyObject {
@@ -95,8 +104,12 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
 
             let movies = self.fetchPersonMoviesActionProperty.value
             if !movies.isEmpty {
-                self.personMoviesButtonActionProperty.send(movies)
+                self.personMoviesButtonActionProperty.send((movies, self.person))
             }
+        }.store(in: &cancellable)
+
+        personImageSelectedProperty.sink { [weak self] personImage in
+            self?.personImageActionProperty.send(personImage)
         }.store(in: &cancellable)
 
         let personDetailsEvent = viewDidLoadProperty
@@ -193,7 +206,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 }
             }, receiveValue: { [weak self] socialNetworks in
                 guard let `self` = self else { return }
-                self.socialNetworksActionProperty.send(socialNetworks)
+                self.socialNetworksActionProperty.value = socialNetworks
+
             }).store(in: &cancellable)
 
         let imagesEvent = viewDidLoadProperty
@@ -223,10 +237,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 }
             }, receiveValue: { [weak self] personImages in
                 guard let `self` = self else { return }
+                self.personImagesActionProperty.value = personImages
 
-                if let images = personImages.images, !images.isEmpty {
-                    print(images)
-                }
             }).store(in: &cancellable)
     }
 
@@ -254,6 +266,11 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
     private let personMoviesButtonPressedProperty = PassthroughSubject<Void, Never>()
     public func personMoviesButtonPressed() {
         personMoviesButtonPressedProperty.send(())
+    }
+
+    private let personImageSelectedProperty = PassthroughSubject<PersonImage, Never>()
+    public func personImageSelected(personImage: PersonImage) {
+        personImageSelectedProperty.send(personImage)
     }
 
     // MARK: - ⬆️ OUTPUTS Definition
@@ -287,8 +304,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return fetchPersonMoviesActionProperty
     }
 
-    private let personMoviesButtonActionProperty = PassthroughSubject<[Movie], Never>()
-    public func personMoviesButtonAction() -> PassthroughSubject<[Movie], Never> {
+    private let personMoviesButtonActionProperty = PassthroughSubject<([Movie], Person), Never>()
+    public func personMoviesButtonAction() -> PassthroughSubject<([Movie], Person), Never> {
         return personMoviesButtonActionProperty
     }
 
@@ -297,9 +314,19 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return movieSelectedActionProperty
     }
 
-    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
-    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+    private let socialNetworksActionProperty = CurrentValueSubject<SocialNetworks?, Never>(nil)
+    public func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never> {
         return socialNetworksActionProperty
+    }
+
+    private let personImagesActionProperty = CurrentValueSubject<PersonImages?, Never>(nil)
+    public func personImagesAction() -> CurrentValueSubject<PersonImages?, Never> {
+        return personImagesActionProperty
+    }
+
+    private let personImageActionProperty = PassthroughSubject<PersonImage, Never>()
+    public func personImageAction() -> PassthroughSubject<PersonImage, Never> {
+        return personImageActionProperty
     }
 
     // MARK: - ⚙️ Helpers

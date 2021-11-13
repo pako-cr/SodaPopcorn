@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+// TODO: Change the name of this VC and VM to CustomLongTextVC
 final class CustomTextVC: BaseViewController {
     // MARK: Consts
     private let viewModel: CustomTextVM
@@ -42,21 +43,7 @@ final class CustomTextVC: BaseViewController {
         return label
     }()
 
-    private var textView: UITextView = {
-        let textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.font = UIFont.preferredFont(forTextStyle: .body).italic()
-        textView.textAlignment = .natural
-        textView.isSelectable = false
-        textView.isEditable = false
-        textView.backgroundColor = .clear
-        textView.isScrollEnabled = true
-        textView.text = NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview")
-        textView.sizeToFit()
-        textView.adjustsFontForContentSizeCategory = true
-        textView.maximumContentSizeCategory = .accessibilityMedium
-        return textView
-    }()
+    private var textView = CustomTextView(customText: NSLocalizedString("movie_details_vc_no_overview_found", comment: "No overview"))
 
     init(viewModel: CustomTextVM) {
         self.viewModel = viewModel

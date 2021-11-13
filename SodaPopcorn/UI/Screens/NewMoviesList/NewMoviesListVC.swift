@@ -315,12 +315,12 @@ final class NewMoviesListVC: BaseViewController {
 			if self.loading && dataSourceItems < 1 {
 				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_loading_movies_title_label", comment: "Loading title"),
                                                       message: NSLocalizedString("movie_list_view_controller_loading_movies_description_label", comment: "Loading Message"),
-                                                      centered: true)
+                                                      centeredY: true)
 
 			} else if !self.loading && dataSourceItems < 1 {
 				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_empty_movies_title_label", comment: "Empty list title"),
                                                       message: NSLocalizedString("movie_list_view_controller_empty_movies_description_label", comment: "Empty Message"),
-                                                      centered: true)
+                                                      centeredY: true)
 
 			} else {
 				self.movieCollectionView.removeEmptyView()

@@ -18,23 +18,20 @@ final class KnownForCollectionViewCell: UICollectionViewCell {
                 guard let `self` = self, let movie = self.movie else { return }
 
                 if movie.title == "more_info" {
-                    self.posterImage.isHidden = true
+
+                    let config = UIImage.SymbolConfiguration(font: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.caption1), scale: UIImage.SymbolScale.small)
+                    let image = UIImage(systemName: "plus", withConfiguration: config)?
+                        .withRenderingMode(.alwaysOriginal)
+                        .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
+
+                    self.posterImage.image = image
+                    self.posterImage.contentMode = .scaleAspectFit
                     self.movieName.isHidden = true
                     self.characterName.isHidden = true
-                    self.layer.borderWidth = 1
-                    self.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
-                    self.layer.cornerRadius = 10
-
-                    self.setEmptyView(title: NSLocalizedString("more_info", comment: "More info"), centered: true)
 
                 } else {
-                    self.removeEmptyView()
-                    self.posterImage.isHidden = false
                     self.movieName.isHidden = false
                     self.characterName.isHidden = false
-                    self.layer.borderWidth = 0
-                    self.layer.borderWidth = 1
-                    self.layer.borderColor = UIColor.clear.cgColor
 
                     if let posterPath = movie.posterPath {
                         self.posterImage.setUrlString(urlString: posterPath)

@@ -51,7 +51,7 @@
 "more" = "Más";
 "credits_vc_cast_header" = "Elenco";
 "credits_vc_crew_header" = "Equipo";
-"no_cast" = "Sin información";
+"no_cast" = "Sin información del elenco";
 "more_info" = "Más...";
 "person_years_old" = " (%@ años)";
 "birthdate" = "Fecha de Nacimiento";
@@ -59,3 +59,8 @@
 "description" = "Descripción";
 "no_biography_found" = "Biografía no disponible";
 "known_for_collection_view_title" = "Aparece en";
+"biography" = "Biografía";
+"no_social_networks" = "Sin información de redes sociales";
+"no_person_movies" = "Sin información de películas";
+"no_person_images" = "Sin información de imágenes";
+"person_appears_on" = "%@ aparece en";
