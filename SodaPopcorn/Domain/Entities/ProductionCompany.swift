@@ -5,18 +5,17 @@
 //  Created by Francisco Cordoba on 3/11/21.
 //
 
-public final class ProductionCompany {
-    public var id: Int?
-    public var logoPath: String?
-    public var name: String?
+struct ProductionCompany {
+    let id: Int?
+    let logoPath, name: String?
 
-    private init(id: Int?, logoPath: String?, name: String?) {
+    init(id: Int?, logoPath: String?, name: String?) {
         self.id = id
-        self.logoPath = logoPath
         self.name = name
+        self.logoPath = logoPath
     }
 
-    convenience init(apiResponse: ProductionCompanyApiResponse) {
+    init(apiResponse: ProductionCompanyApiResponse) {
         self.init(id: apiResponse.id,
                   logoPath: apiResponse.logoPath,
                   name: apiResponse.name)

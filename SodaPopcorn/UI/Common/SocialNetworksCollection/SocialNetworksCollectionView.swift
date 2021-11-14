@@ -18,40 +18,11 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var movieDetailsVM: MovieDetailsVM?
 
     // MARK: - UI Elements
-    private let collectionLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label")
-        label.sizeToFit()
-        label.isHidden = true
-        return label
-    }()
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label"))
 
-    private lazy var websiteUrlButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        button.addTarget(self, action: #selector(openMovieWebsite), for: .touchUpInside)
-        button.contentHorizontalAlignment = .left
-        button.setTitleColor(UIColor.gray, for: .normal)
-        button.titleLabel?.numberOfLines = 1
-        button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.maximumContentSizeCategory = .accessibilityMedium
-        button.sizeToFit()
-        button.titleLabel?.lineBreakMode = .byTruncatingTail
-        return button
-    }()
-
-    init(movieDetailsVM: MovieDetailsVM) {
-        self.movieDetailsVM = movieDetailsVM
+    init() {
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
 
@@ -67,21 +38,16 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
+        view.translatesAutoresizingMaskIntoConstraints = false
+
         view.addSubview(collectionView)
         view.addSubview(collectionLabel)
-        view.addSubview(websiteUrlButton)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
 
-        websiteUrlButton.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
-        websiteUrlButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        websiteUrlButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        websiteUrlButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
-
-        collectionView.topAnchor.constraint(equalTo: websiteUrlButton.bottomAnchor, constant: 10.0).isActive = true
+        collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -108,7 +74,6 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
                                                    heightDimension: .absolute(60.0))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
             let section = NSCollectionLayoutSection(group: group)
 
             return section
@@ -140,7 +105,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
             var snapshot = self.dataSource.snapshot()
 
             if let socialNetworks = socialNetworks, !socialNetworks.isEmpty {
-                self.collectionLabel.isHidden = false
+                self.collectionView.removeEmptyView()
                 snapshot.appendItems(socialNetworks, toSection: .socialNetworks)
             }
 
@@ -175,20 +140,10 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         }
     }
 
-    func setWebsiteUrl(url: String?) {
-        if let url = url, !url.isEmpty {
-            self.collectionLabel.isHidden = false
-            self.websiteUrlButton.setTitle(url, for: .normal)
-            self.websiteUrlButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body).italic()
-            self.websiteUrlButton.setTitleColor(UIColor.systemBlue, for: .normal)
-        }
-    }
-
-    @objc func openMovieWebsite() {
-        if let websiteUrl = self.websiteUrlButton.titleLabel?.text, !websiteUrl.isEmpty,
-           !websiteUrl.elementsEqual(NSLocalizedString("not_applicable", comment: "Not applicable")),
-           let url = URL(string: websiteUrl) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    func setupEmptyView() {
+        DispatchQueue.main.async { [weak self] in
+            guard let `self` = self else { return }
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_social_networks", comment: "No social networks info"), centeredX: false)
         }
     }
 }

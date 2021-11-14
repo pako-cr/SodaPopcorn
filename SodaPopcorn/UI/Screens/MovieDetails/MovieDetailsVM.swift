@@ -26,6 +26,9 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when a cast member is selected.
     func castMemberSelected(cast: Cast)
+
+    /// Call when the movie's overview is pressed.
+    func overviewTextPressed()
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -41,26 +44,23 @@ public protocol MovieDetailsVMOutputs: AnyObject {
     /// Emits when an error occurred.
     func showError() -> PassthroughSubject<String, Never>
 
-    /// Emits when an backdrop image is selected from the movie details.
-    func backdropImageAction() -> PassthroughSubject<String, Never>
-
-    /// Emits when the backdrop images are fetched.
-    func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never>
-
-    /// Emits when the cast information is fetched.
-    func castAction() -> PassthroughSubject<[Cast], Never>
+    /// Emits when the credits information is fetched.
+    func creditsAction() -> CurrentValueSubject<Credits?, Never>
 
     /// Emits when the social networks are fetched.
-    func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never>
+    func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never>
 
     /// Emits when the gallery button is pressed.
     func galleryButtonAction() -> PassthroughSubject<Void, Never>
 
     /// Emits when a cast member is selected.
-    func castMemberAction() -> PassthroughSubject<Cast, Never>
+    func castMemberAction() -> PassthroughSubject<Person, Never>
 
     /// Emits when the credits button is pressed.
-    func creditsButtonAction() -> PassthroughSubject<Credits, Never>
+    func creditsButtonAction() -> PassthroughSubject<(Movie, Credits), Never>
+
+    /// Emits when the movie's overview is pressed.
+    func overviewTextAction() -> PassthroughSubject<String, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -79,8 +79,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
-	private var page = 0
-    private var credits: Credits?
 
     init(movieService: MovieService, movie: Movie) {
         self.movieService = movieService
@@ -95,23 +93,25 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 			self?.closeButtonActionProperty.send(())
 		}.store(in: &cancellable)
 
-        backdropImageSelectedProperty.sink { [weak self] (imageURL) in
-            self?.backdropImageActionProperty.send(imageURL)
-        }.store(in: &cancellable)
-
         galleryButtonPressedProperty.sink { [weak self] _ in
             guard let `self` = self else { return }
             self.galleryButtonActionProperty.send(())
         }.store(in: &cancellable)
 
         castMemberSelectedProperty.sink { [weak self] cast in
-            self?.castMemberActionProperty.send(cast)
+            let person = Person(name: cast.name, id: cast.id)
+            self?.castMemberActionProperty.send(person)
         }.store(in: &cancellable)
 
         creditsButtonPressedProperty.sink { [weak self] _ in
-            if let credits = self?.credits {
-                self?.creditsButtonActionProperty.send(credits)
+            if let credits = self?.creditsActionProperty.value, let movie = self?.movie {
+                self?.creditsButtonActionProperty.send((movie, credits))
             }
+        }.store(in: &cancellable)
+
+        overviewTextPressedProperty.sink { [weak self] (overview) in
+            guard let `self` = self, let overview = self.movie.overview else { return }
+            self.overviewTextActionProperty.send(overview)
         }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
@@ -151,44 +151,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 self.movieInfoActionProperty.send(movieDetails)
             }).store(in: &cancellable)
 
-        let imagesEvent = viewDidLoadProperty
-            .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
-                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-
-                return movieService.getImages(movieId: self.movie.id ?? "")
-                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-
-                        self?.handleNetworkResponseError(networkResponse)
-                        return networkResponse
-                    })
-                    .replaceError(with: MovieImages())
-                    .eraseToAnyPublisher()
-            }.share()
-
-        imagesEvent
-            .sink(receiveCompletion: { [weak self] completionReceived in
-                guard let `self` = self else { return }
-
-                switch completionReceived {
-                    case .failure(let error):
-                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
-                    default: break
-                }
-            }, receiveValue: { [weak self] movieImages in
-                guard let `self` = self else { return }
-
-                if let backdrops = movieImages.backdrops, !backdrops.isEmpty {
-                    self.backdropImagesActionProperty.send(backdrops.filter({ $0.filePath != self.movie.backdropPath }))
-                }
-            }).store(in: &cancellable)
-
-        let socialNetworksEvent = viewDidLoadProperty
+        let movieExternalIdsEvent = viewDidLoadProperty
             .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.socialNetworks(movieId: self.movie.id ?? "")
+                return movieService.movieExternalIds(movieId: self.movie.id ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -199,7 +166,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                     .eraseToAnyPublisher()
             }.share()
 
-        socialNetworksEvent
+        movieExternalIdsEvent
             .sink(receiveCompletion: { [weak self] completionReceived in
                 guard let `self` = self else { return }
 
@@ -211,7 +178,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 }
             }, receiveValue: { [weak self] socialNetworks in
                 guard let `self` = self else { return }
-                self.socialNetworksActionProperty.send(socialNetworks)
+                self.socialNetworksActionProperty.value = socialNetworks
+
             }).store(in: &cancellable)
 
         let creditsEvent = viewDidLoadProperty
@@ -241,11 +209,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 }
             }, receiveValue: { [weak self] credits in
                 guard let `self` = self else { return }
+                self.creditsActionProperty.value = credits
 
-                self.credits = credits
-                if let cast = credits.cast {
-                    self.castActionProperty.send(cast)
-                }
             }).store(in: &cancellable)
 	}
 
@@ -285,6 +250,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         creditsButtonPressedProperty.send(())
     }
 
+    private let overviewTextPressedProperty = PassthroughSubject<Void, Never>()
+    public func overviewTextPressed() {
+        overviewTextPressedProperty.send()
+    }
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
 	public func closeButtonAction() -> PassthroughSubject<Void, Never> {
@@ -306,18 +276,8 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return showErrorProperty
     }
 
-    private let backdropImageActionProperty = PassthroughSubject<String, Never>()
-    public func backdropImageAction() -> PassthroughSubject<String, Never> {
-        return backdropImageActionProperty
-    }
-
-    private let backdropImagesActionProperty = PassthroughSubject<[Backdrop], Never>()
-    public func backdropImagesAction() -> PassthroughSubject<[Backdrop], Never> {
-        return backdropImagesActionProperty
-    }
-
-    private let socialNetworksActionProperty = PassthroughSubject<SocialNetworks, Never>()
-    public func socialNetworksAction() -> PassthroughSubject<SocialNetworks, Never> {
+    private let socialNetworksActionProperty = CurrentValueSubject<SocialNetworks?, Never>(nil)
+    public func socialNetworksAction() -> CurrentValueSubject<SocialNetworks?, Never> {
         return socialNetworksActionProperty
     }
 
@@ -326,19 +286,24 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return galleryButtonActionProperty
     }
 
-    private let castActionProperty = PassthroughSubject<[Cast], Never>()
-    public func castAction() -> PassthroughSubject<[Cast], Never> {
-        return castActionProperty
+    private let creditsActionProperty = CurrentValueSubject<Credits?, Never>(nil)
+    public func creditsAction() -> CurrentValueSubject<Credits?, Never> {
+        return creditsActionProperty
     }
 
-    private let castMemberActionProperty = PassthroughSubject<Cast, Never>()
-    public func castMemberAction() -> PassthroughSubject<Cast, Never> {
+    private let castMemberActionProperty = PassthroughSubject<Person, Never>()
+    public func castMemberAction() -> PassthroughSubject<Person, Never> {
         return castMemberActionProperty
     }
 
-    private let creditsButtonActionProperty = PassthroughSubject<Credits, Never>()
-    public func creditsButtonAction() -> PassthroughSubject<Credits, Never> {
+    private let creditsButtonActionProperty = PassthroughSubject<(Movie, Credits), Never>()
+    public func creditsButtonAction() -> PassthroughSubject<(Movie, Credits), Never> {
         return creditsButtonActionProperty
+    }
+
+    private let overviewTextActionProperty = PassthroughSubject<String, Never>()
+    public func overviewTextAction() -> PassthroughSubject<String, Never> {
+        return overviewTextActionProperty
     }
 
 	// MARK: - ⚙️ Helpers
@@ -346,7 +311,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         var localizedErrorString: String
 
         switch networkResponse {
-
             case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
             case .badRequest: localizedErrorString = "network_response_error_bad_request"
             case .outdated: localizedErrorString = "network_response_error_outdated"

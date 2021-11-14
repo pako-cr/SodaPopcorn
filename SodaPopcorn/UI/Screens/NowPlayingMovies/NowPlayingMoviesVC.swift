@@ -1,5 +1,5 @@
 //
-//  NewMoviesListVC.swift
+//  NowPlayingMoviesVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/9/21.
@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-final class NewMoviesListVC: BaseViewController {
+final class NowPlayingMoviesVC: BaseViewController {
 	enum Section: CaseIterable {
 		case movies
 	}
@@ -18,7 +18,7 @@ final class NewMoviesListVC: BaseViewController {
 	typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
 
 	// MARK: - Consts
-	private let viewModel: NewMoviesListVM
+	private let viewModel: NowPlayingMoviesVM
 
 	// MARK: - Variables
 
@@ -86,10 +86,11 @@ final class NewMoviesListVC: BaseViewController {
 	private lazy var refreshControl: UIRefreshControl = {
 		let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(self.reloadCollectionView), for: .valueChanged)
+        refreshControl.tintColor = UIColor(named: "PrimaryColor")
 		return refreshControl
 	}()
 
-	init(viewModel: NewMoviesListVM) {
+	init(viewModel: NowPlayingMoviesVM) {
 		self.viewModel = viewModel
 		super.init()
 	}
@@ -102,8 +103,7 @@ final class NewMoviesListVC: BaseViewController {
 		configureCollectionView()
 		configureDataSource()
 		setInitialData()
-		setupUI()
-		bindViewModel()
+        super.viewDidLoad()
 		viewModel.inputs.fetchNewMovies()
 	}
 
@@ -133,7 +133,7 @@ final class NewMoviesListVC: BaseViewController {
 			.filter({ !($0?.isEmpty ?? true) })
 			.sink(receiveValue: { [weak self] (movies) in
 				guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
                     self?.updateDataSource(movies: movies)
                 }
 			})
@@ -161,11 +161,11 @@ final class NewMoviesListVC: BaseViewController {
 			})
 	}
 
-	// MARK: - ⚙️ Helpers
+	// MARK: - Collection
 	private func configureCollectionView() {
 		movieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
 		movieCollectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
-		movieCollectionView.register(SectionFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier)
+		movieCollectionView.register(ActivityIndicatorFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier)
 		movieCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
 		movieCollectionView.translatesAutoresizingMaskIntoConstraints = false
 		movieCollectionView.isScrollEnabled = true
@@ -185,11 +185,11 @@ final class NewMoviesListVC: BaseViewController {
                                                   heightDimension: .fractionalHeight(1.0))
 
 			let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .uniform(size: 5.0)
+            item.contentInsets = .uniform(size: 2.0)
 
 			let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.5 : 3.75)))
 
 			let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -198,7 +198,7 @@ final class NewMoviesListVC: BaseViewController {
 			// Supplementary footer view setup
 			let headerFooterSize = NSCollectionLayoutSize(
 				widthDimension: .fractionalWidth(1.0),
-				heightDimension: .absolute(20))
+				heightDimension: .absolute(30))
 
 			let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
 				layoutSize: headerFooterSize,
@@ -223,7 +223,7 @@ final class NewMoviesListVC: BaseViewController {
 		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
 			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
 
-			return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
+			return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier, for: indexPath) as? ActivityIndicatorFooterReusableView
 		}
 
 		self.dataSource = dataSource
@@ -245,11 +245,7 @@ final class NewMoviesListVC: BaseViewController {
 			}
 
 			var snapshot = self.dataSource.snapshot()
-			if let lastItem = snapshot.itemIdentifiers.last {
-				snapshot.insertItems(movies, afterItem: lastItem)
-			} else {
-				snapshot.appendItems(movies, toSection: .movies)
-			}
+            snapshot.appendItems(movies, toSection: .movies)
 
 			self.handleFetchingChange(finishedFetching: false)
 
@@ -291,7 +287,7 @@ final class NewMoviesListVC: BaseViewController {
 		dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
 			guard kind == UICollectionView.elementKindSectionFooter else { return nil }
 
-			let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionFooterReusableView.reuseIdentifier, for: indexPath) as? SectionFooterReusableView
+			let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier, for: indexPath) as? ActivityIndicatorFooterReusableView
 			_ = finishedFetching ? footerView?.stopActivityIndicator() : footerView?.startActivityIndicator()
 			return footerView
 		}
@@ -315,12 +311,12 @@ final class NewMoviesListVC: BaseViewController {
 			if self.loading && dataSourceItems < 1 {
 				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_loading_movies_title_label", comment: "Loading title"),
                                                       message: NSLocalizedString("movie_list_view_controller_loading_movies_description_label", comment: "Loading Message"),
-                                                      centered: true)
+                                                      centeredY: true)
 
 			} else if !self.loading && dataSourceItems < 1 {
 				self.movieCollectionView.setEmptyView(title: NSLocalizedString("movie_list_view_controller_empty_movies_title_label", comment: "Empty list title"),
                                                       message: NSLocalizedString("movie_list_view_controller_empty_movies_description_label", comment: "Empty Message"),
-                                                      centered: true)
+                                                      centeredY: true)
 
 			} else {
 				self.movieCollectionView.removeEmptyView()
@@ -328,16 +324,15 @@ final class NewMoviesListVC: BaseViewController {
 		}
 	}
 
+    // MARK: - ⚙️ Helpers
+
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑 NewMoviesListVC deinit.")
-		fetchMoviesSubscription.cancel()
-		loadingSubscription.cancel()
-		finishedFetchingSubscription.cancel()
+		print("🗑 NowPlayingMoviesVC deinit.")
 	}
 }
 
-extension NewMoviesListVC: UICollectionViewDelegate {
+extension NowPlayingMoviesVC: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
 		viewModel.inputs.movieSelected(movie: movie)

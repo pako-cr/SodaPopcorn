@@ -17,20 +17,23 @@ final class CastCollectionViewCell: UICollectionViewCell {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let cast = self.cast else { return }
 
-                if cast.name == "no_cast" {
-                    self.posterImage.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("no_cast", comment: "No cast"))
+                if cast.name == "more_info" {
 
-                } else if cast.name == "more_info" {
-                    self.posterImage.isHidden = true
+                    let config = UIImage.SymbolConfiguration(pointSize: 0.1, weight: .ultraLight, scale: .small)
+                    let image = UIImage(systemName: "ellipsis.circle", withConfiguration: config)?
+                        .withRenderingMode(.alwaysOriginal)
+                        .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
+
+                    self.posterImage.image = image
+                    self.posterImage.contentMode = .scaleAspectFit
                     self.castName.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("more_info", comment: "More info"), centered: true)
+                    self.characterName.isHidden = true
 
                 } else {
-                    self.removeEmptyView()
-                    self.posterImage.isHidden = false
                     self.castName.isHidden = false
+                    self.characterName.isHidden = false
 
+                    self.posterImage.contentMode = .scaleAspectFill
                     if let profilePath = cast.profilePath {
                         self.posterImage.setUrlString(urlString: profilePath)
                     } else {
@@ -39,6 +42,10 @@ final class CastCollectionViewCell: UICollectionViewCell {
 
                     if let castName = cast.name {
                         self.castName.text = castName
+                    }
+
+                    if let characterName = cast.character {
+                        self.characterName.text = characterName
                     }
                 }
             }
@@ -52,16 +59,35 @@ final class CastCollectionViewCell: UICollectionViewCell {
         posterImage.layer.cornerRadius = 10
         posterImage.layer.borderWidth = 0
         posterImage.layer.masksToBounds = true
+        posterImage.contentMode = .scaleAspectFill
         return posterImage
+    }()
+
+    private let mainStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.distribution = .fillProportionally
+        stack.alignment = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
     }()
 
     private let castName: UILabel = {
         let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 2
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .caption1).bold()
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+        label.maximumContentSizeCategory = .accessibilityMedium
+        label.sizeToFit()
+        return label
+    }()
+
+    private let characterName: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 1
         label.font = UIFont.preferredFont(forTextStyle: .caption1)
         label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
         label.sizeToFit()
@@ -79,17 +105,21 @@ final class CastCollectionViewCell: UICollectionViewCell {
 
     func setupCellView() {
         addSubview(posterImage)
-        addSubview(castName)
+        addSubview(mainStack)
+
+        mainStack.addArrangedSubview(castName)
+        mainStack.addArrangedSubview(characterName)
 
         posterImage.topAnchor.constraint(equalTo: topAnchor).isActive = true
         posterImage.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         posterImage.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         posterImage.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.8).isActive = true
 
-        castName.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 2.0).isActive = true
-        castName.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        castName.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        castName.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        mainStack.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 2.0).isActive = true
+        mainStack.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        mainStack.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        mainStack.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
     }
 
     // MARK: Helpers

@@ -1,5 +1,5 @@
 //
-//  SectionFooterReusableView.swift
+//  ActivityIndicatorFooterReusableView.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 8/10/21.
@@ -7,9 +7,9 @@
 
 import UIKit
 
-final class SectionFooterReusableView: UICollectionReusableView {
+final class ActivityIndicatorFooterReusableView: UICollectionReusableView {
 	static var reuseIdentifier: String {
-		return String(describing: SectionFooterReusableView.self)
+		return String(describing: ActivityIndicatorFooterReusableView.self)
 	}
 
 	private let activityIndicator: UIActivityIndicatorView = {

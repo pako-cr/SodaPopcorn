@@ -5,14 +5,14 @@
 //  Created by Francisco Cordoba on 5/11/21.
 //
 
-public final class Poster: Hashable {
-    public var filePath: String?
+public struct Poster: Hashable {
+    let filePath: String?
 
-    private init(filePath: String? = nil) {
+    init(filePath: String? = nil) {
         self.filePath = filePath
     }
 
-    convenience init(apiResponse: PosterApiResponse) {
+    init(apiResponse: PosterApiResponse) {
         self.init(filePath: apiResponse.filePath)
     }
 

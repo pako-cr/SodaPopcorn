@@ -7,9 +7,9 @@
 	<key>BaseURL</key>
 	<dict>
 		<key>production</key>
-		<string>https://api.themoviedb.org/3/movie/</string>
+		<string>https://api.themoviedb.org/3/</string>
 		<key>staging</key>
-		<string>https://staging.themoviedb.org/3/movie/</string>
+		<string>https://staging.themoviedb.org/3/</string>
 	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>

@@ -21,33 +21,7 @@ public final class CastCollectionView: UICollectionViewController {
     private var movieDetailsVM: MovieDetailsVM?
 
     // MARK: - UI Elements
-    private let collectionLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title3).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.text = NSLocalizedString("cast_collection_view_title", comment: "Cast Label")
-        label.sizeToFit()
-        return label
-    }()
-
-    private lazy var moreInfoButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(moreInfoButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("gallery", comment: "Gallert button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        button.setTitle(NSLocalizedString("more", comment: "Gallert button"), for: .normal)
-        button.layer.borderColor = UIColor(named: "PrimaryColor")?.cgColor
-        button.layer.cornerRadius = 10
-        button.layer.borderWidth = 1
-        button.isHidden = true
-        return button
-    }()
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("cast_collection_view_title", comment: "Cast Label"))
 
     init(movieDetailsVM: MovieDetailsVM) {
         self.movieDetailsVM = movieDetailsVM
@@ -66,20 +40,14 @@ public final class CastCollectionView: UICollectionViewController {
     }
 
     func setupUI() {
+        view.translatesAutoresizingMaskIntoConstraints = false
+
         view.addSubview(collectionLabel)
         view.addSubview(collectionView)
-        view.addSubview(moreInfoButton)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        collectionLabel.trailingAnchor.constraint(equalTo: moreInfoButton.leadingAnchor).isActive = true
-        collectionLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8).isActive = true
-        collectionLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2).isActive = true
-
-        moreInfoButton.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        moreInfoButton.leadingAnchor.constraint(equalTo: collectionLabel.trailingAnchor).isActive = true
-        moreInfoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        moreInfoButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
+        collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 
         collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 2.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -112,7 +80,6 @@ public final class CastCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-
             section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
 
             return section
@@ -144,12 +111,9 @@ public final class CastCollectionView: UICollectionViewController {
             var snapshot = self.dataSource.snapshot()
 
             if !cast.isEmpty {
-                self.moreInfoButton.isHidden = false
-                snapshot.appendItems(cast, toSection: .cast)
-
+                self.collectionView.removeEmptyView()
+                snapshot.appendItems(Array(cast.prefix(11)), toSection: .cast)
                 snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
-            } else {
-                snapshot.appendItems([Cast(name: "no_cast")], toSection: .cast)
             }
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
@@ -160,18 +124,20 @@ public final class CastCollectionView: UICollectionViewController {
         guard let cast = dataSource.itemIdentifier(for: indexPath) else { return }
 
         if cast.name == "more_info" {
-            self.moreInfoButtonPressed()
+            self.movieDetailsVM?.inputs.creditsButtonPressed()
         } else {
             self.movieDetailsVM?.inputs.castMemberSelected(cast: cast)
         }
     }
 
-    // MARK: - ⚙️ Helpers
-    @objc
-    private func moreInfoButtonPressed() {
-        movieDetailsVM?.inputs.creditsButtonPressed()
+    func setupEmptyView() {
+        DispatchQueue.main.async { [weak self] in
+            guard let `self` = self else { return }
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_cast", comment: "No cast information"), centeredX: false)
+        }
     }
 
+    // MARK: - ⚙️ Helpers
     func updateCollectionViewData(cast: [Cast]) {
         self.updateDataSource(cast: cast)
     }

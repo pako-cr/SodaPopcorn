@@ -33,7 +33,10 @@ public protocol CreditsVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 
     /// Emits when a cast member is selected.
-    func castMemberAction() -> PassthroughSubject<Cast, Never>
+    func castMemberAction() -> PassthroughSubject<Person, Never>
+
+    /// Emits to return the movie information.
+    func movieAction() -> CurrentValueSubject<Movie, Never>
 }
 
 public protocol CreditsVMTypes: AnyObject {
@@ -43,7 +46,7 @@ public protocol CreditsVMTypes: AnyObject {
 
 public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, CreditsVMOutputs, CreditsVMTypes {
     // MARK: Constants
-    private let movieService: MovieService
+    private let movie: Movie
     private let credits: Credits
 
     // MARK: Variables
@@ -53,8 +56,8 @@ public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, C
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
 
-    public init(movieService: MovieService, credits: Credits) {
-        self.movieService = movieService
+    public init(movie: Movie, credits: Credits) {
+        self.movie = movie
         self.credits = credits
 
         closeButtonPressedProperty.sink { [weak self] _ in
@@ -68,7 +71,8 @@ public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, C
         }.store(in: &cancellable)
 
         castMemberSelectedProperty.sink { [weak self] cast in
-            self?.castMemberActionProperty.send(cast)
+            let person = Person(name: cast.name, id: cast.id)
+            self?.castMemberActionProperty.send(person)
         }.store(in: &cancellable)
     }
 
@@ -109,28 +113,17 @@ public final class CreditsVM: ObservableObject, Identifiable, CreditsVMInputs, C
         return showErrorProperty
     }
 
-    private let castMemberActionProperty = PassthroughSubject<Cast, Never>()
-    public func castMemberAction() -> PassthroughSubject<Cast, Never> {
+    private let castMemberActionProperty = PassthroughSubject<Person, Never>()
+    public func castMemberAction() -> PassthroughSubject<Person, Never> {
         return castMemberActionProperty
     }
 
-    // MARK: - ⚙️ Helpers
-    private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        var localizedErrorString: String
-
-        switch networkResponse {
-
-        case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
-        case .badRequest: localizedErrorString = "network_response_error_bad_request"
-        case .outdated: localizedErrorString = "network_response_error_outdated"
-        case .failed: localizedErrorString = "network_response_error_failed"
-        case .noData: localizedErrorString = "network_response_error_no_data"
-        case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
-        default: localizedErrorString = "network_response_error_failed"
-        }
-
-        self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
+    private lazy var movieActionProperty = CurrentValueSubject<Movie, Never>(self.movie)
+    public func movieAction() -> CurrentValueSubject<Movie, Never> {
+        return movieActionProperty
     }
+
+    // MARK: - ⚙️ Helpers
 
     // MARK: - 🗑 Deinit
     deinit {

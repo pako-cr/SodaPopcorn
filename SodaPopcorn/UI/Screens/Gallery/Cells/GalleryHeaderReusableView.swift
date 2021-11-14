@@ -12,17 +12,7 @@ final class GalleryHeaderReusableView: UICollectionReusableView {
         return String(describing: GalleryHeaderReusableView.self)
     }
 
-    private let headerLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .title1).bold()
-        label.textAlignment = .natural
-        label.adjustsFontForContentSizeCategory = true
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.sizeToFit()
-        return label
-    }()
+    private let headerLabel = CustomTitleLabelView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,10 +22,9 @@ final class GalleryHeaderReusableView: UICollectionReusableView {
         addSubview(headerLabel)
 
         NSLayoutConstraint.activate([
-            headerLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            headerLabel.topAnchor.constraint(equalTo: topAnchor),
-            headerLabel.widthAnchor.constraint(equalTo: widthAnchor),
-            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0)
+            headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
+            headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 

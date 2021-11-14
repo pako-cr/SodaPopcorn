@@ -29,18 +29,6 @@ final class GalleryVC: BaseViewController {
     private var showErrorSubscription: Cancellable!
 
     // MARK: UI Elements
-    private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        let button = UIButton(type: .system)
-        button.setImage(image, for: .normal)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        return button
-    }()
-
     private var customCollectionView: UICollectionView!
 
     init(viewModel: GalleryVM) {
@@ -56,9 +44,9 @@ final class GalleryVC: BaseViewController {
         configureCollectionView()
         configureDataSource()
         setInitialData()
-        setupUI()
-        bindViewModel()
+        super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
+        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
@@ -69,17 +57,20 @@ final class GalleryVC: BaseViewController {
 
     override func setupUI() {
         view.addSubview(customCollectionView)
-        view.addSubview(closeButton)
 
-        closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        customCollectionView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 10).isActive = true
+        customCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         customCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         customCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         customCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+
+    private func setupNavigationBar() {
+        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
+
+        title = NSLocalizedString("gallery", comment: "Gallery")
     }
 
     override func bindViewModel() {
@@ -90,7 +81,7 @@ final class GalleryVC: BaseViewController {
             })
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         customCollectionView.register(BackdropCollectionViewCell.self, forCellWithReuseIdentifier: BackdropCollectionViewCell.reuseIdentifier)
@@ -178,14 +169,14 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.05))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(horizontal: 5.0, vertical: 0.0)
+        sectionHeader.contentInsets = .init(horizontal: 20.0, vertical: 0.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -209,14 +200,14 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .uniform(size: 5.0)
+        sectionHeader.contentInsets = .init(header: 20.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -240,23 +231,23 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(45))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .uniform(size: 5.0)
+        sectionHeader.contentInsets = .init(header: 20.0)
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
     }
 
     private func setInitialData() {
-        var snapshot = self.dataSource.snapshot()
+        var snapshot = dataSource.snapshot()
         snapshot.appendSections(Section.allCases)
-        self.dataSource.apply(snapshot, animatingDifferences: false)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 
     private func updateDataSource(gallery: Gallery, animatingDifferences: Bool = true) {
@@ -297,6 +288,11 @@ final class GalleryVC: BaseViewController {
         if let url = URL(string: "https://www.youtube.com/watch?v=\(videoURL)") {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
+    }
+
+    // MARK: - 🗑 Deinit
+    deinit {
+        print("🗑", "GalleryVC deinit.")
     }
 }
 

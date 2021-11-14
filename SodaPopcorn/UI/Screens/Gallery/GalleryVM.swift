@@ -64,7 +64,6 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
-    private var gallery = Gallery()
 
     public init(movieService: MovieService, movie: Movie) {
         self.movieService = movieService
@@ -90,7 +89,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
             .flatMap { [weak self] _ -> AnyPublisher<MovieImages, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.getImages(movieId: self.movie.id ?? "")
+                return movieService.movieImages(movieId: self.movie.id ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [GalleryVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -105,7 +104,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
             .flatMap { [weak self] _ -> AnyPublisher<Videos, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.getVideos(movieId: self.movie.id ?? "")
+                return movieService.movieVideos(movieId: self.movie.id ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [GalleryVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -126,22 +125,27 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
                     self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
                 default: break
                 }
-            }, receiveValue: { [weak self] (movieImages, videos) in
+            }, receiveValue: { [weak self] (movieImages, movieVideos) in
                 guard let `self` = self else { return }
 
-                if let backdrops = movieImages.backdrops, !backdrops.isEmpty {
-                    self.gallery.backdrops = backdrops
+                var videos: [Video] = []
+                var backdrops: [Backdrop] = []
+                var posters: [Poster] = []
+
+                if let movieBackdrops = movieImages.backdrops, !movieBackdrops.isEmpty {
+                    backdrops = movieBackdrops
                 }
 
-                if let posters = movieImages.posters, !posters.isEmpty {
-                    self.gallery.posters = posters
+                if let moviePosters = movieImages.posters, !moviePosters.isEmpty {
+                    posters = moviePosters
                 }
 
-                if let videos = videos.results {
-                    self.gallery.videos = videos
+                if let movieVideos = movieVideos.results {
+                    videos = movieVideos
                 }
 
-                self.galleryActionProperty.send(self.gallery)
+                let gallery = Gallery(videos: videos, backdrops: backdrops, posters: posters)
+                self.galleryActionProperty.send(gallery)
             }).store(in: &cancellable)
     }
 

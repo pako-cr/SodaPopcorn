@@ -28,18 +28,6 @@ final class CreditsVC: BaseViewController {
     private var showErrorSubscription: Cancellable!
 
     // MARK: UI Elements
-    private lazy var closeButton: UIButton = {
-        let image = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        let button = UIButton(type: .system)
-        button.setImage(image, for: .normal)
-        button.contentMode = .scaleAspectFit
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        button.accessibilityLabel = NSLocalizedString("close", comment: "Close button")
-        button.tintColor = UIColor(named: "PrimaryColor")
-        return button
-    }()
-
     private var customCollectionView: UICollectionView!
 
     init(viewModel: CreditsVM) {
@@ -55,9 +43,9 @@ final class CreditsVC: BaseViewController {
         configureCollectionView()
         configureDataSource()
         setInitialData()
-        setupUI()
-        bindViewModel()
+        super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
+        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
@@ -68,17 +56,18 @@ final class CreditsVC: BaseViewController {
 
     override func setupUI() {
         view.addSubview(customCollectionView)
-        view.addSubview(closeButton)
 
-        closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        customCollectionView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 10).isActive = true
+        customCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         customCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         customCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         customCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+
+    private func setupNavigationBar() {
+        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     override func bindViewModel() {
@@ -145,7 +134,7 @@ final class CreditsVC: BaseViewController {
                                                   heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .uniform(size: 5.0)
+            item.contentInsets = .uniform(size: 2.0)
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -158,14 +147,14 @@ final class CreditsVC: BaseViewController {
             // Supplementary header view setup
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(45))
+                heightDimension: .absolute(UIScreen.main.bounds.height * 0.05))
 
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top)
 
-            sectionHeader.contentInsets = .uniform(size: 5.0)
+            sectionHeader.contentInsets = .init(horizontal: 20.0, vertical: 0.0)
             section.boundarySupplementaryItems = [sectionHeader]
 
             return section
@@ -204,6 +193,11 @@ final class CreditsVC: BaseViewController {
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
+    }
+
+    // MARK: - 🗑 Deinit
+    deinit {
+        print("🗑", "CreditsVC deinit.")
     }
 }
 

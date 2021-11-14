@@ -77,8 +77,6 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
         viewModel.inputs.viewDidLoad()
     }
 
@@ -112,11 +110,11 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
         closeButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        posterImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        posterImage.topAnchor.constraint(equalTo: closeButton.bottomAnchor).isActive = true
         posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         posterImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         posterImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.0).isActive = true
+        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.9).isActive = true
 
         handleGestureRecongnizers()
     }
@@ -134,7 +132,7 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(presentImageOptionsActionSheet))
         longPressRecognizer.minimumPressDuration = 1.0
 
-        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomOutAction))
+        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapGestureZoomAction))
         doubleTapRecognizer.numberOfTapsRequired = 2
 
         posterImage.isUserInteractionEnabled = true
@@ -149,8 +147,9 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     }
 
     @objc
-    private func tapGestureZoomOutAction(recognizer: UITapGestureRecognizer) {
-        scrollView.setZoomScale(1.0, animated: true)
+    private func tapGestureZoomAction(recognizer: UITapGestureRecognizer) {
+        let zoomScale = scrollView.zoomScale > 5.0 ? 1.0 : 10.0
+        scrollView.setZoomScale(zoomScale, animated: true)
     }
 
     @objc

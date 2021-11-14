@@ -7,7 +7,7 @@
  */
 
 "app_name" = "SodaPopcorn";
-"app_name_with_icon" = "SodaPopcorn 🍿";
+"app_name_with_icon" = "Soda&Popcorn 🍿";
 "movie_list_view_controller_no_movies_to_show_title_label" = "No movies to show 🙁";
 "movie_list_view_controller_no_movies_to_show_description_label" = "Check your network connection \n and pull to refresh ↕️";
 "movie_list_view_controller_loading_movies_title_label" = "Loading movies... ⏰";
@@ -41,7 +41,7 @@
 "gallery" = "Gallery";
 "gallery_view_backdrops_header" = "Backdrops";
 "gallery_view_posters_header" = "Posters";
-"gallery_view_videos_header" = "Videos";
+"gallery_view_videos_header" = "Trailers/Videos";
 "poster_collection_view_cell_no_posters" = "No posters";
 "poster_collection_view_cell_no_backdrops" = "No backdrops";
 "poster_collection_view_cell_no_videos" = "No videos";
@@ -51,5 +51,19 @@
 "more" = "More";
 "credits_vc_cast_header" = "Cast";
 "credits_vc_crew_header" = "Crew";
-"no_cast" = "No info";
-"more_info" = "More ➡️";
+"no_cast" = "No cast to display";
+"more_info" = "More...";
+"person_years_old" = " (%@ years old)";
+"birthdate" = "Birthdate";
+"place_of_birth" = "Place of Birth";
+"description" = "Description";
+"no_biography_found" = "No biography found";
+"known_for_collection_view_title" = "Known for";
+"biography" = "Biography";
+"no_social_networks" = "No social networks to display";
+"no_person_movies" = "No movies to display";
+"no_person_images" = "No images to display";
+"person_appears_on" = "%@ appears on";
+"website" = "Website";
+"no_information" = "No information";
+"person_gallery" = "%@'s gallery";

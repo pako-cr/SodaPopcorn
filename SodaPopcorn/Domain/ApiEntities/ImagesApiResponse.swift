@@ -5,21 +5,17 @@
 //  Created by Francisco Cordoba on 6/11/21.
 //
 
-import Foundation
+public struct ImagesApiResponse: Decodable {
+    let id: String?
+    let backdropsApiResponse: [BackdropApiResponse]?
+    let postersApiResponse: [PosterApiResponse]?
 
-public final class ImagesApiResponse: Codable {
-    public var id: String?
-    public var backdropsApiResponse: [BackdropApiResponse]?
-    public var postersApiResponse: [PosterApiResponse]?
-
-    private enum ImagesApiResponseCodingKeys: String, CodingKey {
-        case id
-        case backdrops
-        case posters
+    private enum CodingKeys: String, CodingKey {
+        case id, backdrops, posters
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: ImagesApiResponseCodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try String(container.decode(Int.self, forKey: .id))
         backdropsApiResponse = try container.decodeIfPresent([BackdropApiResponse].self, forKey: .backdrops)
