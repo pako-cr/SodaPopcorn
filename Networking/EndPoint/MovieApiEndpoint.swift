@@ -14,6 +14,7 @@ public enum MovieApiEndpoint {
     case movieImages(movieId: String)
     case movieExternalIds(movieId: String)
     case movieCredits(movieId: String)
+    case movieSimilarMovies(movieId: String, page: Int)
     case person(personId: String)
     case personMovieCredits(personId: String)
     case personExternalIds(personId: String)
@@ -71,6 +72,8 @@ extension MovieApiEndpoint: EndPointType {
             return "\(movieId)/external_ids"
         case .movieCredits(let movieId):
             return "\(movieId)/credits"
+        case .movieSimilarMovies(let movieId, _):
+            return "\(movieId)/similar"
         case .person(let personId):
             return "\(personId)"
         case .personMovieCredits(let personId):
@@ -88,7 +91,7 @@ extension MovieApiEndpoint: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .moviesNowPlaying(let page):
+        case .moviesNowPlaying(let page), .movieSimilarMovies(_, let page):
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["page": page,

@@ -89,4 +89,8 @@ final class CustomPosterImage: UIImageView {
     func setUrlString(urlString: String) {
         self.urlString = urlString
     }
+
+    func stopActivityIndicator() {
+        self.activityIndicatorView.stopAnimating()
+    }
 }

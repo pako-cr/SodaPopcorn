@@ -34,18 +34,21 @@ final class PersonDetailsVC: BaseViewController {
                 }
 
                 // Birthday
-                if let birthday = person.birthday, !birthday.isEmpty {
-                    self.birthdayValue.text = birthday
+                if let birthdate = person.birthday, !birthdate.isEmpty {
+                    var birthdateString = birthdate
 
-                    if let personAge = self.calculatePersonAge(birthday: birthday) {
+                    if let personAge = self.calculatePersonAge(birthday: birthdate) {
                         let yearsOld = String(format: NSLocalizedString("person_years_old", comment: "Person age"), personAge.description)
-                        self.birthdayValue.text?.append(yearsOld)
+                        birthdateString.append(yearsOld)
+
                     }
+
+                    self.birthdateHeaderValue.setValue(value: birthdateString)
                 }
 
                 // Place of birth
                 if let placeOfBirth = person.placeOfBirth, !placeOfBirth.isEmpty {
-                    self.placeOfBirthValue.text = placeOfBirth
+                    self.placeOfBirthHeaderValue.setValue(value: placeOfBirth)
                 }
 
                 // Biography
@@ -97,69 +100,19 @@ final class PersonDetailsVC: BaseViewController {
         label.adjustsFontSizeToFitWidth = true
         label.adjustsFontForContentSizeCategory = true
         label.sizeToFit()
-        label.text = NSLocalizedString("not_applicable", comment: "Not applicable")
+        label.text = NSLocalizedString("no_information", comment: "No information")
         label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
-    private let birthdayLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.adjustsFontForContentSizeCategory = true
-        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        label.text = NSLocalizedString("birthdate", comment: "Not applicable")
-        label.textColor = UIColor.darkGray
-        label.sizeToFit()
-        return label
-    }()
+    private let birthdateHeaderValue = CustomPersonHeaderValueView(header: NSLocalizedString("birthdate", comment: "Birthdate label"))
 
-    private let birthdayValue: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textAlignment = .natural
-        label.adjustsFontSizeToFitWidth = true
-        label.adjustsFontForContentSizeCategory = true
-        label.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        label.sizeToFit()
-        label.text = NSLocalizedString("not_applicable", comment: "Not applicable")
-        return label
-    }()
-
-    private let placeOfBirthLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.numberOfLines = 1
-        label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
-        label.textAlignment = .natural
-        label.maximumContentSizeCategory = .accessibilityMedium
-        label.adjustsFontForContentSizeCategory = true
-        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        label.text = NSLocalizedString("place_of_birth", comment: "Not applicable")
-        label.textColor = UIColor.darkGray
-        label.sizeToFit()
-        return label
-    }()
-
-    private let placeOfBirthValue: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.numberOfLines = 2
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textAlignment = .natural
-        label.adjustsFontSizeToFitWidth = true
-        label.adjustsFontForContentSizeCategory = true
-        label.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        label.sizeToFit()
-        label.text = NSLocalizedString("not_applicable", comment: "Not applicable")
-        return label
-    }()
+    private let placeOfBirthHeaderValue = CustomPersonHeaderValueView(header: NSLocalizedString("place_of_birth", comment: "Place of birth"))
 
     private let biographyLabel = CustomTitleLabelView(titleText: NSLocalizedString("biography", comment: "Overview Label"))
 
-    private let biographyValue = CustomTextView(customText: NSLocalizedString("no_biography_found", comment: "No biograpghy"))
+    private let biographyValue = CustomTextView(customText: NSLocalizedString("no_information", comment: "No information"))
 
     private lazy var personGalleryCollectionView = PersonGalleryCollectionView(viewModel: self.viewModel)
 
@@ -206,10 +159,8 @@ final class PersonDetailsVC: BaseViewController {
         contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
 
         headerStack.addArrangedSubview(personNameLabel)
-        headerStack.addArrangedSubview(birthdayLabel)
-        headerStack.addArrangedSubview(birthdayValue)
-        headerStack.addArrangedSubview(placeOfBirthLabel)
-        headerStack.addArrangedSubview(placeOfBirthValue)
+        headerStack.addArrangedSubview(birthdateHeaderValue)
+        headerStack.addArrangedSubview(placeOfBirthHeaderValue)
 
         contentView.addSubview(posterImage)
         contentView.addSubview(headerStack)

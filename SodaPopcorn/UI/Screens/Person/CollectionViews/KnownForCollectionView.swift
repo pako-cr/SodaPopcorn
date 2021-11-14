@@ -138,7 +138,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_movies", comment: "No person movies"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

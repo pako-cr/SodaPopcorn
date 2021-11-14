@@ -47,7 +47,7 @@ final class HomeCoordinator: Coordinator {
 		let viewController = NowPlayingMoviesVC(viewModel: viewModel)
         let navigationController = NavigationController(rootViewController: viewController)
 
-        navigationController.tabBarItem = UITabBarItem(title: "Now Playing", image: UIImage(systemName: "film.fill"), tag: 0)
+        navigationController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "film.fill"), tag: 0)
 
 		homeVC?.viewControllers = [navigationController]
 		homeVC?.selectedIndex = 0
@@ -98,6 +98,11 @@ final class HomeCoordinator: Coordinator {
             .sink { [weak self] person in
                 guard let `self` = self else { return }
                 self.showPersonDetailsView(with: person, on: navigationController)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                self?.showMovieDetails(movie: movie, with: navigationController)
             }.store(in: &cancellable)
 	}
 
@@ -273,6 +278,11 @@ final class HomeCoordinator: Coordinator {
             .sink { [weak self] person in
                 guard let `self` = self else { return }
                 self.showPersonDetailsView(with: person, on: navigationController)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                self?.showMovieDetails(movie: movie, with: navigationController)
             }.store(in: &cancellable)
     }
 

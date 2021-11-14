@@ -37,7 +37,7 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
 
                 self.movieOverview.text = !(movie.overview?.isEmpty ?? true)
                 ? movie.overview
-                : NSLocalizedString("movie_list_collection_view_cell_no_overview_found", comment: "")
+                : NSLocalizedString("no_information", comment: "No information")
 
 				self.sizeToFit()
 			}

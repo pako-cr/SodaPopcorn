@@ -87,7 +87,7 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 				switch completionReceived {
 					case .failure(let error):
 						print("🔴 [NowPlayingMoviesVM] [init] Received completion error. Error: \(error.localizedDescription)")
-						self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+						self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
 					default: break
 				}
 			}, receiveValue: { [weak self] movies in
@@ -149,22 +149,10 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 	}
 
 	// MARK: - ⚙️ Helpers
-	private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-		var localizedErrorString: String
-
-		switch networkResponse {
-
-			case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
-			case .badRequest: localizedErrorString = "network_response_error_bad_request"
-			case .outdated: localizedErrorString = "network_response_error_outdated"
-			case .failed: localizedErrorString = "network_response_error_failed"
-			case .noData: localizedErrorString = "network_response_error_no_data"
-			case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
-			default: localizedErrorString = "network_response_error_failed"
-		}
-
-		self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
-	}
+    private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
+        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
+    }
 
 	// MARK: - 🗑 Deinit
 	deinit {

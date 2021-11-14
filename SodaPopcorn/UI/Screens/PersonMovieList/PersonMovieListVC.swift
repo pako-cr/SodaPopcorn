@@ -112,18 +112,6 @@ final class PersonMovieListVC: BaseViewController {
 
             let section = NSCollectionLayoutSection(group: group)
 
-            // Supplementary footer view setup
-            let headerFooterSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(20))
-
-            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerFooterSize,
-                elementKind: UICollectionView.elementKindSectionFooter,
-                alignment: .bottom)
-
-            section.boundarySupplementaryItems = [sectionFooter]
-
             return section
         })
     }

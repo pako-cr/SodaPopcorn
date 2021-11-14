@@ -62,7 +62,7 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
-        collectionView.isScrollEnabled = true
+        collectionView.isScrollEnabled = false
         collectionView.alwaysBounceHorizontal = true
         collectionView.backgroundColor = .clear
     }
@@ -137,7 +137,7 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_images", comment: "No images to display"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

@@ -169,14 +169,15 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.05))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.075))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(horizontal: 20.0, vertical: 0.0)
+        sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -200,14 +201,15 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.075))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(header: 20.0)
+        sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -231,14 +233,15 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
+            heightDimension: .absolute(UIScreen.main.bounds.height * 0.075))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(header: 20.0)
+        sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section

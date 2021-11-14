@@ -22,7 +22,7 @@ final class CreditsHeaderReusableView: UICollectionReusableView {
         addSubview(headerLabel)
 
         NSLayoutConstraint.activate([
-            headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             headerLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             headerLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])

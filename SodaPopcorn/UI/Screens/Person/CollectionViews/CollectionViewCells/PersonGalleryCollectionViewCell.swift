@@ -26,6 +26,7 @@ final class PersonGalleryCollectionViewCell: UICollectionViewCell {
 
                     self.posterImage.image = image
                     self.posterImage.contentMode = .scaleAspectFit
+                    self.posterImage.stopActivityIndicator()
 
                 } else {
                     if let profilePath = personImage.filePath {

@@ -50,6 +50,10 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.movieCredits(movieId: movieId)
     }
 
+    public func movieSimilarMovies(movieId: String, page: Int? = nil) -> AnyPublisher<Movies, NetworkResponse> {
+        return movieNetworkService.movieSimilarMovies(movieId: movieId, page: page)
+    }
+
     public func personDetails(personId: String) -> AnyPublisher<Person, NetworkResponse> {
         return movieNetworkService.personDetails(personId: personId)
     }

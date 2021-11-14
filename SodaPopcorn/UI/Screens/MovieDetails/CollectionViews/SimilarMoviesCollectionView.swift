@@ -1,28 +1,30 @@
 //
-//  SocialNetworksCollectionView.swift
+//  SimilarMoviesCollectionView.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 7/11/21.
+//  Created by Francisco Cordoba on 13/11/21.
 //
 
 import UIKit
 
-public final class SocialNetworksCollectionView: UICollectionViewController {
+public final class SimilarMoviesCollectionView: UICollectionViewController {
     enum Section: CaseIterable {
-        case socialNetworks
+        case movies
     }
 
     // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, SocialNetwork>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, SocialNetwork>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, Movie>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
 
     // MARK: - Variables
     private var dataSource: DataSource!
+    private var viewModel: MovieDetailsVM?
 
     // MARK: - UI Elements
-    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("movie_details_vc_homepage_label", comment: "Homepage label"))
+    private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("similar_movies", comment: "Similar movies"))
 
-    init() {
+    init(viewModel: MovieDetailsVM) {
+        self.viewModel = viewModel
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
 
@@ -40,14 +42,14 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     func setupUI() {
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(collectionView)
         view.addSubview(collectionLabel)
+        view.addSubview(collectionView)
 
         collectionLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         collectionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 
-        collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 10.0).isActive = true
+        collectionView.topAnchor.constraint(equalTo: collectionLabel.bottomAnchor, constant: 2.0).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -56,37 +58,42 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
-        collectionView.register(SocialNetworksCollectionViewCell.self, forCellWithReuseIdentifier: SocialNetworksCollectionViewCell.reuseIdentifier)
+        collectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
         collectionView.isScrollEnabled = false
+        collectionView.alwaysBounceHorizontal = true
         collectionView.backgroundColor = .clear
     }
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33333), heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3333), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = .small()
 
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                   heightDimension: .absolute(60.0))
+                                                   heightDimension: .fractionalHeight(1.0))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
             let section = NSCollectionLayoutSection(group: group)
+
+            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
 
             return section
         })
     }
 
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<SocialNetworksCollectionViewCell, SocialNetwork> { cell, _, socialNetwork in
-            cell.configure(with: socialNetwork)
+        let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
+            cell.configure(with: movie)
         }
 
-        let dataSource = UICollectionViewDiffableDataSource<Section, SocialNetwork>(collectionView: collectionView) { (collectionView, indexPath, imageURL) in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: imageURL)
+        let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: collectionView) { (collectionView, indexPath, movie) in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
         }
 
         self.dataSource = dataSource
@@ -98,15 +105,15 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
         self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func updateDataSource(socialNetworks: [SocialNetwork]?, animatingDifferences: Bool = true) {
+    private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
 
-            if let socialNetworks = socialNetworks, !socialNetworks.isEmpty {
+            if !movies.isEmpty {
                 self.collectionView.removeEmptyView()
-                snapshot.appendItems(socialNetworks, toSection: .socialNetworks)
+                snapshot.appendItems(Array(movies.prefix(18)), toSection: .movies)
             }
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
@@ -114,36 +121,18 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     }
 
     override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let socialNetwork = dataSource.itemIdentifier(for: indexPath) else { return }
-        self.openSocialNetwork(socialNetwork: socialNetwork)
+        guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
+        self.viewModel?.inputs.movieSelected(movie: movie)
     }
 
     // MARK: - ⚙️ Helpers
-    func updateCollectionViewData(socialNetworks: SocialNetworks) {
-        self.updateDataSource(socialNetworks: socialNetworks.networks)
-    }
-
-    private func openSocialNetwork(socialNetwork: SocialNetwork) {
-        var homeUrl = ""
-
-        switch socialNetwork {
-        case .instagram(let userId):
-            homeUrl = "https://www.instagram.com/\(userId)"
-        case .facebook(let userId):
-            homeUrl = "https://www.facebook.com/\(userId)"
-        case .twitter(let userId):
-            homeUrl = "https://www.twitter.com/\(userId)"
-        }
-
-        if let url = URL(string: homeUrl) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
+    func updateCollectionViewData(movies: [Movie]) {
+        self.updateDataSource(movies: movies)
     }
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
-            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

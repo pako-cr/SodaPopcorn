@@ -29,6 +29,12 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when the movie's overview is pressed.
     func overviewTextPressed()
+
+    /// Call when the similar movies button is pressed.
+    func similarMoviesButtonPressed()
+
+    /// Call when a movie is selected from the movie details.
+    func movieSelected(movie: Movie)
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -61,6 +67,15 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when the movie's overview is pressed.
     func overviewTextAction() -> PassthroughSubject<String, Never>
+
+    /// Emits to return the similar movies.
+    func similarMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
+
+    /// Emits when the similar movies button is pressed.
+    func similarMoviesButtonAction() -> PassthroughSubject<[Movie], Never>
+
+    /// Emits when a movie is selected.
+    func movieSelectedAction() -> PassthroughSubject<Movie, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -114,6 +129,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
             self.overviewTextActionProperty.send(overview)
         }.store(in: &cancellable)
 
+        similarMoviesButtonPressedProperty.sink { [weak self] _ in
+            if let movies = self?.similarMoviesActionProperty.value {
+                self?.similarMoviesButtonActionProperty.send(movies)
+            }
+        }.store(in: &cancellable)
+
+        movieSelectedProperty.sink { [weak self] (movie) in
+            self?.movieSelectedActionProperty.send(movie)
+        }.store(in: &cancellable)
+
         let movieDetailsEvent = viewDidLoadProperty
             .flatMap { [weak self] _ -> AnyPublisher<Movie, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
@@ -140,7 +165,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] movieDetails in
@@ -173,7 +198,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] socialNetworks in
@@ -204,13 +229,43 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] credits in
                 guard let `self` = self else { return }
                 self.creditsActionProperty.value = credits
 
+            }).store(in: &cancellable)
+
+        let similarMoviesEvent = viewDidLoadProperty
+            .flatMap { [weak self] _ -> AnyPublisher<Movies, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                return movieService.movieSimilarMovies(movieId: self.movie.id ?? "")
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+                        self?.loadingProperty.value = false
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Movies())
+                    .eraseToAnyPublisher()
+            }.share()
+
+        similarMoviesEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] movieDetails in
+                guard let `self` = self else { return }
+                self.similarMoviesActionProperty.value = movieDetails.movies
             }).store(in: &cancellable)
 	}
 
@@ -253,6 +308,16 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let overviewTextPressedProperty = PassthroughSubject<Void, Never>()
     public func overviewTextPressed() {
         overviewTextPressedProperty.send()
+    }
+
+    private let similarMoviesButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func similarMoviesButtonPressed() {
+        similarMoviesButtonPressedProperty.send(())
+    }
+
+    private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
+    public func movieSelected(movie: Movie) {
+        movieSelectedProperty.send(movie)
     }
 
 	// MARK: - ⬆️ OUTPUTS Definition
@@ -306,21 +371,25 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return overviewTextActionProperty
     }
 
+    private let similarMoviesButtonActionProperty = PassthroughSubject<[Movie], Never>()
+    public func similarMoviesButtonAction() -> PassthroughSubject<[Movie], Never> {
+        return similarMoviesButtonActionProperty
+    }
+
+    private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()
+    public func movieSelectedAction() -> PassthroughSubject<Movie, Never> {
+        return movieSelectedActionProperty
+    }
+
+    private let similarMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
+    public func similarMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
+        return similarMoviesActionProperty
+    }
+
 	// MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        var localizedErrorString: String
-
-        switch networkResponse {
-            case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
-            case .badRequest: localizedErrorString = "network_response_error_bad_request"
-            case .outdated: localizedErrorString = "network_response_error_outdated"
-            case .failed: localizedErrorString = "network_response_error_failed"
-            case .noData: localizedErrorString = "network_response_error_no_data"
-            case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
-            default: localizedErrorString = "network_response_error_failed"
-        }
-
-        self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
+        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 
 	// MARK: - 🗑 Deinit
