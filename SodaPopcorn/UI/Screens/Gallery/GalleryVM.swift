@@ -132,12 +132,12 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
                 var backdrops: [Backdrop] = []
                 var posters: [Poster] = []
 
-                if let movieBackdrops = movieImages.backdrops, !movieBackdrops.isEmpty {
-                    backdrops = movieBackdrops
+                if let defaultBackdrop = movie.backdropPath, !defaultBackdrop.isEmpty {
+                    backdrops.append(Backdrop(filePath: defaultBackdrop))
+                }
 
-                    if !backdrops.contains(where: { $0.filePath == movie.backdropPath }) {
-                        backdrops.insert(Backdrop(filePath: movie.backdropPath), at: 0)
-                    }
+                if let movieBackdrops = movieImages.backdrops, !movieBackdrops.isEmpty {
+                    backdrops.append(contentsOf: movieBackdrops)
                 }
 
                 if let moviePosters = movieImages.posters, !moviePosters.isEmpty {

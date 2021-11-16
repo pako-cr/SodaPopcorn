@@ -18,6 +18,12 @@ final class PersonDetailsVC: BaseViewController {
     private var imagesSubscription: Cancellable!
     private var socialNetworksSubscription: Cancellable!
 
+    // MARK: Constraints
+    private var profileImageHeightAnchor: NSLayoutConstraint?
+    private var galleryCollectionViewHeightAnchor: NSLayoutConstraint?
+    private var knownForCollectionViewHeightAnchor: NSLayoutConstraint?
+    private var socialNetworksHeightAnchor: NSLayoutConstraint?
+
     private var person: Person? {
         didSet {
             DispatchQueue.main.async { [weak self] in
@@ -25,7 +31,7 @@ final class PersonDetailsVC: BaseViewController {
 
                 // Poster
                 if let posterImageUrl = person.profilePath {
-                    self.posterImage.setUrlString(urlString: posterImageUrl)
+                    self.profileImage.setUrlString(urlString: posterImageUrl)
                 }
 
                 // Title
@@ -81,7 +87,7 @@ final class PersonDetailsVC: BaseViewController {
         return contentView
     }()
 
-    private let posterImage = CustomPosterImage(frame: .zero)
+    private let profileImage = CustomProfileImage(frame: .zero)
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -114,7 +120,7 @@ final class PersonDetailsVC: BaseViewController {
 
     private let biographyValue = CustomTextView(customText: NSLocalizedString("no_information", comment: "No information"))
 
-    private lazy var personGalleryCollectionView = PersonGalleryCollectionView(viewModel: self.viewModel)
+    private lazy var galleryCollectionView = PersonGalleryCollectionView(viewModel: self.viewModel)
 
     private lazy var knownForCollectionView = KnownForCollectionView(viewModel: self.viewModel)
 
@@ -141,6 +147,11 @@ final class PersonDetailsVC: BaseViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+
+        profileImageHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3)
+        galleryCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
+        knownForCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.35)
+        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
     }
 
     override func setupUI() {
@@ -162,26 +173,27 @@ final class PersonDetailsVC: BaseViewController {
         headerStack.addArrangedSubview(birthdateHeaderValue)
         headerStack.addArrangedSubview(placeOfBirthHeaderValue)
 
-        contentView.addSubview(posterImage)
+        contentView.addSubview(profileImage)
         contentView.addSubview(headerStack)
         contentView.addSubview(biographyLabel)
         contentView.addSubview(biographyValue)
-        contentView.addSubview(personGalleryCollectionView.view)
+        contentView.addSubview(galleryCollectionView.view)
         contentView.addSubview(knownForCollectionView.view)
         contentView.addSubview(socialNetworksCollectionView.view)
         contentView.addSubview(websiteInformation)
 
-        posterImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        posterImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        posterImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.3333).isActive = true
-        posterImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        profileImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        profileImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        profileImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.3333).isActive = true
+        profileImageHeightAnchor = profileImage.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3))
+        profileImageHeightAnchor?.isActive = true
 
         headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
-        headerStack.leadingAnchor.constraint(equalTo: posterImage.trailingAnchor, constant: 10).isActive = true
+        headerStack.leadingAnchor.constraint(equalTo: profileImage.trailingAnchor, constant: 10).isActive = true
         headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        headerStack.bottomAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 0).isActive = true
+        headerStack.bottomAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 0).isActive = true
 
-        biographyLabel.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 20).isActive = true
+        biographyLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 20).isActive = true
         biographyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         biographyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
 
@@ -190,25 +202,28 @@ final class PersonDetailsVC: BaseViewController {
         biographyValue.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         biographyValue.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25).isActive = true
 
-        personGalleryCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
-        personGalleryCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        personGalleryCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        personGalleryCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        galleryCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
+        galleryCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+        galleryCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        galleryCollectionViewHeightAnchor = galleryCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3))
+        galleryCollectionViewHeightAnchor?.isActive = true
 
-        knownForCollectionView.view.topAnchor.constraint(equalTo: personGalleryCollectionView.view.bottomAnchor, constant: 20).isActive = true
+        knownForCollectionView.view.topAnchor.constraint(equalTo: galleryCollectionView.view.bottomAnchor, constant: 20).isActive = true
         knownForCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         knownForCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        knownForCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.35).isActive = true
+        knownForCollectionViewHeightAnchor = knownForCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.35))
+        knownForCollectionViewHeightAnchor?.isActive = true
 
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: knownForCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
+        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15))
+        socialNetworksHeightAnchor?.isActive = true
 
         websiteInformation.topAnchor.constraint(equalTo: socialNetworksCollectionView.view.bottomAnchor, constant: 20).isActive = true
         websiteInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         websiteInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+        websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
         websiteInformation.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
@@ -244,10 +259,10 @@ final class PersonDetailsVC: BaseViewController {
         imagesSubscription = viewModel.outputs.personImagesAction()
             .sink(receiveValue: { [weak self] personImages in
                 guard let `self` = self else { return }
-                if let images = personImages {
-                    self.personGalleryCollectionView.updateCollectionViewData(images: images)
+                if let images = personImages, !images.isEmpty {
+                    self.galleryCollectionView.updateCollectionViewData(images: images)
                 } else {
-                    self.personGalleryCollectionView.setupEmptyView()
+                    self.galleryCollectionView.setupEmptyView()
                 }
 
             })

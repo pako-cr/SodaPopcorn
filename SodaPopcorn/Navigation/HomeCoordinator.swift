@@ -43,13 +43,21 @@ final class HomeCoordinator: Coordinator {
     func start() {
 		self.homeVC = HomeVC()
 
-		let viewModel = NowPlayingMoviesVM(movieService: movieService)
-		let viewController = NowPlayingMoviesVC(viewModel: viewModel)
-        let navigationController = NavigationController(rootViewController: viewController)
+        // Home
+		let nowPlayingMoviesVM = NowPlayingMoviesVM(movieService: movieService)
+		let nowPlayingMoviesVC = NowPlayingMoviesVC(viewModel: nowPlayingMoviesVM)
+        let nowPlayingNavigationController = NavigationController(rootViewController: nowPlayingMoviesVC)
 
-        navigationController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "film.fill"), tag: 0)
+        nowPlayingNavigationController.tabBarItem = UITabBarItem(title: NSLocalizedString("home", comment: "Home"), image: UIImage(systemName: "film.fill"), tag: 0)
 
-		homeVC?.viewControllers = [navigationController]
+        // Search
+        let searchViewModel = SearchVM(movieService: movieService)
+        let searchViewController = SearchVC(viewModel: searchViewModel)
+        let searchNavigationController = NavigationController(rootViewController: searchViewController)
+
+        searchViewController.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
+
+		homeVC?.viewControllers = [nowPlayingNavigationController, searchNavigationController]
 		homeVC?.selectedIndex = 0
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
@@ -57,10 +65,10 @@ final class HomeCoordinator: Coordinator {
 		parentViewController.view.addSubview(homeVC!.view)
 		homeVC!.didMove(toParent: parentViewController)
 
-		viewModel.outputs.movieSelectedAction()
+        nowPlayingMoviesVM.outputs.movieSelectedAction()
 			.sink { [weak self] movie in
 				guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: navigationController)
+                self.showMovieDetails(movie: movie, on: nowPlayingNavigationController)
 			}.store(in: &cancellable)
 	}
 
@@ -121,6 +129,18 @@ final class HomeCoordinator: Coordinator {
     private func showPosterImageView(with imageURL: String, on navigationController: UIViewController) {
         let viewModel = PosterImageVM(imageURL: imageURL)
         let viewController = PosterImageVC(viewModel: viewModel)
+
+        navigationController.present(viewController, animated: true, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                navigationController.dismiss(animated: true, completion: nil)
+            }.store(in: &cancellable)
+    }
+
+    private func showProfileImageView(with imageURL: String, on navigationController: UIViewController) {
+        let viewModel = ProfileImageVM(imageURL: imageURL)
+        let viewController = ProfileImageVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 
@@ -215,8 +235,8 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.personImageAction()
             .sink { [weak self] personImage in
-                guard let `self` = self, let imagePath = personImage.filePath else { return }
-                self.showPosterImageView(with: imagePath, on: navigationController)
+                guard let `self` = self else { return }
+                self.showProfileImageView(with: personImage, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personGallerySelectedAction()
@@ -299,7 +319,7 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.imageAction()
             .sink { [weak self] image in
-                self?.showPosterImageView(with: image, on: navigationController)
+                self?.showProfileImageView(with: image, on: navigationController)
             }.store(in: &cancellable)
     }
 }

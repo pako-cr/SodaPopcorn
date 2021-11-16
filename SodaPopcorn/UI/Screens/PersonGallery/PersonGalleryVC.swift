@@ -84,7 +84,7 @@ final class PersonGalleryVC: BaseViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        customCollectionView.register(PosterCollectionViewCell.self, forCellWithReuseIdentifier: PosterCollectionViewCell.reuseIdentifier)
+        customCollectionView.register(ProfileCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCollectionViewCell.reuseIdentifier)
         customCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         customCollectionView.translatesAutoresizingMaskIntoConstraints = false
         customCollectionView.isScrollEnabled = true
@@ -98,7 +98,7 @@ final class PersonGalleryVC: BaseViewController {
 
     private func configureDataSource() {
         self.dataSource = DataSource(collectionView: customCollectionView, cellProvider: { collectionView, indexPath, item in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PosterCollectionViewCell.reuseIdentifier, for: indexPath) as? PosterCollectionViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCollectionViewCell.reuseIdentifier, for: indexPath) as? ProfileCollectionViewCell
             cell?.configure(with: item)
             return cell
         })
@@ -137,7 +137,7 @@ final class PersonGalleryVC: BaseViewController {
             var snapshot = self.dataSource.snapshot()
 
             if images?.isEmpty ?? true {
-                snapshot.appendItems(["no_posters"], toSection: .images)
+                snapshot.appendItems(["no_profiles"], toSection: .images)
             } else {
                 snapshot.appendItems(images?.map({ $0.filePath ?? ""}) ?? [], toSection: .images)
             }

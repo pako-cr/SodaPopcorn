@@ -58,7 +58,7 @@ public final class SimilarMoviesCollectionView: UICollectionViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
-        collectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
+        collectionView.register(MovieCollectionViewCell.self, forCellWithReuseIdentifier: MovieCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
@@ -88,7 +88,7 @@ public final class SimilarMoviesCollectionView: UICollectionViewController {
     }
 
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
+        let cellRegistration = UICollectionView.CellRegistration<MovieCollectionViewCell, Movie> { cell, _, movie in
             cell.configure(with: movie)
         }
 

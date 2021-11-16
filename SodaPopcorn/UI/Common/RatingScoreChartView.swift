@@ -1,5 +1,5 @@
 //
-//  RatingView.swift
+//  RatingScoreChartView.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 13/11/21.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public final class RatingView: UIView {
+public final class RatingScoreChartView: UIView {
 
     // MARK: - UI Elements
     private let ratingLabel: UILabel = {

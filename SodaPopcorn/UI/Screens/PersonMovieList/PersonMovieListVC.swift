@@ -8,29 +8,18 @@
 import Combine
 import UIKit
 
-final class PersonMovieListVC: BaseViewController {
-    enum Section: CaseIterable {
-        case movies
-    }
-
-    // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, Movie>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Movie>
-
+final class PersonMovieListVC: MoviesBaseCollectionView {
     // MARK: - Consts
     private let viewModel: PersonMovieListVM
 
     // MARK: - Variables
     private var moviesSubscription: Cancellable!
     private var personSubscription: Cancellable!
-    private var dataSource: DataSource!
 
     // MARK: - UI Elements
-    private var movieCollectionView: UICollectionView!
-
     init(viewModel: PersonMovieListVM) {
         self.viewModel = viewModel
-        super.init()
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -38,10 +27,9 @@ final class PersonMovieListVC: BaseViewController {
     }
 
     override func viewDidLoad() {
-        configureCollectionView()
-        configureDataSource()
-        setInitialData()
         super.viewDidLoad()
+        setupUI()
+        bindViewModel()
         viewModel.inputs.viewDidLoad()
         setupNavigationBar()
     }
@@ -49,16 +37,10 @@ final class PersonMovieListVC: BaseViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-        movieCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
-    override func setupUI() {
-        view.addSubview(movieCollectionView)
-
-        movieCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
-        movieCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        movieCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    func setupUI() {
+        collectionView.delegate = self
     }
 
     private func setupNavigationBar() {
@@ -68,7 +50,7 @@ final class PersonMovieListVC: BaseViewController {
         navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
-    override func bindViewModel() {
+    func bindViewModel() {
         moviesSubscription = viewModel.outputs.moviesAction()
             .sink(receiveValue: { [weak self] (movies) in
                 guard let `self` = self else { return }
@@ -81,69 +63,35 @@ final class PersonMovieListVC: BaseViewController {
             })
     }
 
-    // MARK: - Collection
-    private func configureCollectionView() {
-        movieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        movieCollectionView.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.reuseIdentifier)
-        movieCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
-        movieCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        movieCollectionView.isScrollEnabled = true
-        movieCollectionView.showsVerticalScrollIndicator = false
-        movieCollectionView.allowsSelection = true
-        movieCollectionView.isPrefetchingEnabled = true
-        movieCollectionView.delegate = self
-        movieCollectionView.alwaysBounceVertical = true
-    }
-
-    private func createLayout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3333),
-                                                  heightDimension: .fractionalHeight(1.0))
-
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .uniform(size: 5.0)
-
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
-
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
-            let section = NSCollectionLayoutSection(group: group)
-
-            return section
-        })
-    }
-
-    private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<MovieListCollectionViewCell, Movie> { cell, _, movie in
-            cell.configure(with: movie)
-        }
-
-        let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: movieCollectionView) { (collectionView, indexPath, movie) in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
-        }
-
-        self.dataSource = dataSource
-    }
-
-    private func setInitialData() {
-        var snapshot = dataSource.snapshot()
-        snapshot.appendSections(Section.allCases)
-        self.dataSource.apply(snapshot, animatingDifferences: false)
-    }
-
-    private func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
+    // MARK: - Collection View
+    override func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
-
             snapshot.appendItems(movies, toSection: .movies)
 
             self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.handleEmptyView()
         }
+    }
+
+    override func handleEmptyView() {
+        if dataSource.snapshot().numberOfItems < 1 {
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionView.setEmptyView(title: NSLocalizedString("empty_movies_title_label", comment: "Empty list title"),
+                                                     message: NSLocalizedString("empty_movies_description_label", comment: "Empty list message"),
+                                                     centeredY: true)
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionView.removeEmptyView()
+            }
+        }
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+
     }
 
     // MARK: - ⚙️ Helpers

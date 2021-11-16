@@ -8,10 +8,8 @@
 
 "app_name" = "SodaPopcorn";
 "app_name_with_icon" = "Soda&Popcorn 🍿";
-"movie_list_view_controller_no_movies_to_show_title_label" = "No movies to show 🙁";
-"movie_list_view_controller_no_movies_to_show_description_label" = "Check your network connection \n and pull to refresh ↕️";
-"movie_list_view_controller_loading_movies_title_label" = "Loading movies 🎬";
-"movie_list_view_controller_loading_movies_description_label" = "Please wait while we get the information";
+"loading_movies_title_label" = "Loading movies 🎬";
+"loading_movies_description_label" = "Please wait while we get the information";
 "close" = "Close";
 "collection_view_set_layout_button_title" = "Set layout";
 "collection_view_set_size_menu_title" = "Select size";
@@ -34,8 +32,8 @@
 "gallery_view_backdrops_header" = "Backdrops";
 "gallery_view_posters_header" = "Posters";
 "gallery_view_videos_header" = "Videos: Trailers, Teasers";
-"movie_list_view_controller_empty_movies_title_label" = "No movies 😞";
-"movie_list_view_controller_empty_movies_description_label" = "No movies to display here 🎬";
+"empty_movies_title_label" = "No movies 😞";
+"empty_movies_description_label" = "No movies to display here 🎬";
 "cast_collection_view_title" = "Cast";
 "more" = "More";
 "credits_vc_cast_header" = "Cast";
@@ -53,3 +51,8 @@
 "person_gallery" = "%@'s gallery";
 "credits" = "Credits";
 "similar_movies" = "Similar Movies";
+"search" = "Search";
+"home" = "Home";
+"search_title" = "Start typing to search 🔍";
+"columns" = "Columns";
+"list" = "List";

@@ -1,29 +1,29 @@
 //
-//  CustomPosterImage.swift
+//  CustomProfileImage.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Córdoba on 12/10/21.
+//  Created by Francisco Zimplifica on 16/11/21.
 //
 
 import UIKit
 
-final class CustomPosterImage: UIImageView {
+final class CustomProfileImage: UIImageView {
     // MARK: - Variables
-    var posterSize = PosterSize.w154
+    var profileSize = ProfileSize.w185
 
     private var urlString: String? {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let `self` = self, let urlString = self.urlString else { return }
 
-                if let cacheImage = cache.value(forKey: "\(self.posterSize.rawValue)\(urlString)") {
+                if let cacheImage = cache.value(forKey: "\(self.profileSize.rawValue)\(urlString)") {
                     self.image = cacheImage
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
                     self.activityIndicatorView.startAnimating()
-//                    print("⭐️ getPosterImage \(urlString) with poster size: \(self.posterSize)")
-                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(posterSize: self.posterSize)) { data, error in
+//                    print("⭐️ getProfileImage \(urlString) with poster size: \(self.posterSize)")
+                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(profileSize: self.profileSize)) { data, error in
 
                         if error != nil {
                             DispatchQueue.main.async { [weak self] in
@@ -41,7 +41,7 @@ final class CustomPosterImage: UIImageView {
 
                             if let newImage = UIImage(data: data) {
                                 self.image = newImage
-                                cache.insert(newImage, forKey: "\(self.posterSize.rawValue)\(urlString)")
+                                cache.insert(newImage, forKey: "\(self.profileSize.rawValue)\(urlString)")
                             }
                         }
                     }
@@ -66,9 +66,13 @@ final class CustomPosterImage: UIImageView {
     private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
         clipsToBounds = true
-        contentMode = .scaleAspectFill
         sizeToFit()
-        image = UIImage(named: "no_poster")
+        image = UIImage(named: "no_profile")
+
+        layer.cornerRadius = 10
+        layer.borderWidth = 0
+        layer.masksToBounds = true
+        contentMode = .scaleAspectFill
 
         addSubview(activityIndicatorView)
 
@@ -88,5 +92,9 @@ final class CustomPosterImage: UIImageView {
 
     func setUrlString(urlString: String) {
         self.urlString = urlString
+    }
+
+    func stopActivityIndicator() {
+        self.activityIndicatorView.stopAnimating()
     }
 }

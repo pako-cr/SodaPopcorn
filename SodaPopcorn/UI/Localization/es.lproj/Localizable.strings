@@ -8,10 +8,8 @@
 
 "app_name" = "SodaPopcorn";
 "app_name_with_icon" = "Soda&Popcorn 🍿";
-"movie_list_view_controller_no_movies_to_show_title_label" = "No hay películas 🙁";
-"movie_list_view_controller_no_movies_to_show_description_label" = "Verifica tu conexión y recarga \n la pantalla ↕️";
-"movie_list_view_controller_loading_movies_title_label" = "Cargando películas 🎬";
-"movie_list_view_controller_loading_movies_description_label" = "Por favor espera mientras cargamos la información";
+"loading_movies_title_label" = "Cargando películas 🎬";
+"loading_movies_description_label" = "Por favor espera mientras cargamos la información";
 "close" = "Cerrar";
 "collection_view_set_layout_button_title" = "Cambiar diseño";
 "collection_view_set_size_menu_title" = "Seleccionar tamaño";
@@ -34,8 +32,8 @@
 "gallery_view_backdrops_header" = "Fondos";
 "gallery_view_posters_header" = "Posters";
 "gallery_view_videos_header" = "Videos y Trailers";
-"movie_list_view_controller_empty_movies_title_label" = "Sin películas 😞";
-"movie_list_view_controller_empty_movies_description_label" = "No hay películas para mostrar 🎬";
+"empty_movies_title_label" = "Sin películas 😞";
+"empty_movies_description_label" = "No hay películas para mostrar 🎬";
 "cast_collection_view_title" = "Elenco";
 "more" = "Más";
 "credits_vc_cast_header" = "Elenco";
@@ -53,4 +51,8 @@
 "person_gallery" = "Galería de  %@";
 "credits" = "Créditos";
 "similar_movies" = "Películas Similares";
-
+"search" = "Buscar";
+"home" = "Principal";
+"search_title" = "Escribe algo para buscar 🔍";
+"columns" = "Columnas";
+"list" = "Lista";

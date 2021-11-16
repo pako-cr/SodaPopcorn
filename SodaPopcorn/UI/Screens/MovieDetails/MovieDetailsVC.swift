@@ -19,6 +19,12 @@ final class MovieDetailsVC: BaseViewController {
     private var castSubscription: Cancellable!
     private var similarMoviesSubscription: Cancellable!
 
+    // MARK: Constraints
+    private var backdropImageHeightAnchor: NSLayoutConstraint?
+    private var castHeightAnchor: NSLayoutConstraint?
+    private var similarMoviesHeightAnchor: NSLayoutConstraint?
+    private var socialNetworksHeightAnchor: NSLayoutConstraint?
+
     private var oldMovie: Movie?
     private var movie: Movie? {
         didSet {
@@ -63,7 +69,7 @@ final class MovieDetailsVC: BaseViewController {
 
                 // Rating
                 if let rating = movie.rating, rating > 0.0, self.oldMovie?.rating != rating {
-                    self.ratingView.setRatingValue(ratingValue: movie.rating ?? 0.0)
+                    self.ratingScoreChartView.setRatingValue(ratingValue: movie.rating ?? 0.0)
                 }
 
                 // Overview
@@ -115,7 +121,7 @@ final class MovieDetailsVC: BaseViewController {
 
     private let backdropImage = CustomBackdropImage(frame: .zero)
 
-    private lazy var ratingView = RatingView(ratingValue: self.movie?.rating ?? 0.0)
+    private lazy var ratingScoreChartView = RatingScoreChartView(ratingValue: self.movie?.rating ?? 0.0)
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -170,7 +176,6 @@ final class MovieDetailsVC: BaseViewController {
         label.maximumContentSizeCategory = .accessibilityMedium
         label.adjustsFontForContentSizeCategory = true
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        label.text = NSLocalizedString("not_applicable", comment: "Not applicable")
         label.textColor = UIColor.darkGray
         label.sizeToFit()
         return label
@@ -184,7 +189,6 @@ final class MovieDetailsVC: BaseViewController {
         label.maximumContentSizeCategory = .accessibilityMedium
         label.adjustsFontForContentSizeCategory = true
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        label.text = String("﹒ \(NSLocalizedString("not_applicable", comment: "Not applicable"))")
         label.textColor = UIColor.darkGray
         label.sizeToFit()
         return label
@@ -227,6 +231,11 @@ final class MovieDetailsVC: BaseViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+
+        backdropImageHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3)
+        castHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
+        similarMoviesHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.3)
+        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
     }
 
     override func setupUI() {
@@ -248,7 +257,7 @@ final class MovieDetailsVC: BaseViewController {
         headerStack.addArrangedSubview(taglineLabel)
 
         contentView.addSubview(backdropImage)
-        contentView.addSubview(ratingView)
+        contentView.addSubview(ratingScoreChartView)
         contentView.addSubview(headerStack)
         contentView.addSubview(subHeaderStack)
         contentView.addSubview(genresInformation)
@@ -268,12 +277,13 @@ final class MovieDetailsVC: BaseViewController {
         backdropImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         backdropImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        backdropImage.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        backdropImageHeightAnchor = backdropImage.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3))
+        backdropImageHeightAnchor?.isActive = true
 
-        ratingView.bottomAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
-        ratingView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
-        ratingView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        ratingView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        ratingScoreChartView.bottomAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
+        ratingScoreChartView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        ratingScoreChartView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        ratingScoreChartView.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
         headerStack.topAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
         headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
@@ -287,7 +297,7 @@ final class MovieDetailsVC: BaseViewController {
         genresInformation.topAnchor.constraint(equalTo: subHeaderStack.bottomAnchor, constant: 20).isActive = true
         genresInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         genresInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        genresInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+        genresInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
 
         overviewLabel.topAnchor.constraint(equalTo: genresInformation.bottomAnchor, constant: 20).isActive = true
         overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
@@ -301,32 +311,35 @@ final class MovieDetailsVC: BaseViewController {
         productionCompaniesInformation.topAnchor.constraint(equalTo: overviewValue.bottomAnchor, constant: 20).isActive = true
         productionCompaniesInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         productionCompaniesInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        productionCompaniesInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.12).isActive = true
+        productionCompaniesInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
 
         budgetRevenueInformation.topAnchor.constraint(equalTo: productionCompaniesInformation.bottomAnchor, constant: 20).isActive = true
         budgetRevenueInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         budgetRevenueInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        budgetRevenueInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+        budgetRevenueInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
 
         castCollectionView.view.topAnchor.constraint(equalTo: budgetRevenueInformation.bottomAnchor, constant: 20).isActive = true
         castCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         castCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        castCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        castHeightAnchor = castCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3))
+        castHeightAnchor?.isActive = true
 
         similarMoviesCollectionView.view.topAnchor.constraint(equalTo: castCollectionView.view.bottomAnchor, constant: 20).isActive = true
         similarMoviesCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         similarMoviesCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        similarMoviesCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3).isActive = true
+        similarMoviesHeightAnchor = similarMoviesCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.3))
+        similarMoviesHeightAnchor?.isActive = true
 
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: similarMoviesCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        socialNetworksCollectionView.view.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.15).isActive = true
+        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15))
+        socialNetworksHeightAnchor?.isActive = true
 
         websiteInformation.topAnchor.constraint(equalTo: socialNetworksCollectionView.view.bottomAnchor, constant: 20).isActive = true
         websiteInformation.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
         websiteInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1).isActive = true
+        websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
         websiteInformation.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 

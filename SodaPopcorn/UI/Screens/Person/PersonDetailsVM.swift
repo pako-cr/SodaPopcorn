@@ -24,8 +24,8 @@ public protocol PersonDetailsVMInputs: AnyObject {
     /// Call when user press more movies button.
     func personMoviesButtonPressed()
 
-    /// Call when a person image is selected.
-    func personImageSelected(personImage: PersonImage)
+    /// Call when an image is selected.
+    func personImageSelected(imageUrl: String)
 
     /// Call when the user selects person gallery.
     func personGallerySelected()
@@ -65,8 +65,8 @@ public protocol PersonDetailsVMOutputs: AnyObject {
     /// Emits when the user selects person gallery.
     func personGallerySelectedAction() -> PassthroughSubject<(Person, [PersonImage]), Never>
 
-    /// Emits when a person image is selected.
-    func personImageAction() -> PassthroughSubject<PersonImage, Never>
+    /// Emits when an image is selected.
+    func personImageAction() -> PassthroughSubject<String, Never>
 }
 
 public protocol PersonDetailsVMTypes: AnyObject {
@@ -282,9 +282,9 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         personMoviesButtonPressedProperty.send(())
     }
 
-    private let personImageSelectedProperty = PassthroughSubject<PersonImage, Never>()
-    public func personImageSelected(personImage: PersonImage) {
-        personImageSelectedProperty.send(personImage)
+    private let personImageSelectedProperty = PassthroughSubject<String, Never>()
+    public func personImageSelected(imageUrl: String) {
+        personImageSelectedProperty.send(imageUrl)
     }
 
     private let personGallerySelectedProperty = PassthroughSubject<Void, Never>()
@@ -343,8 +343,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return personImagesActionProperty
     }
 
-    private let personImageActionProperty = PassthroughSubject<PersonImage, Never>()
-    public func personImageAction() -> PassthroughSubject<PersonImage, Never> {
+    private let personImageActionProperty = PassthroughSubject<String, Never>()
+    public func personImageAction() -> PassthroughSubject<String, Never> {
         return personImageActionProperty
     }
 
