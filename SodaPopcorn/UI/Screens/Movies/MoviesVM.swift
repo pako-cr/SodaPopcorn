@@ -1,5 +1,5 @@
 //
-//  NowPlayingMoviesVM.swift
+//  MoviesVM.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 3/9/21.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public protocol NowPlayingMoviesVMInputs: AnyObject {
+public protocol MoviesVMInputs: AnyObject {
 	/// Call to get the new movies.
 	func fetchNewMovies()
 
@@ -17,9 +17,12 @@ public protocol NowPlayingMoviesVMInputs: AnyObject {
 
 	/// Call when a movie is selected.
 	func movieSelected(movie: Movie)
+
+    /// Call when the close button is pressed.
+    func closeButtonPressed()
 }
 
-public protocol NowPlayingMoviesVMOutputs: AnyObject {
+public protocol MoviesVMOutputs: AnyObject {
 	/// Emits to get the new movies.
 	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
@@ -34,27 +37,34 @@ public protocol NowPlayingMoviesVMOutputs: AnyObject {
 
 	/// Emits when an error occurred.
 	func showError() -> PassthroughSubject<String, Never>
+
+    /// Emits when the close button is pressed.
+    func closeButtonAction() -> PassthroughSubject<Void, Never>
 }
 
-public protocol NowPlayingMoviesVMTypes: AnyObject {
-	var inputs: NowPlayingMoviesVMInputs { get }
-	var outputs: NowPlayingMoviesVMOutputs { get }
+public protocol MoviesVMTypes: AnyObject {
+	var inputs: MoviesVMInputs { get }
+	var outputs: MoviesVMOutputs { get }
 }
 
-public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayingMoviesVMInputs, NowPlayingMoviesVMOutputs, NowPlayingMoviesVMTypes {
+public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, MoviesVMOutputs, MoviesVMTypes {
 	// MARK: Constants
 	private let movieService: MovieService
+    private let searchCriteria: SearchCriteria
+    let presentedViewController: Bool
 
 	// MARK: Variables
-	public var inputs: NowPlayingMoviesVMInputs { return self }
-	public var outputs: NowPlayingMoviesVMOutputs { return self }
+	public var inputs: MoviesVMInputs { return self }
+	public var outputs: MoviesVMOutputs { return self }
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
 	private var page = 0
 
-	public init(movieService: MovieService) {
+    public init(movieService: MovieService, searchCriteria: SearchCriteria, presentedViewController: Bool) {
 		self.movieService = movieService
+        self.searchCriteria = searchCriteria
+        self.presentedViewController = presentedViewController
 
 		self.movieSelectedProperty
 			.sink { [weak self] movie in
@@ -62,7 +72,18 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 				self.movieSelectedActionProperty.send(movie)
 			}.store(in: &cancellable)
 
-		let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+        self.closeButtonPressedProperty
+            .sink { [weak self] in
+                self?.closeButtonActionProperty.send(())
+            }.store(in: &cancellable)
+
+        let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+            .filter({ _ in
+                switch self.searchCriteria {
+                case .nowPlaying: return true
+                default: return false
+                }
+            })
 			.flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
@@ -70,7 +91,7 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
                 return movieService.moviesNowPlaying(page: self.page)
                     .retry(2)
 					.mapError({ [weak self] networkResponse -> NetworkResponse in
-						print("🔴 [NowPlayingMoviesVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+						print("🔴 [MoviesVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
                         self?.loadingProperty.value = false
 						self?.handleNetworkResponseError(networkResponse)
 						return networkResponse
@@ -79,14 +100,48 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 				 	.eraseToAnyPublisher()
             }).share()
 
-		getNewMoviesEvent
-			.sink(receiveCompletion: { [weak self] completionReceived in
-				guard let `self` = self else { return }
+        let searchByGenreEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+            .filter({ _ in
+                switch self.searchCriteria {
+                case .discover:
+                    return true
+                default:
+                    return false
+                }
+            })
+            .flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                self.loadingProperty.value = true
+                var genreId = 0
+
+                switch self.searchCriteria {
+                case .discover(let genre): genreId = genre
+                default: break
+                }
+
+                return movieService.discover(genre: genreId, page: self.page)
+                    .retry(2)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [SearchVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+                        self?.loadingProperty.value = false
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Movies())
+                     .eraseToAnyPublisher()
+            }).share()
+
+        Publishers.Merge(
+            searchByGenreEvent,
+            getNewMoviesEvent)
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
 
 				self.loadingProperty.value = false
 				switch completionReceived {
 					case .failure(let error):
-						print("🔴 [NowPlayingMoviesVM] [init] Received completion error. Error: \(error.localizedDescription)")
+						print("🔴 [MoviesVM] [init] Received completion error. Error: \(error.localizedDescription)")
 						self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
 					default: break
 				}
@@ -122,6 +177,11 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 		movieSelectedProperty.send(movie)
 	}
 
+    private let closeButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func closeButtonPressed() {
+        closeButtonPressedProperty.send(())
+    }
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let fetchNewMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
 	public func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
@@ -148,6 +208,11 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 		return showErrorProperty
 	}
 
+    private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
+    public func closeButtonAction() -> PassthroughSubject<Void, Never> {
+        return closeButtonActionProperty
+    }
+
 	// MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
         print("❌ Networkd response error: \(networkResponse.localizedDescription)")
@@ -156,6 +221,6 @@ public final class NowPlayingMoviesVM: ObservableObject, Identifiable, NowPlayin
 
 	// MARK: - 🗑 Deinit
 	deinit {
-		print("🗑", "NowPlayingMoviesVM deinit.")
+		print("🗑", "MoviesVM deinit.")
 	}
 }

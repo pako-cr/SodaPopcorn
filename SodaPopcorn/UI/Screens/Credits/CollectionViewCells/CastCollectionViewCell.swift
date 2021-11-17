@@ -37,7 +37,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
                     if let profilePath = cast.profilePath {
                         self.profileImage.setUrlString(urlString: profilePath)
                     } else {
-                        self.profileImage.image = UIImage(named: "no_poster")
+                        self.profileImage.image = UIImage(named: "no_profile")
                     }
 
                     if let castName = cast.name {

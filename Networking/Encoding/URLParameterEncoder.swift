@@ -15,6 +15,7 @@ public struct URLParameterEncoder: ParameterEncoder {
 
 			urlComponents.queryItems = [URLQueryItem]()
 
+            // TODO: Review encoding!!!
 			for (key, value) in parameters {
 				let queryItem = URLQueryItem(name: key,
 											 value: "\(value)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed))

@@ -44,32 +44,40 @@ final class HomeCoordinator: Coordinator {
 		self.homeVC = HomeVC()
 
         // Home
-		let nowPlayingMoviesVM = NowPlayingMoviesVM(movieService: movieService)
-		let nowPlayingMoviesVC = NowPlayingMoviesVC(viewModel: nowPlayingMoviesVM)
-        let nowPlayingNavigationController = NavigationController(rootViewController: nowPlayingMoviesVC)
+        let moviesVM = MoviesVM(movieService: movieService, searchCriteria: .nowPlaying, presentedViewController: false)
+		let moviesVC = MoviesVC(viewModel: moviesVM)
+        let moviesNavigationController = NavigationController(rootViewController: moviesVC)
 
-        nowPlayingNavigationController.tabBarItem = UITabBarItem(title: NSLocalizedString("home", comment: "Home"), image: UIImage(systemName: "film.fill"), tag: 0)
+        moviesNavigationController.tabBarItem = UITabBarItem(title: NSLocalizedString("home", comment: "Home"), image: UIImage(systemName: "film.fill"), tag: 0)
 
         // Search
-        let searchViewModel = SearchVM(movieService: movieService)
-        let searchViewController = SearchVC(viewModel: searchViewModel)
-        let searchNavigationController = NavigationController(rootViewController: searchViewController)
+        let searchVM = SearchVM(movieService: movieService)
+        let searchVC = SearchVC(viewModel: searchVM)
+        let searchNavigationController = NavigationController(rootViewController: searchVC)
 
-        searchViewController.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
+        searchVC.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
-		homeVC?.viewControllers = [nowPlayingNavigationController, searchNavigationController]
-		homeVC?.selectedIndex = 0
+		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController]
+		homeVC?.selectedIndex = 1
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
 		parentViewController.addChild(homeVC!)
 		parentViewController.view.addSubview(homeVC!.view)
 		homeVC!.didMove(toParent: parentViewController)
 
-        nowPlayingMoviesVM.outputs.movieSelectedAction()
+        moviesVM.outputs.movieSelectedAction()
 			.sink { [weak self] movie in
 				guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: nowPlayingNavigationController)
+                self.showMovieDetails(movie: movie, on: moviesNavigationController)
 			}.store(in: &cancellable)
+
+        searchVM.outputs.genreSelectedAction()
+            .sink { [weak self] genre in
+                guard let `self` = self else { return }
+                if let genreId = genre.id {
+                    self.showMovieList(searchCriteria: .discover(genre: genreId), on: searchNavigationController)
+                }
+            }.store(in: &cancellable)
 	}
 
 	private func showMovieDetails(movie: Movie, on baseViewController: UIViewController) {
@@ -320,6 +328,25 @@ final class HomeCoordinator: Coordinator {
         viewModel.outputs.imageAction()
             .sink { [weak self] image in
                 self?.showProfileImageView(with: image, on: navigationController)
+            }.store(in: &cancellable)
+    }
+
+    private func showMovieList(searchCriteria: SearchCriteria, on baseViewController: UIViewController) {
+        let viewModel = MoviesVM(movieService: movieService, searchCriteria: searchCriteria, presentedViewController: true)
+        let viewController = MoviesVC(viewModel: viewModel)
+        let navigationController = NavigationController(rootViewController: viewController)
+
+        baseViewController.present(navigationController, animated: false, completion: nil)
+
+        viewModel.outputs.closeButtonAction()
+            .sink { _ in
+                baseViewController.dismiss(animated: false, completion: nil)
+            }.store(in: &cancellable)
+
+        viewModel.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                guard let `self` = self else { return }
+                self.showMovieDetails(movie: movie, on: navigationController)
             }.store(in: &cancellable)
     }
 }

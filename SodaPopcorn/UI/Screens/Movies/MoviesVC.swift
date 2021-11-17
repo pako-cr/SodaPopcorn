@@ -1,5 +1,5 @@
 //
-//  NowPlayingMoviesVC.swift
+//  MoviesVC.swift
 //  SodaPopcorn
 //
 //  Created by Francisco Cordoba on 5/9/21.
@@ -8,9 +8,9 @@
 import Combine
 import UIKit
 
-final class NowPlayingMoviesVC: MoviesBaseCollectionView {
+final class MoviesVC: MoviesBaseCollectionView {
     // MARK: - Consts
-    private let viewModel: NowPlayingMoviesVM
+    private let viewModel: MoviesVM
 
     // MARK: - Variables
 
@@ -54,7 +54,7 @@ final class NowPlayingMoviesVC: MoviesBaseCollectionView {
         return refreshControl
     }()
 
-    init(viewModel: NowPlayingMoviesVM) {
+    init(viewModel: MoviesVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -80,8 +80,14 @@ final class NowPlayingMoviesVC: MoviesBaseCollectionView {
     func setupUI() {
         navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
-        let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
+        if viewModel.presentedViewController {
+            let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+
+        } else {
+            let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
+        }
 
         collectionView.refreshControl = refreshControl
         collectionView.delegate = self
@@ -200,14 +206,18 @@ final class NowPlayingMoviesVC: MoviesBaseCollectionView {
     }
 
     // MARK: - ⚙️ Helpers
+    @objc
+    private func closeButtonPressed() {
+        viewModel.inputs.closeButtonPressed()
+    }
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑 NowPlayingMoviesVC deinit.")
+        print("🗑 MoviesVC deinit.")
     }
 }
 
-extension NowPlayingMoviesVC: UICollectionViewDelegate {
+extension MoviesVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let movie = dataSource.itemIdentifier(for: indexPath) else { return }
         viewModel.inputs.movieSelected(movie: movie)

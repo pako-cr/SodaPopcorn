@@ -149,6 +149,14 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     @objc
     private func tapGestureZoomAction(recognizer: UITapGestureRecognizer) {
         let zoomScale = scrollView.zoomScale > 5.0 ? 1.0 : 10.0
+
+        let coordinates = recognizer.location(in: self.view)
+
+        let zoomRect = CGRect(x: coordinates.x,
+                              y: coordinates.y,
+                              width: .zero,
+                              height: .zero)
+        scrollView.zoom(to: zoomRect, animated: true)
         scrollView.setZoomScale(zoomScale, animated: true)
     }
 

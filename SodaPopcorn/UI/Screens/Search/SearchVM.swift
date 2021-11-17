@@ -14,11 +14,23 @@ public protocol SearchVMInputs: AnyObject {
 
     /// Call when a movie is selected.
     func movieSelected(movie: Movie)
+
+    /// Call when view did load.
+    func viewDidLoad()
+
+    /// Call when a genre is selected.
+    func genreSelected(genre: Genre)
+
+    /// Call when the search text did change.
+    func searchTextDidChange(searchQuery: String?)
 }
 
 public protocol SearchVMOutputs: AnyObject {
     /// Emits to get the movies.
     func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
+
+    /// Emits to get the genres.
+    func genresAction() -> CurrentValueSubject<[Genre]?, Never>
 
     /// Emits when loading.
     func loading() -> CurrentValueSubject<Bool, Never>
@@ -31,6 +43,9 @@ public protocol SearchVMOutputs: AnyObject {
 
     /// Emits when an error occurred.
     func showError() -> PassthroughSubject<String, Never>
+
+    /// Emits when a genre is selected.
+    func genreSelectedAction() -> PassthroughSubject<Genre, Never>
 }
 
 public protocol SearchVMTypes: AnyObject {
@@ -48,6 +63,7 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
+    private var page = 0
 
     public init(movieService: MovieService) {
         self.movieService = movieService
@@ -58,46 +74,84 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
                 self.movieSelectedActionProperty.send(movie)
             }.store(in: &cancellable)
 
-//        let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
-//            .flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
-//                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-//
-//                self.loadingProperty.value = true
-//                return movieService.moviesNowPlaying(page: self.page)
-//                    .retry(2)
-//                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-//                        print("🔴 [SearchVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-//                        self?.loadingProperty.value = false
-//                        self?.handleNetworkResponseError(networkResponse)
-//                        return networkResponse
-//                    })
-//                    .replaceError(with: Movies())
-//                     .eraseToAnyPublisher()
-//            }).share()
-//
-//        getNewMoviesEvent
-//            .sink(receiveCompletion: { [weak self] completionReceived in
-//                guard let `self` = self else { return }
-//
-//                self.loadingProperty.value = false
-//                switch completionReceived {
-//                    case .failure(let error):
-//                        print("🔴 [SearchVM] [init] Received completion error. Error: \(error.localizedDescription)")
-//                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
-//                    default: break
-//                }
-//            }, receiveValue: { [weak self] movies in
-//                guard let `self` = self else { return }
-//
-//                self.loadingProperty.value = false
-//
-//                if movies.numberOfResults != 0 {
-//                    print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
-//
-//                    self.finishedFetchingActionProperty.send(self.page >= movies.numberOfPages ?? 0)
-//                    self.fetchMoviesActionProperty.send(movies.movies)
-//                }
-//            }).store(in: &cancellable)
+        self.genreSelectedProperty
+            .sink { [weak self] genre in
+                self?.genreSelectedActionProperty.send(genre)
+            }.store(in: &cancellable)
+
+        let genresListEvent = viewDidLoadProperty
+            .flatMap({ [weak self] _ -> AnyPublisher<Genres, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                self.loadingProperty.value = true
+                return movieService.genresList()
+                    .retry(2)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [SearchVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+                        self?.loadingProperty.value = false
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Genres())
+                     .eraseToAnyPublisher()
+            }).share()
+
+        genresListEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                self.loadingProperty.value = false
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [SearchVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] genresList in
+                guard let `self` = self else { return }
+
+                self.loadingProperty.value = false
+                self.genresActionProperty.value = genresList.genres
+
+            }).store(in: &cancellable)
+
+        let searchMovieEvent = searchTextDidChangeProperty
+            .filter({ !($0?.isEmpty ?? true) && ($0?.count ?? 0) >= 4 })
+            .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
+            .flatMap({ [weak self] queryText -> AnyPublisher<Movies, Never> in
+                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+
+                self.loadingProperty.value = true
+                return movieService.searchMovie(query: queryText ?? "", page: 1)
+                    .retry(2)
+                    .mapError({ [weak self] networkResponse -> NetworkResponse in
+                        print("🔴 [SearchVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
+                        self?.loadingProperty.value = false
+                        self?.handleNetworkResponseError(networkResponse)
+                        return networkResponse
+                    })
+                    .replaceError(with: Movies())
+                     .eraseToAnyPublisher()
+            }).share()
+
+        searchMovieEvent
+            .sink(receiveCompletion: { [weak self] completionReceived in
+                guard let `self` = self else { return }
+
+                self.loadingProperty.value = false
+                switch completionReceived {
+                    case .failure(let error):
+                        print("🔴 [SearchVM] [init] Received completion error. Error: \(error.localizedDescription)")
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
+                    default: break
+                }
+            }, receiveValue: { [weak self] movies in
+                guard let `self` = self else { return }
+
+                self.loadingProperty.value = false
+                self.fetchMoviesActionProperty.value = movies.movies
+
+            }).store(in: &cancellable)
     }
 
     // MARK: - ⬇️ INPUTS Definition
@@ -111,10 +165,31 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
         movieSelectedProperty.send(movie)
     }
 
+    private let viewDidLoadProperty = PassthroughSubject<Void, Never>()
+    public func viewDidLoad() {
+        viewDidLoadProperty.send(())
+    }
+
+    private let genreSelectedProperty = PassthroughSubject<Genre, Never>()
+    public func genreSelected(genre: Genre) {
+        self.page = 1
+        genreSelectedProperty.send(genre)
+    }
+
+    private let searchTextDidChangeProperty = PassthroughSubject<String?, Never>()
+    public func searchTextDidChange(searchQuery: String?) {
+        searchTextDidChangeProperty.send(searchQuery)
+    }
+
     // MARK: - ⬆️ OUTPUTS Definition
     private let fetchMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
     public func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
         return fetchMoviesActionProperty
+    }
+
+    private let genresActionProperty = CurrentValueSubject<[Genre]?, Never>([])
+    public func genresAction() -> CurrentValueSubject<[Genre]?, Never> {
+        return genresActionProperty
     }
 
     private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
@@ -135,6 +210,11 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
     private let showErrorProperty = PassthroughSubject<String, Never>()
     public func showError() -> PassthroughSubject<String, Never> {
         return showErrorProperty
+    }
+
+    private let genreSelectedActionProperty = PassthroughSubject<Genre, Never>()
+    public func genreSelectedAction() -> PassthroughSubject<Genre, Never> {
+        return genreSelectedActionProperty
     }
 
     // MARK: - ⚙️ Helpers

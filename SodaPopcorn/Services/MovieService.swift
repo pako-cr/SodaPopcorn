@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import CoreData
 import UIKit
 
 public final class MovieService: MovieNetworkServiceProtocol {
@@ -25,7 +24,8 @@ public final class MovieService: MovieNetworkServiceProtocol {
 		return sharedMovieService
 	}
 
-	// MARK: - Network Service
+	// MARK: Network Service
+    // MARK: - Movies
 	public func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
 		return movieNetworkService.moviesNowPlaying(page: page)
 	}
@@ -54,6 +54,19 @@ public final class MovieService: MovieNetworkServiceProtocol {
         return movieNetworkService.movieSimilarMovies(movieId: movieId, page: page)
     }
 
+    public func genresList() -> AnyPublisher<Genres, NetworkResponse> {
+        return movieNetworkService.genresList()
+    }
+
+    public func discover(genre: Int, page: Int) -> AnyPublisher<Movies, NetworkResponse> {
+        return movieNetworkService.discover(genre: genre, page: page)
+    }
+
+    public func searchMovie(query: String, page: Int) -> AnyPublisher<Movies, NetworkResponse> {
+        return movieNetworkService.searchMovie(query: query, page: page)
+    }
+
+    // MARK: - Person
     public func personDetails(personId: String) -> AnyPublisher<Person, NetworkResponse> {
         return movieNetworkService.personDetails(personId: personId)
     }

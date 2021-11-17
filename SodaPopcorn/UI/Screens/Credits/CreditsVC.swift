@@ -84,7 +84,7 @@ final class CreditsVC: BaseViewController {
             })
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection View
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         customCollectionView.register(CastCollectionViewCell.self, forCellWithReuseIdentifier: CastCollectionViewCell.reuseIdentifier)

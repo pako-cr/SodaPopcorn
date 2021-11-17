@@ -28,7 +28,7 @@ final class CustomProfileImage: UIImageView {
                         if error != nil {
                             DispatchQueue.main.async { [weak self] in
                                 guard let `self` = self else { return }
-                                self.image = UIImage(named: "no_poster")
+                                self.image = UIImage(named: "no_profile")
                                 self.activityIndicatorView.stopAnimating()
                             }
                         }
