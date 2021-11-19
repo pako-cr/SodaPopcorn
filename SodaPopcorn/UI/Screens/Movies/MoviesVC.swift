@@ -67,7 +67,7 @@ final class MoviesVC: MoviesBaseCollectionView {
         super.viewDidLoad()
         setupUI()
         bindViewModel()
-        viewModel.inputs.fetchNewMovies()
+        viewModel.inputs.fetchMovies()
     }
 
     override func viewWillLayoutSubviews() {
@@ -94,7 +94,7 @@ final class MoviesVC: MoviesBaseCollectionView {
     }
 
     func bindViewModel() {
-        fetchMoviesSubscription = viewModel.outputs.fetchNewMoviesAction()
+        fetchMoviesSubscription = viewModel.outputs.fetchMoviesAction()
             .filter({ !($0?.isEmpty ?? true) })
             .sink(receiveValue: { [weak self] (movies) in
                 guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
@@ -143,7 +143,7 @@ final class MoviesVC: MoviesBaseCollectionView {
             self.loadedCount = snapshot.numberOfItems
 
             self.collectionView.removeEmptyView()
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
@@ -180,7 +180,7 @@ final class MoviesVC: MoviesBaseCollectionView {
         guard loadedCount != 0 else { return }
 
         if indexPath.row == loadedCount - 1 {
-            self.viewModel.inputs.fetchNewMovies()
+            self.viewModel.inputs.fetchMovies()
         }
     }
 

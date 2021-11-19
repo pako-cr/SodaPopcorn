@@ -11,9 +11,10 @@ public struct MovieApiResponse: Decodable {
     let runtime, voteCount, budget, revenue: Int?
     let productionCompanies: [ProductionCompanyApiResponse]?
     let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline, character: String?
+    let adult: Bool
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, overview, genres, homepage, runtime, budget, revenue, tagline, character
+        case id, title, overview, genres, homepage, runtime, budget, revenue, tagline, character, adult
         case rating               = "vote_average"
         case posterPath           = "poster_path"
         case backdropPath         = "backdrop_path"
@@ -41,5 +42,6 @@ public struct MovieApiResponse: Decodable {
         tagline = try container.decodeIfPresent(String.self, forKey: .tagline)
         productionCompanies = try container.decodeIfPresent([ProductionCompanyApiResponse].self, forKey: .productionCompanies)
         character = try container.decodeIfPresent(String.self, forKey: .character)
+        adult = try container.decode(Bool.self, forKey: .adult)
     }
 }

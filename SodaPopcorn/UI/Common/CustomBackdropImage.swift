@@ -10,6 +10,7 @@ import UIKit
 final class CustomBackdropImage: UIImageView {
     // MARK: - Variables
     var backdropSize = BackdropSize.w780
+    private var activityIndicatorEnabled = true
 
     private var urlString: String? {
         didSet {
@@ -52,14 +53,14 @@ final class CustomBackdropImage: UIImageView {
 
     private let activityIndicatorView: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(style: .medium)
-        activityIndicator.startAnimating()
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.color = UIColor(named: "PrimaryColor")
         return activityIndicator
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(activityIndicatorEnabled: Bool = true) {
+        super.init(frame: .zero)
+        self.activityIndicatorEnabled = activityIndicatorEnabled
         setupView()
     }
 
@@ -76,6 +77,12 @@ final class CustomBackdropImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+
+        if activityIndicatorEnabled {
+            DispatchQueue.main.async { [weak self] in
+                self?.activityIndicatorView.startAnimating()
+            }
+        }
 
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in
             self?.activityIndicatorView.stopAnimating()

@@ -19,7 +19,7 @@ public struct Credits {
 
     init(apiResponse: CreditsApiResponse) {
         self.init(id: apiResponse.id,
-                  cast: apiResponse.cast.map({ Cast(apiResponse: $0) }),
-                  crew: apiResponse.crew.map({ Cast(apiResponse: $0) }))
+                  cast: apiResponse.cast.compactMap({ return !$0.adult ? Cast(apiResponse: $0) : nil }), // Remove adult cast
+                  crew: apiResponse.crew.compactMap({ return !$0.adult ? Cast(apiResponse: $0) : nil })) // Remove adult crew
     }
 }

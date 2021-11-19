@@ -81,7 +81,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
             let section = NSCollectionLayoutSection(group: group)
 
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
@@ -117,7 +117,7 @@ public final class KnownForCollectionView: UICollectionViewController {
                 snapshot.appendItems([Movie(title: "more_info")], toSection: .movies)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

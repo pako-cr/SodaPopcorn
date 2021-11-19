@@ -56,7 +56,7 @@ final class BackdropImageVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var backdropImage: CustomBackdropImage = {
-        let customImage = CustomBackdropImage(frame: .zero)
+        let customImage = CustomBackdropImage()
 
         if let cacheImage = cache.value(forKey: "\(BackdropSize.w780.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = cacheImage

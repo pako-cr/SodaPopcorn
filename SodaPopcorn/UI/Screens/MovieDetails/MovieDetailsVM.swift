@@ -30,9 +30,6 @@ public protocol MovieDetailsVMInputs: AnyObject {
     /// Call when the movie's overview is pressed.
     func overviewTextPressed()
 
-    /// Call when the similar movies button is pressed.
-    func similarMoviesButtonPressed()
-
     /// Call when a movie is selected from the movie details.
     func movieSelected(movie: Movie)
 }
@@ -70,9 +67,6 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits to return the similar movies.
     func similarMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
-
-    /// Emits when the similar movies button is pressed.
-    func similarMoviesButtonAction() -> PassthroughSubject<[Movie], Never>
 
     /// Emits when a movie is selected.
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
@@ -127,12 +121,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         overviewTextPressedProperty.sink { [weak self] (overview) in
             guard let `self` = self, let overview = self.movie.overview else { return }
             self.overviewTextActionProperty.send(overview)
-        }.store(in: &cancellable)
-
-        similarMoviesButtonPressedProperty.sink { [weak self] _ in
-            if let movies = self?.similarMoviesActionProperty.value {
-                self?.similarMoviesButtonActionProperty.send(movies)
-            }
         }.store(in: &cancellable)
 
         movieSelectedProperty.sink { [weak self] (movie) in
@@ -310,11 +298,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         overviewTextPressedProperty.send()
     }
 
-    private let similarMoviesButtonPressedProperty = PassthroughSubject<Void, Never>()
-    public func similarMoviesButtonPressed() {
-        similarMoviesButtonPressedProperty.send(())
-    }
-
     private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
     public func movieSelected(movie: Movie) {
         movieSelectedProperty.send(movie)
@@ -369,11 +352,6 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     private let overviewTextActionProperty = PassthroughSubject<String, Never>()
     public func overviewTextAction() -> PassthroughSubject<String, Never> {
         return overviewTextActionProperty
-    }
-
-    private let similarMoviesButtonActionProperty = PassthroughSubject<[Movie], Never>()
-    public func similarMoviesButtonAction() -> PassthroughSubject<[Movie], Never> {
-        return similarMoviesButtonActionProperty
     }
 
     private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()

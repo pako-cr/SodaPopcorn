@@ -56,3 +56,7 @@
 "search_title" = "Start typing to search 🔍";
 "columns" = "Columns";
 "list" = "List";
+"loading_genres_title_label" = "Loading genres 🎬";
+"loading_genres_description_label" = "Please wait while we get the information";
+"search_content_title" = "Type something to search 🔍";
+"search_content_description" = "You can search movies by name or keywords";

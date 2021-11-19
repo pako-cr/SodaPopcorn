@@ -53,7 +53,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let profileImage = CustomProfileImage(frame: .zero)
+    private let profileImage = CustomProfileImage()
 
     private let mainStack: UIStackView = {
         let stack = UIStackView()

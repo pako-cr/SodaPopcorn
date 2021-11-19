@@ -58,8 +58,8 @@ final class CustomProfileImage: UIImageView {
         return activityIndicator
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: .zero)
         setupView()
     }
 

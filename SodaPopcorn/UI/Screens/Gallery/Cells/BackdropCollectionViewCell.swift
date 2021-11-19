@@ -29,7 +29,7 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let backdropImage = CustomBackdropImage(frame: .zero)
+    private let backdropImage = CustomBackdropImage()
 
     override init(frame: CGRect) {
         super.init(frame: frame)

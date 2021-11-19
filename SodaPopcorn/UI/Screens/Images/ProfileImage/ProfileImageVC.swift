@@ -56,7 +56,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var profileImage: CustomProfileImage = {
-        let customImage = CustomProfileImage(frame: .zero)
+        let customImage = CustomProfileImage()
 
         if let cacheImage = cache.value(forKey: "\(ProfileSize.w185.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = cacheImage

@@ -114,7 +114,7 @@ final class PersonGalleryVC: BaseViewController {
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.5 : 3.75)))
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.75 : 3.75)))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -142,7 +142,7 @@ final class PersonGalleryVC: BaseViewController {
                 snapshot.appendItems(images?.map({ $0.filePath ?? ""}) ?? [], toSection: .images)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

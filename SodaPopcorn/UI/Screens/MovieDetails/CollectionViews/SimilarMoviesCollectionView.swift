@@ -81,7 +81,7 @@ public final class SimilarMoviesCollectionView: UICollectionViewController {
 
             let section = NSCollectionLayoutSection(group: group)
 
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
@@ -116,7 +116,7 @@ public final class SimilarMoviesCollectionView: UICollectionViewController {
                 snapshot.appendItems(Array(movies.prefix(18)), toSection: .movies)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

@@ -36,7 +36,7 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let profileImage = CustomProfileImage(frame: .zero)
+    private let profileImage = CustomProfileImage()
 
     override init(frame: CGRect) {
         super.init(frame: frame)

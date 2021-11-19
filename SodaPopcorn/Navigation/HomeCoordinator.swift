@@ -58,7 +58,7 @@ final class HomeCoordinator: Coordinator {
         searchVC.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
 		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController]
-		homeVC?.selectedIndex = 1
+		homeVC?.selectedIndex = 0
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
 		parentViewController.addChild(homeVC!)
@@ -67,16 +67,19 @@ final class HomeCoordinator: Coordinator {
 
         moviesVM.outputs.movieSelectedAction()
 			.sink { [weak self] movie in
-				guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: moviesNavigationController)
+                self?.showMovieDetails(movie: movie, on: moviesNavigationController)
 			}.store(in: &cancellable)
 
         searchVM.outputs.genreSelectedAction()
             .sink { [weak self] genre in
-                guard let `self` = self else { return }
                 if let genreId = genre.id {
-                    self.showMovieList(searchCriteria: .discover(genre: genreId), on: searchNavigationController)
+                    self?.showMovieList(searchCriteria: .discover(genre: genreId), on: searchNavigationController)
                 }
+            }.store(in: &cancellable)
+
+        searchVM.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                self?.showMovieDetails(movie: movie, on: searchNavigationController)
             }.store(in: &cancellable)
 	}
 
@@ -94,26 +97,22 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.galleryButtonAction()
             .sink { [weak self] _ in
-                guard let `self` = self else { return }
-                self.showGalleryView(with: movie, on: navigationController)
+                self?.showGalleryView(with: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.overviewTextAction()
             .sink { [weak self] overview in
-                guard let `self` = self else { return }
-                self.showCustomLongTextView(with: overview, on: navigationController)
+                self?.showCustomLongTextView(with: overview, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.creditsButtonAction()
             .sink { [weak self] (movie, credits) in
-                guard let `self` = self else { return }
-                self.showCreditsView(with: credits, of: movie, on: navigationController)
+                self?.showCreditsView(with: credits, of: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
             .sink { [weak self] person in
-                guard let `self` = self else { return }
-                self.showPersonDetailsView(with: person, on: navigationController)
+                self?.showPersonDetailsView(with: person, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.movieSelectedAction()
@@ -122,7 +121,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 	}
 
-    private func showBackdropImagesView(with imageURL: String, on navigationController: UIViewController) {
+    private func showBackdropImagesView(with imageURL: String, on navigationController: NavigationController) {
         let viewModel = BackdropImageVM(imageURL: imageURL)
         let viewController = BackdropImageVC(viewModel: viewModel)
 
@@ -158,7 +157,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showGalleryView(with movie: Movie, on navigationController: UINavigationController) {
+    private func showGalleryView(with movie: Movie, on navigationController: NavigationController) {
         let viewModel = GalleryVM(movieService: movieService, movie: movie)
         let viewController = GalleryVC(viewModel: viewModel)
 
@@ -182,7 +181,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showCreditsView(with credits: Credits, of movie: Movie, on navigationController: UINavigationController) {
+    private func showCreditsView(with credits: Credits, of movie: Movie, on navigationController: NavigationController) {
         let viewModel = CreditsVM(movie: movie, credits: credits)
         let viewController = CreditsVC(viewModel: viewModel)
 
@@ -212,7 +211,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showPersonDetailsView(with person: Person, on navigationController: UINavigationController) {
+    private func showPersonDetailsView(with person: Person, on navigationController: NavigationController) {
         let viewModel = PersonDetailsVM(movieService: movieService, person: person)
         let viewController = PersonDetailsVC(viewModel: viewModel)
 
@@ -253,7 +252,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showPersonMovieList(with movies: [Movie], and person: Person, on navigationController: UINavigationController) {
+    private func showPersonMovieList(with movies: [Movie], and person: Person, on navigationController: NavigationController) {
         guard !movies.isEmpty else { return }
 
         let viewModel = PersonMovieListVM(movies: movies, person: person)
@@ -273,7 +272,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showMovieDetails(movie: Movie, with navigationController: UINavigationController) {
+    private func showMovieDetails(movie: Movie, with navigationController: NavigationController) {
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
         let viewController = MovieDetailsVC(viewModel: viewModel)
 
@@ -314,7 +313,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showPersonGallery(person: Person, images: [PersonImage], with navigationController: UINavigationController) {
+    private func showPersonGallery(person: Person, images: [PersonImage], with navigationController: NavigationController) {
         let viewModel = PersonGalleryVM(person: person, personImages: images)
         let viewController = PersonGalleryVC(viewModel: viewModel)
 

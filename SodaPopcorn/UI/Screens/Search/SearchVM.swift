@@ -9,9 +9,6 @@ import Foundation
 import Combine
 
 public protocol SearchVMInputs: AnyObject {
-    /// Call to get the movies.
-    func fetchMovies()
-
     /// Call when a movie is selected.
     func movieSelected(movie: Movie)
 
@@ -23,6 +20,9 @@ public protocol SearchVMInputs: AnyObject {
 
     /// Call when the search text did change.
     func searchTextDidChange(searchQuery: String?)
+
+    /// Call when the search controller change its status.
+    func searchControllerDidChange(isActive: Bool)
 }
 
 public protocol SearchVMOutputs: AnyObject {
@@ -46,6 +46,9 @@ public protocol SearchVMOutputs: AnyObject {
 
     /// Emits when a genre is selected.
     func genreSelectedAction() -> PassthroughSubject<Genre, Never>
+
+    /// Emits when the search controller change its status.
+    func searchControllerDidChangeAction() -> PassthroughSubject<Bool, Never>
 }
 
 public protocol SearchVMTypes: AnyObject {
@@ -55,7 +58,7 @@ public protocol SearchVMTypes: AnyObject {
 
 public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, SearchVMOutputs, SearchVMTypes {
     // MARK: Constants
-    private let movieService: MovieService
+    let movieService: MovieService
 
     // MARK: Variables
     public var inputs: SearchVMInputs { return self }
@@ -70,13 +73,17 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
 
         self.movieSelectedProperty
             .sink { [weak self] movie in
-                guard let `self` = self else { return }
-                self.movieSelectedActionProperty.send(movie)
+                self?.movieSelectedActionProperty.send(movie)
             }.store(in: &cancellable)
 
         self.genreSelectedProperty
             .sink { [weak self] genre in
                 self?.genreSelectedActionProperty.send(genre)
+            }.store(in: &cancellable)
+
+        self.searchControllerDidChangeProperty
+            .sink { [weak self] isActive in
+                self?.searchControllerDidChangeActionProperty.send(isActive)
             }.store(in: &cancellable)
 
         let genresListEvent = viewDidLoadProperty
@@ -155,11 +162,6 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
     }
 
     // MARK: - ⬇️ INPUTS Definition
-    private let fetchMoviesProperty = PassthroughSubject<Void, Never>()
-    public func fetchMovies() {
-        fetchMoviesProperty.send(())
-    }
-
     private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
     public func movieSelected(movie: Movie) {
         movieSelectedProperty.send(movie)
@@ -179,6 +181,11 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
     private let searchTextDidChangeProperty = PassthroughSubject<String?, Never>()
     public func searchTextDidChange(searchQuery: String?) {
         searchTextDidChangeProperty.send(searchQuery)
+    }
+
+    private let searchControllerDidChangeProperty = PassthroughSubject<Bool, Never>()
+    public func searchControllerDidChange(isActive: Bool) {
+        searchControllerDidChangeProperty.send(isActive)
     }
 
     // MARK: - ⬆️ OUTPUTS Definition
@@ -215,6 +222,11 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
     private let genreSelectedActionProperty = PassthroughSubject<Genre, Never>()
     public func genreSelectedAction() -> PassthroughSubject<Genre, Never> {
         return genreSelectedActionProperty
+    }
+
+    private let searchControllerDidChangeActionProperty = PassthroughSubject<Bool, Never>()
+    public func searchControllerDidChangeAction() -> PassthroughSubject<Bool, Never> {
+        return searchControllerDidChangeActionProperty
     }
 
     // MARK: - ⚙️ Helpers

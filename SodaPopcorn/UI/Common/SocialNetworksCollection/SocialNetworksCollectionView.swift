@@ -109,7 +109,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
                 snapshot.appendItems(socialNetworks, toSection: .socialNetworks)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

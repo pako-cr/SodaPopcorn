@@ -6,5 +6,5 @@
 //
 
 public enum SearchCriteria {
-    case nowPlaying, discover(genre: Int)
+    case nowPlaying, discover(genre: Int), topRated, upcomming, popular
 }

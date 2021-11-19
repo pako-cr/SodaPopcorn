@@ -11,8 +11,9 @@ public struct Movie: Hashable {
     let productionCompanies: [ProductionCompany]?
     let runtime, voteCount, budget, revenue: Int?
     let id, title, overview, posterPath, backdropPath, releaseDate, homepage, tagline, character: String?
+    let adult: Bool?
 
-    init(id: String? = nil, title: String? = nil, overview: String? = nil, rating: Double? = nil, posterPath: String? = nil, backdropPath: String? = nil, releaseDate: String? = nil, genres: [Genre]? = nil, homepage: String? = nil, runtime: Int? = nil, voteCount: Int? = nil, budget: Int? = nil, revenue: Int? = nil, tagline: String? = nil, productionCompanies: [ProductionCompany]? = nil, character: String? = nil) {
+    init(id: String? = nil, title: String? = nil, overview: String? = nil, rating: Double? = nil, posterPath: String? = nil, backdropPath: String? = nil, releaseDate: String? = nil, genres: [Genre]? = nil, homepage: String? = nil, runtime: Int? = nil, voteCount: Int? = nil, budget: Int? = nil, revenue: Int? = nil, tagline: String? = nil, productionCompanies: [ProductionCompany]? = nil, character: String? = nil, adult: Bool? = false) {
         self.id = id
         self.title = title
         self.overview = overview
@@ -29,6 +30,7 @@ public struct Movie: Hashable {
         self.tagline = tagline
         self.productionCompanies = productionCompanies
         self.character = character
+        self.adult = adult
     }
 
     init(apiResponse: MovieApiResponse) {
@@ -47,7 +49,8 @@ public struct Movie: Hashable {
                   revenue: apiResponse.revenue,
                   tagline: apiResponse.tagline,
                   productionCompanies: apiResponse.productionCompanies?.map({ ProductionCompany(apiResponse: $0) }),
-                  character: apiResponse.character
+                  character: apiResponse.character,
+                  adult: apiResponse.adult
         )
     }
 

@@ -62,7 +62,7 @@ public final class CastCollectionView: UICollectionViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
-        collectionView.isScrollEnabled = true
+        collectionView.isScrollEnabled = false
         collectionView.alwaysBounceHorizontal = true
         collectionView.backgroundColor = .clear
     }
@@ -80,7 +80,7 @@ public final class CastCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
@@ -116,7 +116,7 @@ public final class CastCollectionView: UICollectionViewController {
                 snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

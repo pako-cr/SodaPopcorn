@@ -10,7 +10,7 @@ import Combine
 
 public protocol MoviesVMInputs: AnyObject {
 	/// Call to get the new movies.
-	func fetchNewMovies()
+	func fetchMovies()
 
 	/// Call to pull to refresh.
 	func pullToRefresh()
@@ -20,11 +20,14 @@ public protocol MoviesVMInputs: AnyObject {
 
     /// Call when the close button is pressed.
     func closeButtonPressed()
+
+    /// Call when the search criteria is changed.
+    func setSearchCriteria(searchCriteria: SearchCriteria)
 }
 
 public protocol MoviesVMOutputs: AnyObject {
 	/// Emits to get the new movies.
-	func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
+	func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
 	/// Emits when loading.
 	func loading() -> CurrentValueSubject<Bool, Never>
@@ -40,6 +43,9 @@ public protocol MoviesVMOutputs: AnyObject {
 
     /// Emits when the close button is pressed.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
+
+    /// Emits when the search criteria is changed.
+    func setSearchCriteriaAction() -> PassthroughSubject<SearchCriteria, Never>
 }
 
 public protocol MoviesVMTypes: AnyObject {
@@ -50,7 +56,6 @@ public protocol MoviesVMTypes: AnyObject {
 public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, MoviesVMOutputs, MoviesVMTypes {
 	// MARK: Constants
 	private let movieService: MovieService
-    private let searchCriteria: SearchCriteria
     let presentedViewController: Bool
 
 	// MARK: Variables
@@ -59,6 +64,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
+    private var searchCriteria = SearchCriteria.nowPlaying
 	private var page = 0
 
     public init(movieService: MovieService, searchCriteria: SearchCriteria, presentedViewController: Bool) {
@@ -77,7 +83,12 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
                 self?.closeButtonActionProperty.send(())
             }.store(in: &cancellable)
 
-        let getNewMoviesEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+        self.setSearchCriteriaProperty
+            .sink { [weak self] searchCriteria in
+                self?.setSearchCriteriaActionProperty.send(searchCriteria)
+            }.store(in: &cancellable)
+
+        let getMoviesEvent = Publishers.Merge(self.fetchMoviesProperty, self.pullToRefreshProperty)
             .filter({ _ in
                 switch self.searchCriteria {
                 case .nowPlaying: return true
@@ -100,7 +111,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 				 	.eraseToAnyPublisher()
             }).share()
 
-        let searchByGenreEvent = Publishers.Merge(self.fetchNewMoviesProperty, self.pullToRefreshProperty)
+        let searchByGenreEvent = Publishers.Merge(self.fetchMoviesProperty, self.pullToRefreshProperty)
             .filter({ _ in
                 switch self.searchCriteria {
                 case .discover:
@@ -134,7 +145,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
         Publishers.Merge(
             searchByGenreEvent,
-            getNewMoviesEvent)
+            getMoviesEvent)
             .sink(receiveCompletion: { [weak self] completionReceived in
                 guard let `self` = self else { return }
 
@@ -154,16 +165,16 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 					print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
 
 					self.finishedFetchingActionProperty.send(self.page >= movies.numberOfPages ?? 0)
-					self.fetchNewMoviesActionProperty.send(movies.movies)
+					self.fetchMoviesActionProperty.send(movies.movies)
 				}
 			}).store(in: &cancellable)
 	}
 
 	// MARK: - ⬇️ INPUTS Definition
-	private let fetchNewMoviesProperty = PassthroughSubject<Void, Never>()
-	public func fetchNewMovies() {
+	private let fetchMoviesProperty = PassthroughSubject<Void, Never>()
+	public func fetchMovies() {
         self.page += 1
-		fetchNewMoviesProperty.send(())
+		fetchMoviesProperty.send(())
 	}
 
 	private let pullToRefreshProperty = PassthroughSubject<Void, Never>()
@@ -182,10 +193,15 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
         closeButtonPressedProperty.send(())
     }
 
+    private let setSearchCriteriaProperty = PassthroughSubject<SearchCriteria, Never>()
+    public func setSearchCriteria(searchCriteria: SearchCriteria) {
+        setSearchCriteriaProperty.send(searchCriteria)
+    }
+
 	// MARK: - ⬆️ OUTPUTS Definition
-	private let fetchNewMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
-	public func fetchNewMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
-		return fetchNewMoviesActionProperty
+	private let fetchMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
+	public func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
+		return fetchMoviesActionProperty
 	}
 
 	private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
@@ -211,6 +227,11 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
     private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
     public func closeButtonAction() -> PassthroughSubject<Void, Never> {
         return closeButtonActionProperty
+    }
+
+    private let setSearchCriteriaActionProperty = PassthroughSubject<SearchCriteria, Never>()
+    public func setSearchCriteriaAction() -> PassthroughSubject<SearchCriteria, Never> {
+        return setSearchCriteriaActionProperty
     }
 
 	// MARK: - ⚙️ Helpers

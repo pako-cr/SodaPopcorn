@@ -11,27 +11,34 @@ import UIKit
 final class SearchVC: BaseViewController {
     enum Section: CaseIterable {
         case genres
+        case movies
     }
 
     // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, Genre>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Genre>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, SearchObject>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, SearchObject>
 
     // MARK: - Consts
     private let viewModel: SearchVM
 
+    private var genres: [Genre]?
+    private var currentSearchControllerStatus = false
+
     // MARK: - Variables
+    private var finishedFetchingSubscription: Cancellable!
+    private var finishedFetching = false
+
     private var dataSource: DataSource!
     private var genresSubscription: Cancellable!
     private var moviesSubscription: Cancellable!
     private var loadingSubscription: Cancellable!
     private var showErrorSubscription: Cancellable!
+    private var searchControllerDidChangeSubscription: Cancellable!
     private var loading = false
 
     // MARK: UI Elements
-    private var genresCollectionView: UICollectionView!
+    private var collectionView: UICollectionView!
 
-    // MARK: - UI Elements
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
         searchController.isActive = true
@@ -62,16 +69,16 @@ final class SearchVC: BaseViewController {
 
         navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
         view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-        genresCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
     override func setupUI() {
-        view.addSubview(genresCollectionView)
+        view.addSubview(collectionView)
 
-        genresCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        genresCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        genresCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        genresCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
     private func setupNavigationBar() {
@@ -82,10 +89,16 @@ final class SearchVC: BaseViewController {
     }
 
     override func bindViewModel() {
-//        moviesSubscription = viewModel.outputs.fetchMoviesAction()
-//            .sink(receiveValue: { [weak self] movies in
-//                self?.title = movie.title ?? NSLocalizedString("credits", comment: "Credits")
-//            })
+        moviesSubscription = viewModel.outputs.fetchMoviesAction()
+            .sink(receiveValue: { [weak self] movies in
+                guard let `self` = self else { return }
+
+                if !(movies?.isEmpty ?? true) {
+                    if self.currentSearchControllerStatus {
+                        self.updateDataSource(movies: movies, animatingDifferences: true)
+                    }
+                }
+            })
 
         showErrorSubscription = viewModel.outputs.showError()
             .sink(receiveValue: { [weak self] errorMessage in
@@ -96,57 +109,117 @@ final class SearchVC: BaseViewController {
 
         loadingSubscription = viewModel.outputs.loading()
             .sink(receiveValue: { [weak self] (loading) in
-                guard let `self` = self else { return }
-                self.loading = loading
+                DispatchQueue.main.async { [weak self] in
+                    self?.loading = loading
+                    self?.searchController.searchBar.isLoading = loading
+                }
             })
 
         genresSubscription = viewModel.outputs.genresAction()
             .sink(receiveValue: { [weak self] genres in
+                self?.genres = genres
                 self?.updateDataSource(genres: genres)
+            })
+
+        searchControllerDidChangeSubscription = viewModel.outputs.searchControllerDidChangeAction()
+            .sink(receiveValue: { [weak self] isActive in
+                guard let `self` = self else { return }
+
+                if isActive {
+                    self.updateDataSource(genres: [], animatingDifferences: true)
+
+                } else {
+                    self.updateDataSource(genres: self.genres, animatingDifferences: true)
+                }
             })
     }
 
     // MARK: - Collection View
     private func configureCollectionView() {
-        genresCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        genresCollectionView.register(GenreCollectionViewCell.self, forCellWithReuseIdentifier: GenreCollectionViewCell.reuseIdentifier)
-        genresCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
-        genresCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        genresCollectionView.isScrollEnabled = true
-        genresCollectionView.showsVerticalScrollIndicator = false
-        genresCollectionView.allowsSelection = true
-        genresCollectionView.isPrefetchingEnabled = true
-        genresCollectionView.delegate = self
-        genresCollectionView.alwaysBounceVertical = true
-        genresCollectionView.backgroundColor = UIColor.systemBackground
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView.register(GenreCollectionViewCell.self, forCellWithReuseIdentifier: GenreCollectionViewCell.reuseIdentifier)
+        collectionView.register(MovieCollectionViewCell.self, forCellWithReuseIdentifier: MovieCollectionViewCell.reuseIdentifier)
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.isScrollEnabled = true
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.allowsSelection = true
+        collectionView.isPrefetchingEnabled = true
+        collectionView.delegate = self
+        collectionView.alwaysBounceVertical = true
+        collectionView.backgroundColor = UIColor.systemBackground
     }
 
     private func configureDataSource() {
-        self.dataSource = DataSource(collectionView: genresCollectionView, cellProvider: { collectionView, indexPath, item in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GenreCollectionViewCell.reuseIdentifier, for: indexPath) as? GenreCollectionViewCell
-            cell?.configure(with: item)
-            return cell
+        self.dataSource = DataSource(collectionView: collectionView, cellProvider: { collectionView, indexPath, item in
+            switch indexPath.section {
+            case 0:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GenreCollectionViewCell.reuseIdentifier, for: indexPath) as? GenreCollectionViewCell
+                if let genre = item.genre {
+                    cell?.configure(with: genre)
+                    return cell
+                }
+                return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath)
+
+            case 1:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCollectionViewCell.reuseIdentifier, for: indexPath) as? MovieCollectionViewCell
+                if let movie = item.movie {
+                    cell?.configure(with: movie)
+                    return cell
+                }
+                return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath)
+            default:
+                return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCellId", for: indexPath)
+            }
         })
     }
 
     private func createLayout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
-                                                  heightDimension: .fractionalHeight(1.0))
+        return UICollectionViewCompositionalLayout(sectionProvider: { [unowned self] (sectionIndex, _) -> NSCollectionLayoutSection? in
 
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .uniform(size: 2.0)
-
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 3 : 6)))
-
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
-            let section = NSCollectionLayoutSection(group: group)
-
-            return section
+            switch sectionIndex {
+            case 0:
+                return self.genresSection()
+            default:
+                return self.moviesSection()
+            }
         })
+    }
+
+    private func genresSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
+                                              heightDimension: .fractionalHeight(1.0))
+
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = .uniform(size: 2.0)
+
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 4.5 : 9)))
+
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
+        let section = NSCollectionLayoutSection(group: group)
+
+        return section
+    }
+
+    private func moviesSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .fractionalHeight(1.0))
+
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 2.0)
+
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.5 : 3.75)))
+
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+
+        let section = NSCollectionLayoutSection(group: group)
+
+        return section
     }
 
     private func setInitialData() {
@@ -155,17 +228,25 @@ final class SearchVC: BaseViewController {
         self.dataSource.apply(snapshot, animatingDifferences: false)
     }
 
-    private func updateDataSource(genres: [Genre]?, animatingDifferences: Bool = true) {
+    private func updateDataSource(genres: [Genre]? = nil, movies: [Movie]? = nil, animatingDifferences: Bool = true) {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
 
             var snapshot = self.dataSource.snapshot()
 
             if let genres = genres, !genres.isEmpty {
-                snapshot.appendItems(genres, toSection: .genres)
+                snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .movies))
+                snapshot.appendItems(genres.map({ SearchObject(genre: Genre(id: $0.id, name: $0.name) )}), toSection: .genres)
+            } else {
+                snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .genres))
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            if let movies = movies, !movies.isEmpty {
+                snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .movies))
+                snapshot.appendItems(movies.map({ SearchObject(movie: Movie(id: $0.id, title: $0.title, overview: $0.overview, rating: $0.rating, posterPath: $0.posterPath, backdropPath: $0.backdropPath, releaseDate: $0.releaseDate)) }), toSection: .movies)
+            }
+
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
             self.handleEmptyView()
         }
     }
@@ -176,17 +257,17 @@ final class SearchVC: BaseViewController {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
             if self.loading && dataSourceItems < 1 {
-                self.genresCollectionView.setEmptyView(title: NSLocalizedString("loading_genres_title_label", comment: "Loading title"),
+                self.collectionView.setEmptyView(title: NSLocalizedString("loading_genres_title_label", comment: "Loading title"),
                                                  message: NSLocalizedString("loading_genres_description_label", comment: "Loading Message"),
                                                  centeredY: true)
 
             } else if !self.loading && dataSourceItems < 1 {
-                self.genresCollectionView.setEmptyView(title: NSLocalizedString("empty_genres_title_label", comment: "Empty list title"),
-                                                 message: NSLocalizedString("empty_genres_description_label", comment: "Empty list message"),
+                self.collectionView.setEmptyView(title: NSLocalizedString("search_content_title", comment: "Search title"),
+                                                 message: NSLocalizedString("search_content_description", comment: "Search description"),
                                                  centeredY: true)
 
             } else {
-                self.genresCollectionView.removeEmptyView()
+                self.collectionView.removeEmptyView()
             }
         }
     }
@@ -201,16 +282,37 @@ final class SearchVC: BaseViewController {
 
 extension SearchVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let genre = dataSource.itemIdentifier(for: indexPath) else { return }
-        viewModel.inputs.genreSelected(genre: genre)
+
+        switch indexPath.section {
+        case 0:
+            guard let genre = dataSource.itemIdentifier(for: indexPath)?.genre else { return }
+            viewModel.inputs.genreSelected(genre: genre)
+        case 1:
+            guard let movie = dataSource.itemIdentifier(for: indexPath)?.movie else { return }
+            viewModel.inputs.movieSelected(movie: movie)
+        default:
+            break
+        }
     }
 }
 
 extension SearchVC: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         searchController.showsSearchResultsController = true
+
+        if currentSearchControllerStatus != searchController.isActive {
+            self.currentSearchControllerStatus = searchController.isActive
+            viewModel.inputs.searchControllerDidChange(isActive: searchController.isActive)
+        }
+
         if let searchQuery = searchController.searchBar.text {
             viewModel.inputs.searchTextDidChange(searchQuery: searchQuery)
+
+            if !searchQuery.isEmpty, searchQuery.count >= 4 {
+                DispatchQueue.main.async { [weak self] in
+                    self?.searchController.searchBar.isLoading = true
+                }
+            }
         }
     }
 }

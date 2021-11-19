@@ -56,3 +56,7 @@
 "search_title" = "Escribe algo para buscar 🔍";
 "columns" = "Columnas";
 "list" = "Lista";
+"loading_genres_title_label" = "Cargando géneros 🎬";
+"loading_genres_description_label" = "Por favor espera mientras cargamos la información";
+"search_content_title" = "Escribe algo para buscar 🔍";
+"search_content_description" = "Puedes buscar por nombre o palabras clave";

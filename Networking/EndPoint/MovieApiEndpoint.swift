@@ -114,11 +114,13 @@ extension MovieApiEndpoint: EndPointType {
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["page": page,
                                                       "api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
         case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .genreList, .person, .personMovieCredits, .personExternalIds, .personImages:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
         case .discover(let genre, let page):
             return .requestParameters(bodyParameters: nil,
@@ -127,6 +129,7 @@ extension MovieApiEndpoint: EndPointType {
                                                       "with_genres": genre,
                                                       "sort_by": "popularity.desc",
                                                       "api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
         case .searchMovie(let query, let page):
             return .requestParameters(bodyParameters: nil,
@@ -134,6 +137,7 @@ extension MovieApiEndpoint: EndPointType {
                                       urlParameters: ["page": page,
                                                       "query": query,
                                                       "api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
         }
     }

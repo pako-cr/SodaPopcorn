@@ -119,7 +119,7 @@ final class MovieDetailsVC: BaseViewController {
         return contentView
     }()
 
-    private let backdropImage = CustomBackdropImage(frame: .zero)
+    private let backdropImage = CustomBackdropImage()
 
     private lazy var ratingScoreChartView = RatingScoreChartView(ratingValue: self.movie?.rating ?? 0.0)
 

@@ -71,7 +71,7 @@ final class PersonMovieListVC: MoviesBaseCollectionView {
             var snapshot = self.dataSource.snapshot()
             snapshot.appendItems(movies, toSection: .movies)
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
             self.handleEmptyView()
         }
     }

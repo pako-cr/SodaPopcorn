@@ -87,7 +87,11 @@ final class PersonDetailsVC: BaseViewController {
         return contentView
     }()
 
-    private let profileImage = CustomProfileImage(frame: .zero)
+    private let profileImage: CustomProfileImage = {
+        let profileImage = CustomProfileImage()
+        profileImage.isUserInteractionEnabled = true
+        return profileImage
+    }()
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -238,6 +242,10 @@ final class PersonDetailsVC: BaseViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(biographyTapped))
         tapGesture.numberOfTouchesRequired = 1
         biographyValue.addGestureRecognizer(tapGesture)
+
+        let profilePhotoTapGesture = UITapGestureRecognizer(target: self, action: #selector(profilePhotoTapped))
+        profilePhotoTapGesture.numberOfTouchesRequired = 1
+        profileImage.addGestureRecognizer(profilePhotoTapGesture)
     }
 
     override func bindViewModel() {
@@ -285,8 +293,10 @@ final class PersonDetailsVC: BaseViewController {
     }
 
     @objc
-    private func galleryButtonPressed() {
-//        viewModel.inputs.galleryButtonPressed()
+    private func profilePhotoTapped() {
+        if let profilePath = person?.profilePath {
+            viewModel.inputs.personImageSelected(imageUrl: profilePath)
+        }
     }
 
     @objc
