@@ -11,8 +11,8 @@ import UIKit
 final class GalleryVC: BaseViewController {
     enum Section: CaseIterable {
         case backdrops
-        case posters
         case videos
+        case posters
     }
 
     // MARK: - Types
@@ -107,11 +107,11 @@ final class GalleryVC: BaseViewController {
                 cell?.configure(with: item)
                 return cell
             case 1:
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PosterCollectionViewCell.reuseIdentifier, for: indexPath) as? PosterCollectionViewCell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.reuseIdentifier, for: indexPath) as? VideoCollectionViewCell
                 cell?.configure(with: item)
                 return cell
             case 2:
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.reuseIdentifier, for: indexPath) as? VideoCollectionViewCell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PosterCollectionViewCell.reuseIdentifier, for: indexPath) as? PosterCollectionViewCell
                 cell?.configure(with: item)
                 return cell
             default:
@@ -128,10 +128,10 @@ final class GalleryVC: BaseViewController {
                 headerCell?.configure(with: NSLocalizedString("gallery_view_backdrops_header", comment: "Backdrops Header"))
 
             } else if indexPath.section == 1 {
-                headerCell?.configure(with: NSLocalizedString("gallery_view_posters_header", comment: "Posters Header"))
+                headerCell?.configure(with: NSLocalizedString("gallery_view_videos_header", comment: "Videos Header"))
 
             } else {
-                headerCell?.configure(with: NSLocalizedString("gallery_view_videos_header", comment: "Videos Header"))
+                headerCell?.configure(with: NSLocalizedString("gallery_view_posters_header", comment: "Posters Header"))
             }
 
             return headerCell
@@ -141,17 +141,16 @@ final class GalleryVC: BaseViewController {
     private func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { [unowned self] (sectionIndex, _) -> NSCollectionLayoutSection? in
 
-            if sectionIndex == 0 {
-                return self.backdropSection()
-            } else if sectionIndex == 1 {
+            switch sectionIndex {
+            case 0...1:
+                return self.backdropsAndVideosSection()
+            default:
                 return self.posterSection()
-            } else {
-                return self.videoSection()
             }
         })
     }
 
-    private func backdropSection() -> NSCollectionLayoutSection {
+    private func backdropsAndVideosSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
                                               heightDimension: .fractionalHeight(1.0))
 
@@ -160,7 +159,7 @@ final class GalleryVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 3 : 6)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 6)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -169,14 +168,15 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.05))
+            heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(horizontal: 20.0, vertical: 0.0)
+        sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -191,7 +191,7 @@ final class GalleryVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1 : 3.5)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -200,45 +200,15 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
+            heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top)
 
-        sectionHeader.contentInsets = .init(header: 20.0)
-        section.boundarySupplementaryItems = [sectionHeader]
-
-        return section
-    }
-
-    private func videoSection() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .fractionalHeight(1.0))
-
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = .uniform(size: 5.0)
-
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
-
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-
-        let section = NSCollectionLayoutSection(group: group)
-
-        // Supplementary header view setup
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * 0.125))
-
-        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top)
-
-        sectionHeader.contentInsets = .init(header: 20.0)
+        sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
 
         return section
@@ -274,7 +244,7 @@ final class GalleryVC: BaseViewController {
                 snapshot.appendItems(gallery.videos?.map({ $0.key ?? ""}) ?? [], toSection: .videos)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
@@ -304,9 +274,9 @@ extension GalleryVC: UICollectionViewDelegate {
         case 0:
             viewModel.inputs.backdropImageSelected(imageURL: itemUrl)
         case 1:
-            viewModel.inputs.posterImageSelected(imageURL: itemUrl)
-        case 2:
             openMovieVideo(videoURL: itemUrl)
+        case 2:
+            viewModel.inputs.posterImageSelected(imageURL: itemUrl)
         default:
             break
         }

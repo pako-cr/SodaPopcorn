@@ -13,8 +13,8 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
     }
 
     // MARK: - Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, PersonImage>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, PersonImage>
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, String>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, String>
 
     // MARK: - Variables
     private var dataSource: DataSource!
@@ -58,11 +58,11 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
     // MARK: - Collection
     private func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
-        collectionView.register(PersonGalleryCollectionViewCell.self, forCellWithReuseIdentifier: PersonGalleryCollectionViewCell.reuseIdentifier)
+        collectionView.register(ProfileCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCollectionViewCell.reuseIdentifier)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
-        collectionView.isScrollEnabled = true
+        collectionView.isScrollEnabled = false
         collectionView.alwaysBounceHorizontal = true
         collectionView.backgroundColor = .clear
     }
@@ -80,18 +80,18 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
     }
 
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<PersonGalleryCollectionViewCell, PersonImage> { cell, _, personImage in
+        let cellRegistration = UICollectionView.CellRegistration<ProfileCollectionViewCell, String> { cell, _, personImage in
             cell.configure(with: personImage)
         }
 
-        let dataSource = UICollectionViewDiffableDataSource<Section, PersonImage>(collectionView: collectionView) { (collectionView, indexPath, personImage) in
+        let dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) { (collectionView, indexPath, personImage) in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: personImage)
         }
 
@@ -112,21 +112,21 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
 
             if let images = images, !images.isEmpty {
                 self.collectionView.removeEmptyView()
-                snapshot.appendItems(Array(images.prefix(11)), toSection: .images)
-                snapshot.appendItems([PersonImage(filePath: "more_info")], toSection: .images)
+                snapshot.appendItems(Array(images.prefix(11).map({ $0.filePath ?? "" })), toSection: .images)
+                snapshot.appendItems(["more_info"], toSection: .images)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
     override public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let personImage = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let itemUrl = dataSource.itemIdentifier(for: indexPath) else { return }
 
-        if personImage.filePath == "more_info" {
+        if itemUrl == "more_info" {
             self.viewModel?.inputs.personGallerySelected()
         } else {
-            self.viewModel?.inputs.personImageSelected(personImage: personImage)
+            self.viewModel?.inputs.personImageSelected(imageUrl: itemUrl)
         }
     }
 
@@ -137,7 +137,7 @@ public final class PersonGalleryCollectionView: UICollectionViewController {
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_images", comment: "No images to display"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

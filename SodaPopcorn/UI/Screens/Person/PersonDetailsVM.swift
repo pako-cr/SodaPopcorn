@@ -24,8 +24,8 @@ public protocol PersonDetailsVMInputs: AnyObject {
     /// Call when user press more movies button.
     func personMoviesButtonPressed()
 
-    /// Call when a person image is selected.
-    func personImageSelected(personImage: PersonImage)
+    /// Call when an image is selected.
+    func personImageSelected(imageUrl: String)
 
     /// Call when the user selects person gallery.
     func personGallerySelected()
@@ -65,8 +65,8 @@ public protocol PersonDetailsVMOutputs: AnyObject {
     /// Emits when the user selects person gallery.
     func personGallerySelectedAction() -> PassthroughSubject<(Person, [PersonImage]), Never>
 
-    /// Emits when a person image is selected.
-    func personImageAction() -> PassthroughSubject<PersonImage, Never>
+    /// Emits when an image is selected.
+    func personImageAction() -> PassthroughSubject<String, Never>
 }
 
 public protocol PersonDetailsVMTypes: AnyObject {
@@ -150,7 +150,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] personDetails in
@@ -182,7 +182,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] movies in
@@ -213,7 +213,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] socialNetworks in
@@ -244,7 +244,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
                 switch completionReceived {
                     case .failure(let error):
                         print("🔴 [PersonDetailsVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                        self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                     default: break
                 }
             }, receiveValue: { [weak self] personImages in
@@ -282,9 +282,9 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         personMoviesButtonPressedProperty.send(())
     }
 
-    private let personImageSelectedProperty = PassthroughSubject<PersonImage, Never>()
-    public func personImageSelected(personImage: PersonImage) {
-        personImageSelectedProperty.send(personImage)
+    private let personImageSelectedProperty = PassthroughSubject<String, Never>()
+    public func personImageSelected(imageUrl: String) {
+        personImageSelectedProperty.send(imageUrl)
     }
 
     private let personGallerySelectedProperty = PassthroughSubject<Void, Never>()
@@ -343,8 +343,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
         return personImagesActionProperty
     }
 
-    private let personImageActionProperty = PassthroughSubject<PersonImage, Never>()
-    public func personImageAction() -> PassthroughSubject<PersonImage, Never> {
+    private let personImageActionProperty = PassthroughSubject<String, Never>()
+    public func personImageAction() -> PassthroughSubject<String, Never> {
         return personImageActionProperty
     }
 
@@ -355,20 +355,8 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
 
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        var localizedErrorString: String
-
-        switch networkResponse {
-
-            case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
-            case .badRequest: localizedErrorString = "network_response_error_bad_request"
-            case .outdated: localizedErrorString = "network_response_error_outdated"
-            case .failed: localizedErrorString = "network_response_error_failed"
-            case .noData: localizedErrorString = "network_response_error_no_data"
-            case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
-            default: localizedErrorString = "network_response_error_failed"
-        }
-
-        self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
+        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 
     // MARK: - 🗑 Deinit

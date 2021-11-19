@@ -22,6 +22,6 @@ public struct Movies {
         self.init(page: apiResponse.page,
                   numberOfResults: apiResponse.numberOfResults,
                   numberOfPages: apiResponse.numberOfPages,
-                  movies: apiResponse.movies?.map({ Movie(apiResponse: $0) }) ?? [])
+                  movies: apiResponse.movies?.compactMap({ return !$0.adult ? Movie(apiResponse: $0) : nil }) ?? []) // Remove adult movies
     }
 }

@@ -122,7 +122,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
                 switch completionReceived {
                 case .failure(let error):
                     print("🔴 [GalleryVM] [init] Received completion error. Error: \(error.localizedDescription)")
-                    self.showErrorProperty.send(NSLocalizedString("network_connection_error", comment: "Network error message"))
+                    self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network error message"))
                 default: break
                 }
             }, receiveValue: { [weak self] (movieImages, movieVideos) in
@@ -132,8 +132,13 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
                 var backdrops: [Backdrop] = []
                 var posters: [Poster] = []
 
+                if let defaultBackdrop = movie.backdropPath, !defaultBackdrop.isEmpty &&
+                    !(movieImages.backdrops?.contains(where: { $0.filePath == defaultBackdrop }) ?? true) {
+                    backdrops.append(Backdrop(filePath: defaultBackdrop))
+                }
+
                 if let movieBackdrops = movieImages.backdrops, !movieBackdrops.isEmpty {
-                    backdrops = movieBackdrops
+                    backdrops.append(contentsOf: movieBackdrops)
                 }
 
                 if let moviePosters = movieImages.posters, !moviePosters.isEmpty {
@@ -213,20 +218,8 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
 
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        var localizedErrorString: String
-
-        switch networkResponse {
-
-        case .authenticationError: localizedErrorString = "network_response_error_authentication_error"
-        case .badRequest: localizedErrorString = "network_response_error_bad_request"
-        case .outdated: localizedErrorString = "network_response_error_outdated"
-        case .failed: localizedErrorString = "network_response_error_failed"
-        case .noData: localizedErrorString = "network_response_error_no_data"
-        case .unableToDecode: localizedErrorString = "network_response_error_unable_to_decode"
-        default: localizedErrorString = "network_response_error_failed"
-        }
-
-        self.showErrorProperty.send(NSLocalizedString(localizedErrorString, comment: "Network response error"))
+        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 
     // MARK: - 🗑 Deinit

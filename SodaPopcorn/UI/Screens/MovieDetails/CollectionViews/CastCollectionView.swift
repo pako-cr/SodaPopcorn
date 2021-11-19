@@ -18,13 +18,13 @@ public final class CastCollectionView: UICollectionViewController {
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var movieDetailsVM: MovieDetailsVM?
+    private var viewModel: MovieDetailsVM?
 
     // MARK: - UI Elements
     private let collectionLabel = CustomTitleLabelView(titleText: NSLocalizedString("cast_collection_view_title", comment: "Cast Label"))
 
-    init(movieDetailsVM: MovieDetailsVM) {
-        self.movieDetailsVM = movieDetailsVM
+    init(viewModel: MovieDetailsVM) {
+        self.viewModel = viewModel
         super.init(collectionViewLayout: UICollectionViewLayout())
     }
 
@@ -62,7 +62,7 @@ public final class CastCollectionView: UICollectionViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsSelection = true
-        collectionView.isScrollEnabled = true
+        collectionView.isScrollEnabled = false
         collectionView.alwaysBounceHorizontal = true
         collectionView.backgroundColor = .clear
     }
@@ -80,7 +80,7 @@ public final class CastCollectionView: UICollectionViewController {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
             let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
@@ -116,7 +116,7 @@ public final class CastCollectionView: UICollectionViewController {
                 snapshot.appendItems([Cast(name: "more_info")], toSection: .cast)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
@@ -124,16 +124,16 @@ public final class CastCollectionView: UICollectionViewController {
         guard let cast = dataSource.itemIdentifier(for: indexPath) else { return }
 
         if cast.name == "more_info" {
-            self.movieDetailsVM?.inputs.creditsButtonPressed()
+            self.viewModel?.inputs.creditsButtonPressed()
         } else {
-            self.movieDetailsVM?.inputs.castMemberSelected(cast: cast)
+            self.viewModel?.inputs.castMemberSelected(cast: cast)
         }
     }
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
-            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_cast", comment: "No cast information"), centeredX: false)
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 

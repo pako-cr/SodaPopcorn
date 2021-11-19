@@ -20,7 +20,7 @@ final class VideoCollectionViewCell: UICollectionViewCell {
                 if videoURL.elementsEqual("no_videos") {
                     self.videoThumbnailImage.isHidden = true
                     self.playVideoButton.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("poster_collection_view_cell_no_videos", comment: "No videos"))
+                    self.setEmptyView(title: NSLocalizedString("no_information", comment: "No information"))
                 } else {
                     self.videoThumbnailImage.setUrlString(urlString: videoURL)
                 }

@@ -69,7 +69,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3333), heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(UIWindow.isLandscape ? 0.25 : 0.3333), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = .small()
@@ -81,7 +81,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
             let section = NSCollectionLayoutSection(group: group)
 
-            section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+            section.orthogonalScrollingBehavior = .groupPagingCentered
 
             return section
         })
@@ -117,7 +117,7 @@ public final class KnownForCollectionView: UICollectionViewController {
                 snapshot.appendItems([Movie(title: "more_info")], toSection: .movies)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
@@ -138,7 +138,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_person_movies", comment: "No person movies"), centeredX: false)
+            self?.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

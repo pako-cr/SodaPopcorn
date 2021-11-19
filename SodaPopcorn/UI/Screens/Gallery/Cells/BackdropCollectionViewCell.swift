@@ -19,7 +19,7 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
 
                 if imageURL.elementsEqual("no_backdrops") {
                     self.backdropImage.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("poster_collection_view_cell_no_backdrops", comment: "No Backdrops"))
+                    self.setEmptyView(title: NSLocalizedString("no_information", comment: "No information"))
 
                 } else {
                     self.backdropImage.setUrlString(urlString: imageURL)
@@ -29,7 +29,7 @@ final class BackdropCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let backdropImage = CustomBackdropImage(frame: .zero)
+    private let backdropImage = CustomBackdropImage()
 
     override init(frame: CGRect) {
         super.init(frame: frame)

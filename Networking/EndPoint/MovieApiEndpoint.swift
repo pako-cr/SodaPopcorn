@@ -8,12 +8,19 @@
 import Foundation
 
 public enum MovieApiEndpoint {
+    // MARK: Movies
     case moviesNowPlaying(page: Int)
 	case movieVideos(movieId: String)
     case movieDetails(movieId: String)
     case movieImages(movieId: String)
     case movieExternalIds(movieId: String)
     case movieCredits(movieId: String)
+    case movieSimilarMovies(movieId: String, page: Int)
+    case genreList
+    case discover(genre: Int, page: Int)
+    case searchMovie(query: String, page: Int)
+
+    // MARK: Persons
     case person(personId: String)
     case personMovieCredits(personId: String)
     case personExternalIds(personId: String)
@@ -31,6 +38,12 @@ extension MovieApiEndpoint: EndPointType {
             case .person, .personMovieCredits, .personExternalIds, .personImages:
                 base.append(contentsOf: "person")
                 break
+            case .genreList:
+                base.append(contentsOf: "genre")
+            case .discover:
+                base.append(contentsOf: "discover")
+            case .searchMovie:
+                base.append(contentsOf: "search")
             default:
                 base.append(contentsOf: "movie")
                 break
@@ -71,6 +84,14 @@ extension MovieApiEndpoint: EndPointType {
             return "\(movieId)/external_ids"
         case .movieCredits(let movieId):
             return "\(movieId)/credits"
+        case .movieSimilarMovies(let movieId, _):
+            return "\(movieId)/similar"
+        case .genreList:
+            return "movie/list"
+        case .discover:
+            return "movie"
+        case .searchMovie:
+            return "movie"
         case .person(let personId):
             return "\(personId)"
         case .personMovieCredits(let personId):
@@ -88,16 +109,35 @@ extension MovieApiEndpoint: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .moviesNowPlaying(let page):
+        case .moviesNowPlaying(let page), .movieSimilarMovies(_, let page):
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["page": page,
                                                       "api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
-        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .person, .personMovieCredits, .personExternalIds, .personImages:
+        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .genreList, .person, .personMovieCredits, .personExternalIds, .personImages:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,
+                                                      "include_adult": false,
+                                                      "language": locale])
+        case .discover(let genre, let page):
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["page": page,
+                                                      "with_genres": genre,
+                                                      "sort_by": "popularity.desc",
+                                                      "api_key": publicApiKey,
+                                                      "include_adult": false,
+                                                      "language": locale])
+        case .searchMovie(let query, let page):
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["page": page,
+                                                      "query": query,
+                                                      "api_key": publicApiKey,
+                                                      "include_adult": false,
                                                       "language": locale])
         }
     }

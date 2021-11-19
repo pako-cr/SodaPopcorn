@@ -109,7 +109,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
                 snapshot.appendItems(socialNetworks, toSection: .socialNetworks)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 
@@ -143,7 +143,7 @@ public final class SocialNetworksCollectionView: UICollectionViewController {
     func setupEmptyView() {
         DispatchQueue.main.async { [weak self] in
             guard let `self` = self else { return }
-            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_social_networks", comment: "No social networks info"), centeredX: false)
+            self.collectionView.setEmptyView(title: "", message: NSLocalizedString("no_information", comment: "No information"), centeredX: false)
         }
     }
 }

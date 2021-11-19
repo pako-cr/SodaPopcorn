@@ -5,7 +5,7 @@
 //  Created by Francisco Cordoba on 3/11/21.
 //
 
-struct Genre {
+public struct Genre: Hashable {
     public var id: Int?
     public var name: String?
 

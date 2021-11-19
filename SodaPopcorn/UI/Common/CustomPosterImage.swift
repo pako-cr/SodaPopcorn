@@ -66,7 +66,7 @@ final class CustomPosterImage: UIImageView {
     private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
         clipsToBounds = true
-        contentMode = .scaleAspectFit
+        contentMode = .scaleAspectFill
         sizeToFit()
         image = UIImage(named: "no_poster")
 

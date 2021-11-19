@@ -19,7 +19,7 @@ final class PosterCollectionViewCell: UICollectionViewCell {
 
                 if imageURL.elementsEqual("no_posters") {
                     self.posterImage.isHidden = true
-                    self.setEmptyView(title: NSLocalizedString("poster_collection_view_cell_no_posters", comment: "No posters"))
+                    self.setEmptyView(title: NSLocalizedString("no_information", comment: "No information"))
                 } else {
                     self.posterImage.setUrlString(urlString: imageURL)
                 }

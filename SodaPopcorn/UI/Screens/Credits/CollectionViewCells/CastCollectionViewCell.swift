@@ -24,8 +24,8 @@ final class CastCollectionViewCell: UICollectionViewCell {
                         .withRenderingMode(.alwaysOriginal)
                         .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
 
-                    self.posterImage.image = image
-                    self.posterImage.contentMode = .scaleAspectFit
+                    self.profileImage.image = image
+                    self.profileImage.contentMode = .scaleAspectFit
                     self.castName.isHidden = true
                     self.characterName.isHidden = true
 
@@ -33,11 +33,11 @@ final class CastCollectionViewCell: UICollectionViewCell {
                     self.castName.isHidden = false
                     self.characterName.isHidden = false
 
-                    self.posterImage.contentMode = .scaleAspectFill
+                    self.profileImage.contentMode = .scaleAspectFill
                     if let profilePath = cast.profilePath {
-                        self.posterImage.setUrlString(urlString: profilePath)
+                        self.profileImage.setUrlString(urlString: profilePath)
                     } else {
-                        self.posterImage.image = UIImage(named: "no_poster")
+                        self.profileImage.image = UIImage(named: "no_profile")
                     }
 
                     if let castName = cast.name {
@@ -53,15 +53,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let posterImage: CustomPosterImage = {
-        let posterImage = CustomPosterImage(frame: .zero)
-        posterImage.posterSize = .w342
-        posterImage.layer.cornerRadius = 10
-        posterImage.layer.borderWidth = 0
-        posterImage.layer.masksToBounds = true
-        posterImage.contentMode = .scaleAspectFill
-        return posterImage
-    }()
+    private let profileImage = CustomProfileImage()
 
     private let mainStack: UIStackView = {
         let stack = UIStackView()
@@ -104,18 +96,18 @@ final class CastCollectionViewCell: UICollectionViewCell {
     }
 
     func setupCellView() {
-        addSubview(posterImage)
+        addSubview(profileImage)
         addSubview(mainStack)
 
         mainStack.addArrangedSubview(castName)
         mainStack.addArrangedSubview(characterName)
 
-        posterImage.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        posterImage.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        posterImage.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        posterImage.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.8).isActive = true
+        profileImage.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        profileImage.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        profileImage.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        profileImage.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.8).isActive = true
 
-        mainStack.topAnchor.constraint(equalTo: posterImage.bottomAnchor, constant: 2.0).isActive = true
+        mainStack.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 2.0).isActive = true
         mainStack.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         mainStack.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         mainStack.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true

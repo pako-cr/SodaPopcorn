@@ -24,6 +24,7 @@ final class CreditsVC: BaseViewController {
     // MARK: - Variables
     private var dataSource: DataSource!
     private var creditsSubscription: Cancellable!
+    private var movieSubscription: Cancellable!
     private var loadingSubscription: Cancellable!
     private var showErrorSubscription: Cancellable!
 
@@ -76,9 +77,14 @@ final class CreditsVC: BaseViewController {
                 guard let `self` = self else { return }
                 self.updateDataSource(credits: credits)
             })
+
+        movieSubscription = viewModel.outputs.movieAction()
+            .sink(receiveValue: { [weak self] movie in
+                self?.title = movie.title ?? NSLocalizedString("credits", comment: "Credits")
+            })
     }
 
-    // MARK: - ⚙️ Helpers
+    // MARK: - Collection View
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         customCollectionView.register(CastCollectionViewCell.self, forCellWithReuseIdentifier: CastCollectionViewCell.reuseIdentifier)
@@ -138,7 +144,7 @@ final class CreditsVC: BaseViewController {
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 3.5)))
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1 : 3.5)))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -147,14 +153,15 @@ final class CreditsVC: BaseViewController {
             // Supplementary header view setup
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height * 0.05))
+                heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
 
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top)
 
-            sectionHeader.contentInsets = .init(horizontal: 20.0, vertical: 0.0)
+            sectionHeader.contentInsets = .init(horizontal: 0.0, vertical: 0.0)
+            sectionHeader.pinToVisibleBounds = true
             section.boundarySupplementaryItems = [sectionHeader]
 
             return section
@@ -185,7 +192,7 @@ final class CreditsVC: BaseViewController {
                 snapshot.appendItems([Cast()], toSection: .crew)
             }
 
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+            self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
     }
 

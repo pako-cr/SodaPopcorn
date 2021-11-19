@@ -26,7 +26,7 @@ final class ActivityIndicatorFooterReusableView: UICollectionReusableView {
 		label.adjustsFontSizeToFitWidth = true
 		label.numberOfLines = 1
 		label.textAlignment = .center
-		label.text = NSLocalizedString("collection_view_footer_no_more_movies_to_fetch", comment: "All movies fetched")
+		label.text = NSLocalizedString("end_of_the_list", comment: "End of the list")
 		return label
 	}()
 

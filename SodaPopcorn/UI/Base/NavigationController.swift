@@ -8,17 +8,14 @@
 import UIKit
 
 public class NavigationController: UINavigationController {
-	private let rootViewController: UIViewController
 
 	override init(rootViewController: UIViewController) {
-		self.rootViewController = rootViewController
 		super.init(rootViewController: rootViewController)
-		self.isModalInPresentation = true
-		self.modalPresentationCapturesStatusBarAppearance = true
-		self.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+//		self.isModalInPresentation = true
+//		self.modalPresentationCapturesStatusBarAppearance = true
+		self.modalPresentationStyle = .fullScreen
 		self.navigationBar.prefersLargeTitles = false
-		self.setNavigationBarHidden(false, animated: true)
-		self.navigationBar.isHidden = false
+		self.setNavigationBarHidden(false, animated: false)
 		self.navigationBar.barTintColor = UIColor.systemBackground
 	}
 
