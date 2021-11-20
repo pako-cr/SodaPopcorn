@@ -17,8 +17,10 @@ final class MoviesVC: MoviesBaseCollectionView {
     // MARK: Subscriptions
     private var finishedFetchingSubscription: Cancellable!
     private var fetchMoviesSubscription: Cancellable!
+    private var searchCriteriaSubscription: Cancellable!
     private var loadingSubscription: Cancellable!
     private var showErrorSubscription: Cancellable!
+    private var viewtitleSubscription: Cancellable!
 
     private var finishedFetching = false
 
@@ -41,6 +43,29 @@ final class MoviesVC: MoviesBaseCollectionView {
             }),
             UIAction(title: NSLocalizedString("list", comment: "List"), image: UIImage(systemName: "square.fill.text.grid.1x2"), handler: { (_) in
                 self.collectionLayout = .list
+            })
+        ])
+
+        return menu
+    }()
+
+    private lazy var moviesFilterMenu: UIMenu = { [unowned self] in
+        let menu = UIMenu(title: NSLocalizedString("movie_lists", comment: "Filter movies by list"), image: nil, identifier: nil, options: [.displayInline], children: [
+            UIAction(title: NSLocalizedString("now_playing_movies", comment: "Now playing movies filter"), image: UIImage(systemName: "clock"), handler: { (_) in
+                viewModel.inputs.setSearchCriteria(searchCriteria: .nowPlaying)
+                title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
+            }),
+            UIAction(title: NSLocalizedString("popular_movies", comment: "Popular movies filter"), image: UIImage(systemName: "person.2.wave.2"), handler: { (_) in
+                viewModel.inputs.setSearchCriteria(searchCriteria: .popular)
+                title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
+            }),
+            UIAction(title: NSLocalizedString("top_rated_movies", comment: "Top rated movies filter"), image: UIImage(systemName: "10.square.fill"), handler: { (_) in
+                viewModel.inputs.setSearchCriteria(searchCriteria: .topRated)
+                title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
+            }),
+            UIAction(title: NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter"), image: UIImage(systemName: "sparkles.tv"), handler: { (_) in
+                viewModel.inputs.setSearchCriteria(searchCriteria: .upcomming)
+                title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
             })
         ])
 
@@ -85,8 +110,11 @@ final class MoviesVC: MoviesBaseCollectionView {
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
 
         } else {
-            let barButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: barButtonImage, primaryAction: UIAction { _ in self.setCollectionViewLayout() }, menu: sizeMenu)
+            let leftBarButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: leftBarButtonImage, primaryAction: UIAction { [weak self] _ in self?.setCollectionViewLayout() }, menu: sizeMenu)
+
+            let rightBarButtonImage = UIImage(systemName: "line.3.horizontal.decrease.circle")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Filter movies"), image: rightBarButtonImage, primaryAction: UIAction { [weak self] _ in self?.filterButtonPressed() }, menu: moviesFilterMenu)
         }
 
         collectionView.refreshControl = refreshControl
@@ -123,6 +151,17 @@ final class MoviesVC: MoviesBaseCollectionView {
                 guard let `self` = self else { return }
                 self.handleEmptyView()
                 Alert.showAlert(on: self, title: NSLocalizedString("alert", comment: "Alert title"), message: errorMessage)
+            })
+
+        searchCriteriaSubscription = viewModel.outputs.searchCriteriaAction()
+            .dropFirst()
+            .sink(receiveValue: { [weak self] _ in
+                self?.reloadDataSource()
+            })
+
+        viewtitleSubscription = viewModel.outputs.setViewTitle()
+            .sink(receiveValue: { [weak self] genreName in
+                self?.title = genreName
             })
     }
 
@@ -209,6 +248,25 @@ final class MoviesVC: MoviesBaseCollectionView {
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
+    }
+
+    private func filterButtonPressed() {
+        switch viewModel.searchCriteria {
+        case .nowPlaying:
+            viewModel.inputs.setSearchCriteria(searchCriteria: .popular)
+            title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
+        case .popular:
+            viewModel.inputs.setSearchCriteria(searchCriteria: .topRated)
+            title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
+        case .topRated:
+            viewModel.inputs.setSearchCriteria(searchCriteria: .upcomming)
+            title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
+        case .upcomming:
+            viewModel.inputs.setSearchCriteria(searchCriteria: .nowPlaying)
+            title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
+        default:
+            break
+        }
     }
 
     // MARK: - 🗑 Deinit

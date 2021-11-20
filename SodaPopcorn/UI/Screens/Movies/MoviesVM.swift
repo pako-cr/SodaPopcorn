@@ -45,7 +45,10 @@ public protocol MoviesVMOutputs: AnyObject {
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
     /// Emits when the search criteria is changed.
-    func setSearchCriteriaAction() -> PassthroughSubject<SearchCriteria, Never>
+    func searchCriteriaAction() -> CurrentValueSubject<SearchCriteria, Never>
+
+    /// Emits when the search criteria is discover by genre.
+    func setViewTitle() -> PassthroughSubject<String, Never>
 }
 
 public protocol MoviesVMTypes: AnyObject {
@@ -64,13 +67,13 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
-    private var searchCriteria = SearchCriteria.nowPlaying
 	private var page = 0
+    private (set) var searchCriteria: SearchCriteria
 
     public init(movieService: MovieService, searchCriteria: SearchCriteria, presentedViewController: Bool) {
 		self.movieService = movieService
-        self.searchCriteria = searchCriteria
         self.presentedViewController = presentedViewController
+        self.searchCriteria = searchCriteria
 
 		self.movieSelectedProperty
 			.sink { [weak self] movie in
@@ -85,21 +88,26 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
         self.setSearchCriteriaProperty
             .sink { [weak self] searchCriteria in
-                self?.setSearchCriteriaActionProperty.send(searchCriteria)
+                self?.searchCriteria = searchCriteria
+                self?.searchCriteriaActionProperty.value = searchCriteria
+                self?.fetchMoviesProperty.send()
             }.store(in: &cancellable)
 
         let getMoviesEvent = Publishers.Merge(self.fetchMoviesProperty, self.pullToRefreshProperty)
-            .filter({ _ in
-                switch self.searchCriteria {
-                case .nowPlaying: return true
-                default: return false
-                }
-            })
 			.flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
                 self.loadingProperty.value = true
-                return movieService.moviesNowPlaying(page: self.page)
+
+                switch self.searchCriteriaActionProperty.value {
+                case .discover(let genre):
+                    if let genreName = genre.name {
+                        self.setViewTitlePropery.send(genreName)
+                    }
+                default: break
+                }
+
+                return movieService.movies(page: self.page, searchCriteria: self.searchCriteriaActionProperty.value)
                     .retry(2)
 					.mapError({ [weak self] networkResponse -> NetworkResponse in
 						print("🔴 [MoviesVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
@@ -111,41 +119,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 				 	.eraseToAnyPublisher()
             }).share()
 
-        let searchByGenreEvent = Publishers.Merge(self.fetchMoviesProperty, self.pullToRefreshProperty)
-            .filter({ _ in
-                switch self.searchCriteria {
-                case .discover:
-                    return true
-                default:
-                    return false
-                }
-            })
-            .flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
-                guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-
-                self.loadingProperty.value = true
-                var genreId = 0
-
-                switch self.searchCriteria {
-                case .discover(let genre): genreId = genre
-                default: break
-                }
-
-                return movieService.discover(genre: genreId, page: self.page)
-                    .retry(2)
-                    .mapError({ [weak self] networkResponse -> NetworkResponse in
-                        print("🔴 [SearchVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
-                        self?.loadingProperty.value = false
-                        self?.handleNetworkResponseError(networkResponse)
-                        return networkResponse
-                    })
-                    .replaceError(with: Movies())
-                     .eraseToAnyPublisher()
-            }).share()
-
-        Publishers.Merge(
-            searchByGenreEvent,
-            getMoviesEvent)
+        getMoviesEvent
             .sink(receiveCompletion: { [weak self] completionReceived in
                 guard let `self` = self else { return }
 
@@ -229,9 +203,14 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
         return closeButtonActionProperty
     }
 
-    private let setSearchCriteriaActionProperty = PassthroughSubject<SearchCriteria, Never>()
-    public func setSearchCriteriaAction() -> PassthroughSubject<SearchCriteria, Never> {
-        return setSearchCriteriaActionProperty
+    private lazy var searchCriteriaActionProperty = CurrentValueSubject<SearchCriteria, Never>(self.searchCriteria)
+    public func searchCriteriaAction() -> CurrentValueSubject<SearchCriteria, Never> {
+        return searchCriteriaActionProperty
+    }
+
+    private let setViewTitlePropery = PassthroughSubject<String, Never>()
+    public func setViewTitle() -> PassthroughSubject<String, Never> {
+        return setViewTitlePropery
     }
 
 	// MARK: - ⚙️ Helpers

@@ -11,7 +11,7 @@ import UIKit
 
 final class HomeCoordinator: Coordinator {
 	// MARK: - Const
-	private let parentViewController: UIViewController
+	private let parentViewController: BaseViewController
 	private let movieService = MovieService.shared()
 
 	// MARK: - Vars
@@ -72,9 +72,7 @@ final class HomeCoordinator: Coordinator {
 
         searchVM.outputs.genreSelectedAction()
             .sink { [weak self] genre in
-                if let genreId = genre.id {
-                    self?.showMovieList(searchCriteria: .discover(genre: genreId), on: searchNavigationController)
-                }
+                self?.showMovieList(searchCriteria: .discover(genre: genre), on: searchNavigationController)
             }.store(in: &cancellable)
 
         searchVM.outputs.movieSelectedAction()
@@ -83,7 +81,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 	}
 
-	private func showMovieDetails(movie: Movie, on baseViewController: UIViewController) {
+	private func showMovieDetails(movie: Movie, on baseViewController: UINavigationController) {
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
@@ -344,8 +342,7 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.movieSelectedAction()
             .sink { [weak self] movie in
-                guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: navigationController)
+                self?.showMovieDetails(movie: movie, on: navigationController)
             }.store(in: &cancellable)
     }
 }

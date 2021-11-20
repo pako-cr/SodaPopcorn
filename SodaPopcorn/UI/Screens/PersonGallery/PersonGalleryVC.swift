@@ -75,9 +75,6 @@ final class PersonGalleryVC: BaseViewController {
     }
 
     private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
         navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 

@@ -40,7 +40,7 @@ class MoviesBaseCollectionView: UIViewController {
                     buttonImage = UIImage(systemName: "square.fill.text.grid.1x2")
                 }
 
-                self.navigationItem.rightBarButtonItem?.image = buttonImage
+                self.navigationItem.leftBarButtonItem?.image = buttonImage
                 self.collectionView.setCollectionViewLayout(self.createLayout(), animated: true)
             }
         }
@@ -102,14 +102,16 @@ class MoviesBaseCollectionView: UIViewController {
             let section = NSCollectionLayoutSection(group: group)
 
             // Supplementary footer view setup
-            let headerFooterSize = NSCollectionLayoutSize(
+            let footerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(30))
+                heightDimension: .absolute(50))
 
             let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerFooterSize,
+                layoutSize: footerSize,
                 elementKind: UICollectionView.elementKindSectionFooter,
                 alignment: .bottom)
+
+            sectionFooter.contentInsets = .small()
 
             section.boundarySupplementaryItems = [sectionFooter]
 

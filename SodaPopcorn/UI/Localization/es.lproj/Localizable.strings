@@ -60,3 +60,8 @@
 "loading_genres_description_label" = "Por favor espera mientras cargamos la información";
 "search_content_title" = "Escribe algo para buscar 🔍";
 "search_content_description" = "Puedes buscar por nombre o palabras clave";
+"movie_lists" = "Listas de Películas";
+"now_playing_movies" = "Recientes";
+"popular_movies" = "Populares";
+"top_rated_movies" = "Mejor Calificadas";
+"upcoming_movies" = "Próximamente";

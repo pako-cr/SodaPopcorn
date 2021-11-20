@@ -10,6 +10,10 @@ import Foundation
 public enum MovieApiEndpoint {
     // MARK: Movies
     case moviesNowPlaying(page: Int)
+    case moviesPopular(page: Int)
+    case moviesTopRated(page: Int)
+    case moviesUpcoming(page: Int)
+
 	case movieVideos(movieId: String)
     case movieDetails(movieId: String)
     case movieImages(movieId: String)
@@ -74,6 +78,12 @@ extension MovieApiEndpoint: EndPointType {
         switch self {
         case .moviesNowPlaying:
             return "now_playing"
+        case .moviesPopular:
+            return "popular"
+        case .moviesTopRated:
+            return "top_rated"
+        case .moviesUpcoming:
+            return "upcoming"
         case .movieVideos(let movieId):
             return "\(movieId)/videos"
         case .movieDetails(let movieId):
@@ -109,7 +119,7 @@ extension MovieApiEndpoint: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .moviesNowPlaying(let page), .movieSimilarMovies(_, let page):
+        case .moviesNowPlaying(let page), .moviesPopular(let page), .moviesTopRated(let page), .moviesUpcoming(let page), .movieSimilarMovies(_, let page):
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["page": page,

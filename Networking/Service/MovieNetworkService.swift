@@ -9,7 +9,8 @@ import Combine
 import Foundation
 
 public protocol MovieNetworkServiceProtocol {
-	func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse>
+    func movies(page: Int, searchCriteria: SearchCriteria) -> AnyPublisher<Movies, NetworkResponse>
+
     func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse>
     func movieImages(movieId: String) -> AnyPublisher<MovieImages, NetworkResponse>
     func movieExternalIds(movieId: String) -> AnyPublisher<SocialNetworks, NetworkResponse>
@@ -30,11 +31,26 @@ final class MovieNetworkService: MovieNetworkServiceProtocol {
 	private let networkManager = NetworkManager<MovieApiEndpoint>()
 
     // MARK: - Movies
-	func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
+    func movies(page: Int, searchCriteria: SearchCriteria = .nowPlaying) -> AnyPublisher<Movies, NetworkResponse> {
 		return AnyPublisher<Movies, NetworkResponse>.create { [weak self] promise in
 			guard let `self` = self else { return Disposable {} }
 
-			self.networkManager.request(.moviesNowPlaying(page: page), completion: { [weak self] data, response, error in
+            var movieEndpoint: MovieApiEndpoint
+
+            switch searchCriteria {
+            case .nowPlaying:
+                movieEndpoint = .moviesNowPlaying(page: page)
+            case .topRated:
+                movieEndpoint = .moviesTopRated(page: page)
+            case .upcomming:
+                movieEndpoint = .moviesUpcoming(page: page)
+            case .popular:
+                movieEndpoint = .moviesPopular(page: page)
+            case .discover(let genre):
+                movieEndpoint = .discover(genre: genre.id ?? 12, page: page)
+            }
+
+			self.networkManager.request (movieEndpoint, completion: { [weak self] data, response, error in
 				guard let `self` = self else { return }
 
 				if error != nil {
