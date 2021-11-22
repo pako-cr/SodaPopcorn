@@ -33,7 +33,7 @@
 "gallery_view_posters_header" = "Posters";
 "gallery_view_videos_header" = "Videos: Trailers, Teasers";
 "empty_movies_title_label" = "No movies 😞";
-"empty_movies_description_label" = "No movies to display here 🎬";
+"empty_movies_description_label" = "No movies to display here 🎬\n Tap to reload 🔄";
 "cast_collection_view_title" = "Cast";
 "more" = "More";
 "credits_vc_cast_header" = "Cast";
@@ -66,3 +66,4 @@
 "top_rated_movies" = "Top Rated";
 "upcoming_movies" = "Upcoming";
 "deathdate" = "Died";
+"options" = "Options";

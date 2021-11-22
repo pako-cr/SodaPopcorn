@@ -195,6 +195,13 @@ final class MoviesVC: MoviesBaseCollectionView {
                                                  message: NSLocalizedString("empty_movies_description_label", comment: "Empty list message"),
                                                  centeredY: true)
 
+                let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.reloadCollectionView))
+                tapGestureRecognizer.numberOfTapsRequired = 1
+
+                self.collectionView.backgroundView?.isUserInteractionEnabled = true
+
+                self.collectionView.backgroundView?.addGestureRecognizer(tapGestureRecognizer)
+
             } else {
                 self.collectionView.removeEmptyView()
             }
@@ -205,6 +212,12 @@ final class MoviesVC: MoviesBaseCollectionView {
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
+    }
+
+    @objc
+    private func reloadCollectionView() {
+        viewModel.inputs.fetchMovies()
+        handleEmptyView()
     }
 
     // MARK: - 🗑 Deinit

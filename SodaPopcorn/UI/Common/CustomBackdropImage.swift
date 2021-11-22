@@ -12,7 +12,7 @@ final class CustomBackdropImage: UIImageView {
     private let resetImage: Bool
 
     // MARK: - Variables
-    var backdropSize = BackdropSize.w780
+    var backdropSize: BackdropSize = UIDevice.current.isIpad ? .w1280 : .w780
 
     private var urlString: String? {
         didSet {

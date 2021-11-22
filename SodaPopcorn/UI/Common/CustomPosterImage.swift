@@ -12,7 +12,7 @@ final class CustomPosterImage: UIImageView {
     private let resetImage: Bool
 
     // MARK: - Variables
-    var posterSize = PosterSize.w185
+    var posterSize = UIDevice.current.isIpad ? PosterSize.w780 : PosterSize.w342
 
     private var urlString: String? {
         didSet {

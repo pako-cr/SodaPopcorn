@@ -12,7 +12,7 @@ final class CustomProfileImage: UIImageView {
     private let resetImage: Bool
 
     // MARK: - Variables
-    var profileSize = ProfileSize.w185
+    var profileSize: ProfileSize = UIDevice.current.isIpad ? .h632 : .w185
 
     private var urlString: String? {
         didSet {
