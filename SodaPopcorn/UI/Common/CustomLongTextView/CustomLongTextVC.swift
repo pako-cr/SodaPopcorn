@@ -58,11 +58,6 @@ final class CustomLongTextVC: BaseViewController {
         viewModel.inputs.viewDidLoad()
     }
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-    }
-
     override func setupUI() {
         view.addSubview(textView)
         view.addSubview(closeButton)

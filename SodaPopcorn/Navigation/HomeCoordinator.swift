@@ -11,7 +11,7 @@ import UIKit
 
 final class HomeCoordinator: Coordinator {
 	// MARK: - Const
-	private let parentViewController: UIViewController
+	private let parentViewController: BaseViewController
 	private let movieService = MovieService.shared()
 
 	// MARK: - Vars
@@ -72,9 +72,7 @@ final class HomeCoordinator: Coordinator {
 
         searchVM.outputs.genreSelectedAction()
             .sink { [weak self] genre in
-                if let genreId = genre.id {
-                    self?.showMovieList(searchCriteria: .discover(genre: genreId), on: searchNavigationController)
-                }
+                self?.showMovieList(searchCriteria: .discover(genre: genre), on: searchNavigationController)
             }.store(in: &cancellable)
 
         searchVM.outputs.movieSelectedAction()
@@ -83,7 +81,7 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 	}
 
-	private func showMovieDetails(movie: Movie, on baseViewController: UIViewController) {
+	private func showMovieDetails(movie: Movie, on baseViewController: UINavigationController) {
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
@@ -170,14 +168,12 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.backdropImageAction()
             .sink { [weak self] image in
-                guard let `self` = self else { return }
-                self.showBackdropImagesView(with: image, on: navigationController)
+                self?.showBackdropImagesView(with: image, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.posterImageAction()
             .sink { [weak self] imageUrl in
-                guard let `self` = self else { return }
-                self.showPosterImageView(with: imageUrl, on: navigationController)
+                self?.showPosterImageView(with: imageUrl, on: navigationController)
             }.store(in: &cancellable)
     }
 
@@ -194,8 +190,7 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.castMemberAction()
             .sink { [weak self] person in
-                guard let `self` = self else { return }
-                self.showPersonDetailsView(with: person, on: navigationController)
+                self?.showPersonDetailsView(with: person, on: navigationController)
             }.store(in: &cancellable)
     }
 
@@ -224,26 +219,22 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.biographyTextAction()
             .sink { [weak self] biography in
-                guard let `self` = self else { return }
-                self.showCustomLongTextView(with: biography, on: navigationController)
+                self?.showCustomLongTextView(with: biography, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.movieSelectedAction()
             .sink { [weak self] movie in
-                guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, with: navigationController)
+                self?.showMovieDetails(movie: movie, with: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personMoviesButtonAction()
             .sink { [weak self] (movies, person) in
-                guard let `self` = self else { return }
-                self.showPersonMovieList(with: movies, and: person, on: navigationController)
+                self?.showPersonMovieList(with: movies, and: person, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personImageAction()
             .sink { [weak self] personImage in
-                guard let `self` = self else { return }
-                self.showProfileImageView(with: personImage, on: navigationController)
+                self?.showProfileImageView(with: personImage, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personGallerySelectedAction()
@@ -262,8 +253,7 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.movieSelectedAction()
             .sink { [weak self] movie in
-                guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, with: navigationController)
+                self?.showMovieDetails(movie: movie, with: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.closeButtonAction()
@@ -274,7 +264,7 @@ final class HomeCoordinator: Coordinator {
 
     private func showMovieDetails(movie: Movie, with navigationController: NavigationController) {
         let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
-        let viewController = MovieDetailsVC(viewModel: viewModel)
+        let viewController = MovieDetailsVC(viewModel: viewModel, pushedViewController: true)
 
         navigationController.pushViewController(viewController, animated: true)
 
@@ -285,26 +275,22 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.galleryButtonAction()
             .sink { [weak self] _ in
-                guard let `self` = self else { return }
-                self.showGalleryView(with: movie, on: navigationController)
+                self?.showGalleryView(with: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.overviewTextAction()
             .sink { [weak self] overview in
-                guard let `self` = self else { return }
-                self.showCustomLongTextView(with: overview, on: navigationController)
+                self?.showCustomLongTextView(with: overview, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.creditsButtonAction()
             .sink { [weak self] (movie, credits) in
-                guard let `self` = self else { return }
-                self.showCreditsView(with: credits, of: movie, on: navigationController)
+                self?.showCreditsView(with: credits, of: movie, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.castMemberAction()
             .sink { [weak self] person in
-                guard let `self` = self else { return }
-                self.showPersonDetailsView(with: person, on: navigationController)
+                self?.showPersonDetailsView(with: person, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.movieSelectedAction()
@@ -344,8 +330,7 @@ final class HomeCoordinator: Coordinator {
 
         viewModel.outputs.movieSelectedAction()
             .sink { [weak self] movie in
-                guard let `self` = self else { return }
-                self.showMovieDetails(movie: movie, on: navigationController)
+                self?.showMovieDetails(movie: movie, on: navigationController)
             }.store(in: &cancellable)
     }
 }

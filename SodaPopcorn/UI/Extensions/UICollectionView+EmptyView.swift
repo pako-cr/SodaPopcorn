@@ -27,7 +27,7 @@ extension UICollectionView {
 
 		let titleLabel: UILabel = {
 			let label = UILabel()
-			label.font = UIFont.preferredFont(forTextStyle: .headline).bold()
+			label.font = UIFont.preferredFont(forTextStyle: .title2).bold()
 			label.text = title
 			label.numberOfLines = 0
             label.textAlignment = centeredX ? .center : .left
@@ -41,7 +41,7 @@ extension UICollectionView {
 		let messageLabel: UILabel = {
 			let label = UILabel()
 			label.textColor = UIColor.lightGray
-			label.font =  UIFont.preferredFont(forTextStyle: .subheadline)
+			label.font =  UIFont.preferredFont(forTextStyle: .title3)
 			label.text = message
 			label.numberOfLines = 2
 			label.textAlignment = centeredX ? .center : .left
@@ -66,7 +66,7 @@ extension UICollectionView {
 
         stack.leadingAnchor.constraint(equalTo: emptyView.leadingAnchor, constant: 10).isActive = true
 		stack.trailingAnchor.constraint(equalTo: emptyView.trailingAnchor, constant: -10).isActive = true
-        stack.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
+        stack.heightAnchor.constraint(equalToConstant: 75.0).isActive = true
 
 		if centeredY {
 			stack.centerYAnchor.constraint(equalTo: emptyView.centerYAnchor).isActive = true

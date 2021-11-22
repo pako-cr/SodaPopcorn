@@ -57,6 +57,14 @@ final class PersonDetailsVC: BaseViewController {
                     self.placeOfBirthHeaderValue.setValue(value: placeOfBirth)
                 }
 
+                // Death
+                if let deathday = person.deathday, !deathday.isEmpty {
+                    let deathdayLabel = CustomPersonHeaderValueView(header: NSLocalizedString("deathdate", comment: "Death date Label"))
+                    deathdayLabel.setValue(value: deathday)
+
+                    self.headerStack.addArrangedSubview(deathdayLabel)
+                }
+
                 // Biography
                 if let biography = person.biography, !biography.isEmpty {
                     self.biographyValue.text = biography
@@ -150,12 +158,16 @@ final class PersonDetailsVC: BaseViewController {
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
 
         profileImageHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3)
         galleryCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
         knownForCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.35)
         socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     override func setupUI() {
@@ -229,13 +241,6 @@ final class PersonDetailsVC: BaseViewController {
         websiteInformation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
         websiteInformation.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.125).isActive = true
         websiteInformation.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
-    }
-
-    private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     private func handleGestureRecongnizers() {

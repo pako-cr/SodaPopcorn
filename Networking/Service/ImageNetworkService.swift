@@ -52,7 +52,7 @@ final class ImageNetworkService: ImageNetworkServiceProtocol {
 						completion(nil, NetworkResponse.failed(networkFailureError.localizedDescription))
 				}
 			}
-		}
+        }
 	}
 
     func getVideoThumbnail(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponse?) -> Void) {

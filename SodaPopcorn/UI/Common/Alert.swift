@@ -28,6 +28,23 @@ struct Alert {
         }
     }
 
+    private static func showBasicPopover(on viewController: UIViewController, actions: [UIAlertAction]) {
+        let alert = UIAlertController(title: NSLocalizedString("options", comment: "Options"), message: "", preferredStyle: .actionSheet)
+
+        let popover = alert.popoverPresentationController
+
+        popover?.sourceView = viewController.view
+        popover?.sourceRect = CGRect(x: viewController.view.bounds.midX, y: viewController.view.bounds.midY, width: 164, height: 164)
+
+        var newActions = actions
+        newActions.append(UIAlertAction(title: NSLocalizedString("alert_cancel_button", comment: "Cancel button"), style: .cancel, handler: nil))
+        newActions.forEach { alert.addAction($0) }
+
+        DispatchQueue.main.async {
+            viewController.present(alert, animated: true)
+        }
+    }
+
 	/// Present an basic alert on the center of the screen.
 	/// - Parameters:
 	///     - viewController: The view controller to be presented in.
@@ -58,6 +75,10 @@ struct Alert {
     ///     - title: A title for the alert.
     ///     - handler: A callback.
     static func showActionSheet(on viewController: UIViewController, actions: [UIAlertAction]) {
-        showBasicActionSheet(on: viewController, actions: actions)
+        if UIDevice.current.isIpad {
+            showBasicPopover(on: viewController, actions: actions)
+        } else {
+            showBasicActionSheet(on: viewController, actions: actions)
+        }
     }
 }

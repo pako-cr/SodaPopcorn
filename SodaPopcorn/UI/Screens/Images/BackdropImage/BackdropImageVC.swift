@@ -56,7 +56,7 @@ final class BackdropImageVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var backdropImage: CustomBackdropImage = {
-        let customImage = CustomBackdropImage()
+        let customImage = CustomBackdropImage(resetImage: false)
 
         if let cacheImage = cache.value(forKey: "\(BackdropSize.w780.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = cacheImage
@@ -78,11 +78,6 @@ final class BackdropImageVC: BaseViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
     override func setupUI() {

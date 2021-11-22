@@ -45,7 +45,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
                 : ""
 
                 if let rating = movie.rating, rating > 0.0 {
-                    self.ratingLabel.text = "﹒ \(movie.rating ?? 0.0)/10 ⭐️"
+                    self.ratingLabel.text = "﹒ \(movie.rating ?? 0.0)/10"
                 }}
 		}
 	}
@@ -70,7 +70,7 @@ final class MovieCollectionViewCell: UICollectionViewCell {
 		return view
 	}()
 
-	private let posterImage = CustomPosterImage(frame: .zero)
+	private let posterImage = CustomPosterImage()
 
 	private let movieTitle: UILabel = {
 		let label = UILabel()

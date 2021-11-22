@@ -11,6 +11,7 @@ import UIKit
 final class MovieDetailsVC: BaseViewController {
     // MARK: Consts
     private let viewModel: MovieDetailsVM
+    private let pushedViewController: Bool
 
     // MARK: - Variables
     private var movieInfoSubscription: Cancellable!
@@ -24,6 +25,8 @@ final class MovieDetailsVC: BaseViewController {
     private var castHeightAnchor: NSLayoutConstraint?
     private var similarMoviesHeightAnchor: NSLayoutConstraint?
     private var socialNetworksHeightAnchor: NSLayoutConstraint?
+
+    private let headerHeight: CGFloat = 300
 
     private var oldMovie: Movie?
     private var movie: Movie? {
@@ -212,8 +215,9 @@ final class MovieDetailsVC: BaseViewController {
 
     private let websiteInformation = CustomHeaderSubheaderView(header: NSLocalizedString("website", comment: "Website"))
 
-    init(viewModel: MovieDetailsVM) {
+    init(viewModel: MovieDetailsVM, pushedViewController: Bool = false) {
         self.viewModel = viewModel
+        self.pushedViewController = pushedViewController
         super.init()
     }
 
@@ -230,12 +234,15 @@ final class MovieDetailsVC: BaseViewController {
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
 
-        backdropImageHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3)
         castHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
         similarMoviesHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.3)
         socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     override func setupUI() {
@@ -273,11 +280,12 @@ final class MovieDetailsVC: BaseViewController {
         subHeaderStack.addArrangedSubview(releaseDateLabel)
         subHeaderStack.addArrangedSubview(runtimeLabel)
 
-        backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        backdropImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
         backdropImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         backdropImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         backdropImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        backdropImageHeightAnchor = backdropImage.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3))
+
+        backdropImageHeightAnchor = backdropImage.heightAnchor.constraint(equalToConstant: headerHeight)
         backdropImageHeightAnchor?.isActive = true
 
         ratingScoreChartView.bottomAnchor.constraint(equalTo: backdropImage.bottomAnchor, constant: 10).isActive = true
@@ -343,11 +351,12 @@ final class MovieDetailsVC: BaseViewController {
         websiteInformation.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
 
-    private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
+    override func setupNavigationBar() {
+        super.setupNavigationBar()
+        if !pushedViewController {
+            let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
+        }
     }
 
     private func handleGestureRecongnizers() {
@@ -437,10 +446,24 @@ final class MovieDetailsVC: BaseViewController {
 
 extension MovieDetailsVC: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Title
         if scrollView.convert(headerStack.frame.origin, to: self.view).y <= 60 {
             navigationController?.navigationBar.topItem?.title = movie?.title ?? ""
         } else {
             navigationController?.navigationBar.topItem?.title = ""
+        }
+
+        // Backdrop Image effect
+        if scrollView.contentOffset.y < 0.0 {
+            backdropImageHeightAnchor?.constant = headerHeight - scrollView.contentOffset.y
+        } else {
+            let parallaxFactor: CGFloat = 0.25
+            let offsetY = scrollView.contentOffset.y * parallaxFactor
+            let minOffsetY: CGFloat = 8.0
+            let availableOffset = min(offsetY, minOffsetY)
+            let contentRectOffsetY = availableOffset / headerHeight
+            backdropImageHeightAnchor?.constant = (headerHeight - scrollView.contentOffset.y) > 0.0 ? (headerHeight - scrollView.contentOffset.y) : 0.0
+            backdropImage.layer.contentsRect = CGRect(x: 0.0, y: -contentRectOffsetY, width: 1.0, height: 1.0)
         }
     }
 }

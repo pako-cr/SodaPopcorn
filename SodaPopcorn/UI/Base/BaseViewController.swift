@@ -21,12 +21,25 @@ class BaseViewController: UIViewController {
         super.viewDidLoad()
 		setupUI()
 		bindViewModel()
+        tabBarController?.tabBar.backgroundColor = UIColor.systemBackground
+    }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
 	func setupUI() {
 	}
 
 	func bindViewModel() {
-
 	}
+
+    func setupNavigationBar() {
+    }
 }

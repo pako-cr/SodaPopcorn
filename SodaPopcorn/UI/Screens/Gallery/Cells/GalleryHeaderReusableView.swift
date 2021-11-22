@@ -32,6 +32,11 @@ final class GalleryHeaderReusableView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
     func configure(with headerTitle: String) {
         self.headerLabel.text = headerTitle
     }

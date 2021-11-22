@@ -52,7 +52,7 @@ final class KnownForCollectionViewCell: UICollectionViewCell {
     }
 
     // MARK: UI Elements
-    private let posterImage = CustomPosterImage(frame: .zero)
+    private let posterImage = CustomPosterImage()
 
     private let mainStack: UIStackView = {
         let stack = UIStackView()

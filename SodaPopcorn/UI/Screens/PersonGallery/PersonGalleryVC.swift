@@ -43,13 +43,21 @@ final class PersonGalleryVC: BaseViewController {
         setInitialData()
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
-        setupNavigationBar()
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
         customCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+
+    override func didReceiveMemoryWarning() {
+        print("⚠️ Memory Warning on PersonGalleryVC")
+        cache.removeAllValues()
     }
 
     override func setupUI() {
@@ -72,13 +80,6 @@ final class PersonGalleryVC: BaseViewController {
             .sink(receiveValue: { [weak self] person in
                 self?.title = String(format: NSLocalizedString("person_gallery", comment: "Person Gallery"), person.name ?? "")
             })
-    }
-
-    private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     // MARK: - Collection

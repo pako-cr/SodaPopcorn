@@ -26,8 +26,8 @@ public final class MovieService: MovieNetworkServiceProtocol {
 
 	// MARK: Network Service
     // MARK: - Movies
-	public func moviesNowPlaying(page: Int) -> AnyPublisher<Movies, NetworkResponse> {
-		return movieNetworkService.moviesNowPlaying(page: page)
+	public func movies(page: Int, searchCriteria: SearchCriteria) -> AnyPublisher<Movies, NetworkResponse> {
+		return movieNetworkService.movies(page: page, searchCriteria: searchCriteria)
 	}
 
     public func movieDetails(movieId: String) -> AnyPublisher<Movie, NetworkResponse> {

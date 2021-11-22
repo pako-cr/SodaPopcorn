@@ -51,8 +51,13 @@ final class GalleryVC: BaseViewController {
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+
         customCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
+    override func didReceiveMemoryWarning() {
+        print("⚠️ Memory Warning on GalleryVC")
+        cache.removeAllValues()
     }
 
     override func setupUI() {
@@ -64,12 +69,8 @@ final class GalleryVC: BaseViewController {
         customCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
-    private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
-
+    override func setupNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
         title = NSLocalizedString("gallery", comment: "Gallery")
     }
 

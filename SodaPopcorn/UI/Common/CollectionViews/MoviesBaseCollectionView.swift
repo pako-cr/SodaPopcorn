@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class MoviesBaseCollectionView: UIViewController {
+class MoviesBaseCollectionView: BaseViewController {
     enum Section: CaseIterable {
         case movies
     }
@@ -22,8 +22,21 @@ class MoviesBaseCollectionView: UIViewController {
     var dataSource: DataSource!
     var loadedCount = 0
 
-    var reloadingDataSource = false
+    var loading = false
 
+    var finishedFetching = false {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let `self` = self else { return }
+                self.footerLabel.isHidden = !self.finishedFetching
+                if self.finishedFetching {
+                    self.activityIndicator.stopAnimating()
+                }
+            }
+        }
+    }
+
+    // MARK: - UI Elements
     var collectionLayout: CollectionLayout = .columns {
         didSet {
             DispatchQueue.main.async { [weak self] in
@@ -40,11 +53,37 @@ class MoviesBaseCollectionView: UIViewController {
                     buttonImage = UIImage(systemName: "square.fill.text.grid.1x2")
                 }
 
-                self.navigationItem.rightBarButtonItem?.image = buttonImage
+                self.navigationItem.leftBarButtonItem?.image = buttonImage
                 self.collectionView.setCollectionViewLayout(self.createLayout(), animated: true)
             }
         }
     }
+
+    let footerContentView: UIView = {
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        return contentView
+    }()
+
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.color = UIColor(named: "PrimaryColor")
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+
+    private let footerLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.textAlignment = .center
+        label.text = NSLocalizedString("end_of_the_list", comment: "End of the list")
+        label.isHidden = true
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,66 +94,75 @@ class MoviesBaseCollectionView: UIViewController {
 
         view.backgroundColor = .systemBackground
 
+        footerContentView.addSubview(footerLabel)
+        footerContentView.addSubview(activityIndicator)
+
         view.addSubview(collectionView)
+        view.addSubview(footerContentView)
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+
+        NSLayoutConstraint.activate([
+            footerContentView.heightAnchor.constraint(equalToConstant: 40.0),
+            footerContentView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            footerContentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            footerContentView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
+        ])
+
+        NSLayoutConstraint.activate([
+            activityIndicator.heightAnchor.constraint(equalToConstant: 40.0),
+            activityIndicator.widthAnchor.constraint(equalTo: footerContentView.widthAnchor),
+            activityIndicator.centerXAnchor.constraint(equalTo: footerContentView.centerXAnchor),
+            activityIndicator.bottomAnchor.constraint(equalTo: footerContentView.bottomAnchor)
+        ])
+
+        NSLayoutConstraint.activate([
+            footerLabel.centerXAnchor.constraint(equalTo: footerContentView.centerXAnchor),
+            footerLabel.widthAnchor.constraint(equalTo: footerContentView.widthAnchor),
+            footerLabel.heightAnchor.constraint(equalToConstant: 45.0),
+            footerLabel.bottomAnchor.constraint(equalTo: footerContentView.bottomAnchor)
         ])
     }
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    override func didReceiveMemoryWarning() {
+        print("⚠️ Memory Warning on MoviesBaseCollectionView")
+        cache.removeAllValues()
     }
 
     func configureCollectionView() {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.register(MovieCollectionViewCell.self, forCellWithReuseIdentifier: MovieCollectionViewCell.reuseIdentifier)
-        collectionView.register(ActivityIndicatorFooterReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.isScrollEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = true
-        collectionView.isPrefetchingEnabled = true
         collectionView.alwaysBounceVertical = true
+        collectionView.contentInset.bottom = 50
+        collectionView.backgroundColor = .clear
     }
 
     func createLayout() -> UICollectionViewLayout {
-        return UICollectionViewCompositionalLayout(sectionProvider: { [weak self] (_, _) -> NSCollectionLayoutSection? in
-            guard let `self` = self else { return nil }
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth((self.collectionLayout == .columns && UIWindow.isLandscape) ? 0.25 : self.collectionLayout.rawValue),
+                                              heightDimension: .fractionalHeight(1.0))
 
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth( (self.collectionLayout == .columns && UIWindow.isLandscape) ? 0.25 : self.collectionLayout.rawValue),
-                                                  heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 2.0)
 
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets.uniform(size: 2.0)
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalWidth(0.5))
 
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.5 : 3.75)))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
 
-            let section = NSCollectionLayoutSection(group: group)
-
-            // Supplementary footer view setup
-            let headerFooterSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(30))
-
-            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerFooterSize,
-                elementKind: UICollectionView.elementKindSectionFooter,
-                alignment: .bottom)
-
-            section.boundarySupplementaryItems = [sectionFooter]
-
-            return section
-        })
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
     }
 
     func configureDataSource() {
@@ -124,12 +172,6 @@ class MoviesBaseCollectionView: UIViewController {
 
         let dataSource = UICollectionViewDiffableDataSource<Section, Movie>(collectionView: collectionView) { (collectionView, indexPath, movie) in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: movie)
-        }
-
-        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard kind == UICollectionView.elementKindSectionFooter else { return nil }
-
-            return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier, for: indexPath) as? ActivityIndicatorFooterReusableView
         }
 
         self.dataSource = dataSource
@@ -143,13 +185,11 @@ class MoviesBaseCollectionView: UIViewController {
     }
 
     func reloadDataSource() {
-        self.reloadingDataSource = false
         var snapshot = dataSource.snapshot()
         snapshot.deleteAllItems()
         snapshot.appendSections(Section.allCases)
 
         self.dataSource.apply(snapshot, animatingDifferences: true)
-        cache.removeAllValues()
     }
 
     func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
@@ -162,5 +202,9 @@ class MoviesBaseCollectionView: UIViewController {
 
     func handleEmptyView() {
         preconditionFailure("Override handleEmptyView() to provide an empty view for the collection view")
+    }
+
+    func setActivityIndicator(active: Bool) {
+        _ = active ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
     }
 }

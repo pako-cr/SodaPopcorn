@@ -8,8 +8,11 @@
 import UIKit
 
 final class CustomProfileImage: UIImageView {
+    // MARK: - Constants
+    private let resetImage: Bool
+
     // MARK: - Variables
-    var profileSize = ProfileSize.w185
+    var profileSize: ProfileSize = UIDevice.current.isIpad ? .h632 : .w185
 
     private var urlString: String? {
         didSet {
@@ -21,21 +24,20 @@ final class CustomProfileImage: UIImageView {
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
-                    self.activityIndicatorView.startAnimating()
-//                    print("⭐️ getProfileImage \(urlString) with poster size: \(self.posterSize)")
-                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(profileSize: self.profileSize)) { data, error in
+                    if self.resetImage {
+                        self.image = UIImage(named: "no_profile")
+                    }
 
-                        if error != nil {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let `self` = self else { return }
-                                self.image = UIImage(named: "no_profile")
-                                self.activityIndicatorView.stopAnimating()
-                            }
+                    self.activityIndicatorView.startAnimating()
+
+                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(profileSize: self.profileSize)) { data, _ in
+
+                        DispatchQueue.main.async { [weak self] in
+                            self?.activityIndicatorView.stopAnimating()
                         }
 
                         DispatchQueue.main.async { [weak self] in
                             guard let `self` = self else { return }
-                            self.activityIndicatorView.stopAnimating()
 
                             guard let data = data else { return }
 
@@ -58,7 +60,8 @@ final class CustomProfileImage: UIImageView {
         return activityIndicator
     }()
 
-    init() {
+    init(resetImage: Bool = true) {
+        self.resetImage = resetImage
         super.init(frame: .zero)
         setupView()
     }
@@ -80,10 +83,6 @@ final class CustomProfileImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in
-            self?.activityIndicatorView.stopAnimating()
-        }
     }
 
     required init?(coder: NSCoder) {

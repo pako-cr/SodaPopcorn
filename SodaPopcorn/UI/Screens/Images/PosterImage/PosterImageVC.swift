@@ -56,7 +56,8 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var posterImage: CustomPosterImage = {
-        let customImage = CustomPosterImage(frame: .zero)
+        let customImage = CustomPosterImage(resetImage: false)
+        customImage.posterSize = .w342
 
         if let cacheImage = cache.value(forKey: "\(PosterSize.w342.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = cacheImage
@@ -78,11 +79,6 @@ final class PosterImageVC: BaseViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
     override func setupUI() {

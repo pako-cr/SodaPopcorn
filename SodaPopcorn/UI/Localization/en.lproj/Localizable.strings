@@ -33,7 +33,7 @@
 "gallery_view_posters_header" = "Posters";
 "gallery_view_videos_header" = "Videos: Trailers, Teasers";
 "empty_movies_title_label" = "No movies 😞";
-"empty_movies_description_label" = "No movies to display here 🎬";
+"empty_movies_description_label" = "No movies to display here 🎬\n Tap to reload 🔄";
 "cast_collection_view_title" = "Cast";
 "more" = "More";
 "credits_vc_cast_header" = "Cast";
@@ -60,3 +60,10 @@
 "loading_genres_description_label" = "Please wait while we get the information";
 "search_content_title" = "Type something to search 🔍";
 "search_content_description" = "You can search movies by name or keywords";
+"movie_lists" = "Movie Lists";
+"now_playing_movies" = "Now Playing";
+"popular_movies" = "Popular";
+"top_rated_movies" = "Top Rated";
+"upcoming_movies" = "Upcoming";
+"deathdate" = "Died";
+"options" = "Options";

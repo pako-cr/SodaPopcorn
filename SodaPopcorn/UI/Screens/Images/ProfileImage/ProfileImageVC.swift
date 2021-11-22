@@ -56,7 +56,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     }()
 
     private lazy var profileImage: CustomProfileImage = {
-        let customImage = CustomProfileImage()
+        let customImage = CustomProfileImage(resetImage: false)
 
         if let cacheImage = cache.value(forKey: "\(ProfileSize.w185.rawValue)\(self.viewModel.imageURL)") {
             customImage.image = cacheImage
@@ -78,11 +78,6 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.inputs.viewDidLoad()
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
     override func setupUI() {

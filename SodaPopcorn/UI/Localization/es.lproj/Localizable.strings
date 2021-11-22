@@ -33,7 +33,7 @@
 "gallery_view_posters_header" = "Posters";
 "gallery_view_videos_header" = "Videos y Trailers";
 "empty_movies_title_label" = "Sin películas 😞";
-"empty_movies_description_label" = "No hay películas para mostrar 🎬";
+"empty_movies_description_label" = "No hay películas para mostrar 🎬\n Presiona para recargar 🔄";
 "cast_collection_view_title" = "Elenco";
 "more" = "Más";
 "credits_vc_cast_header" = "Elenco";
@@ -60,3 +60,10 @@
 "loading_genres_description_label" = "Por favor espera mientras cargamos la información";
 "search_content_title" = "Escribe algo para buscar 🔍";
 "search_content_description" = "Puedes buscar por nombre o palabras clave";
+"movie_lists" = "Listas de Películas";
+"now_playing_movies" = "Recientes";
+"popular_movies" = "Populares";
+"top_rated_movies" = "Mejor Calificadas";
+"upcoming_movies" = "Próximamente";
+"deathdate" = "Defunción";
+"options" = "Opciones";

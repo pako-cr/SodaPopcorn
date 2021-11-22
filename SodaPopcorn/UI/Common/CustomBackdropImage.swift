@@ -8,9 +8,11 @@
 import UIKit
 
 final class CustomBackdropImage: UIImageView {
+    // MARK: - Constants
+    private let resetImage: Bool
+
     // MARK: - Variables
-    var backdropSize = BackdropSize.w780
-    private var activityIndicatorEnabled = true
+    var backdropSize: BackdropSize = UIDevice.current.isIpad ? .w1280 : .w780
 
     private var urlString: String? {
         didSet {
@@ -22,21 +24,20 @@ final class CustomBackdropImage: UIImageView {
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
-                    self.activityIndicatorView.startAnimating()
-//                    print("⭐️ getBackdropImage \(urlString) with backdrop size: \(self.posterSize)")
-                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(backdropSize: self.backdropSize)) { data, error in
+                    if self.resetImage {
+                        self.image = UIImage(named: "no_backdrop")
+                    }
 
-                        if error != nil {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let `self` = self else { return }
-                                self.image = UIImage(named: "no_backdrop")
-                                self.activityIndicatorView.stopAnimating()
-                            }
+                    self.activityIndicatorView.startAnimating()
+
+                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(backdropSize: self.backdropSize)) { data, _ in
+
+                        DispatchQueue.main.async { [weak self] in
+                            self?.activityIndicatorView.stopAnimating()
                         }
 
                         DispatchQueue.main.async { [weak self] in
                             guard let `self` = self else { return }
-                            self.activityIndicatorView.stopAnimating()
 
                             guard let data = data else { return }
 
@@ -55,13 +56,18 @@ final class CustomBackdropImage: UIImageView {
         let activityIndicator = UIActivityIndicatorView(style: .medium)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.color = UIColor(named: "PrimaryColor")
+        activityIndicator.startAnimating()
         return activityIndicator
     }()
 
-    init(activityIndicatorEnabled: Bool = true) {
+    init(activityIndicatorEnabled: Bool = true, resetImage: Bool = true) {
+        self.resetImage = resetImage
         super.init(frame: .zero)
-        self.activityIndicatorEnabled = activityIndicatorEnabled
         setupView()
+
+        if !activityIndicatorEnabled {
+            self.activityIndicatorView.stopAnimating()
+        }
     }
 
     private func setupView() {
@@ -77,16 +83,6 @@ final class CustomBackdropImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-
-        if activityIndicatorEnabled {
-            DispatchQueue.main.async { [weak self] in
-                self?.activityIndicatorView.startAnimating()
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in
-            self?.activityIndicatorView.stopAnimating()
-        }
     }
 
     required init?(coder: NSCoder) {

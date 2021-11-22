@@ -51,8 +51,12 @@ final class CreditsVC: BaseViewController {
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
         customCollectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
 
     override func setupUI() {
@@ -62,13 +66,6 @@ final class CreditsVC: BaseViewController {
         customCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         customCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         customCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-    }
-
-    private func setupNavigationBar() {
-        let leftBarButtonItemImage = UIImage(systemName: "arrow.backward")?.withRenderingMode(.alwaysTemplate)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     override func bindViewModel() {
