@@ -141,7 +141,7 @@ class MoviesBaseCollectionView: BaseViewController {
         collectionView.isScrollEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = true
-        collectionView.alwaysBounceVertical = true
+        collectionView.alwaysBounceVertical = false
         collectionView.contentInset.bottom = 50
         collectionView.backgroundColor = .clear
     }

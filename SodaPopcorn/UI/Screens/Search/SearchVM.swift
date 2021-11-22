@@ -66,7 +66,6 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
-    private var page = 0
 
     public init(movieService: MovieService) {
         self.movieService = movieService
@@ -174,7 +173,6 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
 
     private let genreSelectedProperty = PassthroughSubject<Genre, Never>()
     public func genreSelected(genre: Genre) {
-        self.page = 1
         genreSelectedProperty.send(genre)
     }
 

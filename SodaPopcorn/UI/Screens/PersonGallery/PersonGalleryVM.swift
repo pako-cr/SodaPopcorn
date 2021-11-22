@@ -27,7 +27,7 @@ public protocol PersonGalleryVMOutputs: AnyObject {
     func imagesAction() -> CurrentValueSubject<[PersonImage], Never>
 
     /// Emits when a person image is selected.
-    func imageAction() -> PassthroughSubject<String, Never>
+    func imageAction() -> PassthroughSubject<(String, [String]), Never>
 
     /// Emits to return the person.
     func personAction() -> CurrentValueSubject<Person, Never>
@@ -59,7 +59,12 @@ public final class PersonGalleryVM: ObservableObject, Identifiable, PersonGaller
         }.store(in: &cancellable)
 
         imageSelectedProperty.sink { [weak self] imageUrl in
-            self?.imageActionProperty.send(imageUrl)
+            guard let `self` = self else { return }
+            let images = self.personImages.filter({ $0.filePath != "" }).map({ $0.filePath ?? "" })
+
+            if !images.isEmpty {
+                self.imageActionProperty.send((imageUrl, images))
+            }
         }.store(in: &cancellable)
     }
 
@@ -100,8 +105,8 @@ public final class PersonGalleryVM: ObservableObject, Identifiable, PersonGaller
         return imagesActionProperty
     }
 
-    private let imageActionProperty = PassthroughSubject<String, Never>()
-    public func imageAction() -> PassthroughSubject<String, Never> {
+    private let imageActionProperty = PassthroughSubject<(String, [String]), Never>()
+    public func imageAction() -> PassthroughSubject<(String, [String]), Never> {
         return imageActionProperty
     }
 

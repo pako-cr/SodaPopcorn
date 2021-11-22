@@ -119,9 +119,9 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 	}
 
-    private func showBackdropImagesView(with imageURL: String, on navigationController: NavigationController) {
-        let viewModel = BackdropImageVM(imageURL: imageURL)
-        let viewController = BackdropImageVC(viewModel: viewModel)
+    private func showBackdropImagesView(with selectedImage: String, and images: [String], on navigationController: NavigationController) {
+        let viewModel = BackdropImagesVM(selectedImage: selectedImage, images: images)
+        let viewController = BackdropImagesVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 
@@ -131,9 +131,9 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showPosterImageView(with imageURL: String, on navigationController: UIViewController) {
-        let viewModel = PosterImageVM(imageURL: imageURL)
-        let viewController = PosterImageVC(viewModel: viewModel)
+    private func showPosterImageView(with selectedImage: String, and images: [String], on navigationController: UIViewController) {
+        let viewModel = PosterImagesVM(selectedImage: selectedImage, images: images)
+        let viewController = PosterImagesVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
 
@@ -143,8 +143,8 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
     }
 
-    private func showProfileImageView(with imageURL: String, on navigationController: UIViewController) {
-        let viewModel = ProfileImageVM(imageURL: imageURL)
+    private func showProfileImageView(with selectedImage: String, and images: [String], on navigationController: UIViewController) {
+        let viewModel = ProfileImageVM(selectedImage: selectedImage, images: images)
         let viewController = ProfileImageVC(viewModel: viewModel)
 
         navigationController.present(viewController, animated: true, completion: nil)
@@ -166,14 +166,14 @@ final class HomeCoordinator: Coordinator {
                 navigationController.popViewController(animated: true)
             }.store(in: &cancellable)
 
-        viewModel.outputs.backdropImageAction()
-            .sink { [weak self] image in
-                self?.showBackdropImagesView(with: image, on: navigationController)
+        viewModel.outputs.backdropImagesAction()
+            .sink { [weak self] (selectedImage, images) in
+                self?.showBackdropImagesView(with: selectedImage, and: images, on: navigationController)
             }.store(in: &cancellable)
 
-        viewModel.outputs.posterImageAction()
-            .sink { [weak self] imageUrl in
-                self?.showPosterImageView(with: imageUrl, on: navigationController)
+        viewModel.outputs.posterImagesAction()
+            .sink { [weak self] (selectedImage, images) in
+                self?.showPosterImageView(with: selectedImage, and: images, on: navigationController)
             }.store(in: &cancellable)
     }
 
@@ -233,8 +233,8 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 
         viewModel.outputs.personImageAction()
-            .sink { [weak self] personImage in
-                self?.showProfileImageView(with: personImage, on: navigationController)
+            .sink { [weak self] (selectedImage, images) in
+                self?.showProfileImageView(with: selectedImage, and: images, on: navigationController)
             }.store(in: &cancellable)
 
         viewModel.outputs.personGallerySelectedAction()
@@ -311,8 +311,8 @@ final class HomeCoordinator: Coordinator {
             }.store(in: &cancellable)
 
         viewModel.outputs.imageAction()
-            .sink { [weak self] image in
-                self?.showProfileImageView(with: image, on: navigationController)
+            .sink { [weak self] (selectedImage, images) in
+                self?.showProfileImageView(with: selectedImage, and: images, on: navigationController)
             }.store(in: &cancellable)
     }
 

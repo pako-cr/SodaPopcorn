@@ -1,14 +1,14 @@
 //
-//  ProfileImageVM.swift
+//  BackdropImagesVM.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 16/11/21.
+//  Created by Francisco Cordoba on 5/11/21.
 //
 
 import Foundation
 import Combine
 
-public protocol ProfileImageVMInputs: AnyObject {
+public protocol BackdropImagesVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
@@ -19,11 +19,11 @@ public protocol ProfileImageVMInputs: AnyObject {
     func collectionViewUpdated()
 }
 
-public protocol ProfileImageVMOutputs: AnyObject {
+public protocol BackdropImagesVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
-    /// Emits to get return the image information.
+    /// Emits to get return the images information.
     func imagesAction() -> PassthroughSubject<[String], Never>
 
     /// Emits to get return the selected image information.
@@ -36,19 +36,19 @@ public protocol ProfileImageVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 }
 
-public protocol ProfileImageVMTypes: AnyObject {
-    var inputs: ProfileImageVMInputs { get }
-    var outputs: ProfileImageVMOutputs { get }
+public protocol BackdropImagesVMTypes: AnyObject {
+    var inputs: BackdropImagesVMInputs { get }
+    var outputs: BackdropImagesVMOutputs { get }
 }
 
-public final class ProfileImageVM: ObservableObject, Identifiable, ProfileImageVMInputs, ProfileImageVMOutputs, ProfileImageVMTypes {
+public final class BackdropImagesVM: ObservableObject, Identifiable, BackdropImagesVMInputs, BackdropImagesVMOutputs, BackdropImagesVMTypes {
     // MARK: Constants
     private let selectedImage: String
     private let images: [String]
 
     // MARK: Variables
-    public var inputs: ProfileImageVMInputs { return self }
-    public var outputs: ProfileImageVMOutputs { return self }
+    public var inputs: BackdropImagesVMInputs { return self }
+    public var outputs: BackdropImagesVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
@@ -119,6 +119,6 @@ public final class ProfileImageVM: ObservableObject, Identifiable, ProfileImageV
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "ProfileImageVM deinit.")
+        print("🗑", "BackdropImagesVM deinit.")
     }
 }

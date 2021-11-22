@@ -78,7 +78,9 @@ final class GalleryVC: BaseViewController {
         fetchGallerySubscription = viewModel.outputs.galleryAction()
             .sink(receiveValue: { [weak self] gallery in
                 guard let `self` = self else { return }
-                self.updateDataSource(gallery: gallery)
+                if let gallery = gallery {
+                    self.updateDataSource(gallery: gallery)
+                }
             })
     }
 
