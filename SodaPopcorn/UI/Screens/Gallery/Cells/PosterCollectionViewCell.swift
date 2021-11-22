@@ -29,7 +29,7 @@ final class PosterCollectionViewCell: UICollectionViewCell {
 
     // MARK: UI Elements
     private let posterImage: CustomPosterImage = {
-        let posterImage = CustomPosterImage(frame: .zero)
+        let posterImage = CustomPosterImage()
         posterImage.posterSize = .w342
         return posterImage
     }()

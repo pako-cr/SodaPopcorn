@@ -12,6 +12,16 @@ final class GenreCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "genreCollectionViewCellId"
 
     // MARK: Variables
+    private var imageViewCenterYLayoutConstraint: NSLayoutConstraint?
+    private var parallaxOffset: CGFloat = 0 {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let `self` = self else { return }
+                self.imageViewCenterYLayoutConstraint?.constant = self.parallaxOffset
+            }
+        }
+    }
+
     private var genre: Genre? {
         didSet {
             DispatchQueue.main.async { [weak self] in
@@ -64,7 +74,6 @@ final class GenreCollectionViewCell: UICollectionViewCell {
                 }
 
                 self.genreImage.image = image
-                self.genreImage.alpha = 0.75
             }
         }
     }
@@ -75,12 +84,14 @@ final class GenreCollectionViewCell: UICollectionViewCell {
     private lazy var genreName: UILabel = {
         let label = UILabel(frame: .zero)
         label.numberOfLines = 1
-        label.font = self.traitCollection.userInterfaceStyle == .light ? .preferredFont(forTextStyle: .title3).bold() : .preferredFont(forTextStyle: .headline)
+        label.textColor = .white
+        label.font = .preferredFont(forTextStyle: .title1)
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
         label.maximumContentSizeCategory = .accessibilityMedium
         label.sizeToFit()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         return label
     }()
 
@@ -93,29 +104,37 @@ final class GenreCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        genreName.font = traitCollection.userInterfaceStyle == .light ? .preferredFont(forTextStyle: .title3).bold() : .preferredFont(forTextStyle: .headline)
-    }
-
     func setupCellView() {
+        layer.masksToBounds = true
+
         addSubview(genreImage)
         addSubview(genreName)
 
-        genreImage.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        imageViewCenterYLayoutConstraint = genreImage.centerYAnchor.constraint(equalTo: centerYAnchor)
+        imageViewCenterYLayoutConstraint?.isActive = true
+
+        genreImage.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 1.5).isActive = true
+        genreImage.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         genreImage.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         genreImage.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        genreImage.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
 
-        genreName.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        genreName.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        genreName.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.9).isActive = true
-        genreName.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.9).isActive = true
+        genreName.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        genreName.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        genreName.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        genreName.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 
     // MARK: Helpers
     func configure(with genre: Genre) {
         self.genre = genre
+    }
+
+    func updateParallaxOffset(collectionViewBounds bounds: CGRect) {
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
+        let offsetFromCenter = CGPoint(x: center.x - self.center.x, y: center.y - self.center.y)
+        let maxVerticalOffset = (bounds.height / 2) + self.bounds.height / 2
+        let scaleFactor = 40 / maxVerticalOffset
+        parallaxOffset = offsetFromCenter.y * scaleFactor
     }
 
     // MARK: - 🗑 Deinit

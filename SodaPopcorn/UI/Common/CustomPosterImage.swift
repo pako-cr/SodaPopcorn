@@ -8,8 +8,11 @@
 import UIKit
 
 final class CustomPosterImage: UIImageView {
+    // MARK: - Constants
+    private let resetImage: Bool
+
     // MARK: - Variables
-    var posterSize = PosterSize.w154
+    var posterSize = PosterSize.w185
 
     private var urlString: String? {
         didSet {
@@ -21,17 +24,13 @@ final class CustomPosterImage: UIImageView {
                     self.activityIndicatorView.stopAnimating()
 
                 } else {
-                    self.activityIndicatorView.startAnimating()
-//                    print("⭐️ getPosterImage \(urlString) with poster size: \(self.posterSize)")
-                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(posterSize: self.posterSize)) { data, error in
+                    if self.resetImage {
+                        self.image = UIImage(named: "no_poster")
+                    }
 
-                        if error != nil {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let `self` = self else { return }
-                                self.image = UIImage(named: "no_poster")
-                                self.activityIndicatorView.stopAnimating()
-                            }
-                        }
+                    self.activityIndicatorView.startAnimating()
+
+                    ImageService.shared().getImage(imagePath: urlString, imageSize: ImageSize(posterSize: self.posterSize)) { data, _ in
 
                         DispatchQueue.main.async { [weak self] in
                             guard let `self` = self else { return }
@@ -58,8 +57,9 @@ final class CustomPosterImage: UIImageView {
         return activityIndicator
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(resetImage: Bool = true) {
+        self.resetImage = resetImage
+        super.init(frame: .zero)
         setupView()
     }
 
@@ -76,10 +76,6 @@ final class CustomPosterImage: UIImageView {
         activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityIndicatorView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         activityIndicatorView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in
-            self?.activityIndicatorView.stopAnimating()
-        }
     }
 
     required init?(coder: NSCoder) {

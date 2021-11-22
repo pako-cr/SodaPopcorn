@@ -12,8 +12,6 @@ final class MoviesVC: MoviesBaseCollectionView {
     // MARK: - Consts
     private let viewModel: MoviesVM
 
-    // MARK: - Variables
-
     // MARK: Subscriptions
     private var finishedFetchingSubscription: Cancellable!
     private var fetchMoviesSubscription: Cancellable!
@@ -21,19 +19,6 @@ final class MoviesVC: MoviesBaseCollectionView {
     private var loadingSubscription: Cancellable!
     private var showErrorSubscription: Cancellable!
     private var viewtitleSubscription: Cancellable!
-
-    private var finishedFetching = false
-
-    private var loading = false {
-        didSet {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
-                guard let `self` = self else { return }
-                if !self.loading {
-                    self.refreshControl.endRefreshing()
-                }
-            }
-        }
-    }
 
     // MARK: - UI Elements
     private lazy var sizeMenu: UIMenu = { [unowned self] in
@@ -72,16 +57,9 @@ final class MoviesVC: MoviesBaseCollectionView {
         return menu
     }()
 
-    private lazy var refreshControl: UIRefreshControl = {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(self.reloadCollectionView), for: .valueChanged)
-        refreshControl.tintColor = UIColor(named: "PrimaryColor")
-        return refreshControl
-    }()
-
     init(viewModel: MoviesVM) {
         self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+        super.init()
     }
 
     required init?(coder: NSCoder) {
@@ -90,19 +68,12 @@ final class MoviesVC: MoviesBaseCollectionView {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
+        setupNavigationBar()
+        collectionView.delegate = self
         viewModel.inputs.fetchMovies()
     }
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
-    }
-
-    func setupUI() {
+    override func setupNavigationBar() {
         navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
         if viewModel.presentedViewController {
@@ -111,22 +82,21 @@ final class MoviesVC: MoviesBaseCollectionView {
 
         } else {
             let leftBarButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: leftBarButtonImage, primaryAction: UIAction { [weak self] _ in self?.setCollectionViewLayout() }, menu: sizeMenu)
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: leftBarButtonImage, primaryAction: nil, menu: sizeMenu)
 
             let rightBarButtonImage = UIImage(systemName: "line.3.horizontal.decrease.circle")
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Filter movies"), image: rightBarButtonImage, primaryAction: UIAction { [weak self] _ in self?.filterButtonPressed() }, menu: moviesFilterMenu)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Filter movies"), image: rightBarButtonImage, primaryAction: nil, menu: moviesFilterMenu)
         }
-
-        collectionView.refreshControl = refreshControl
-        collectionView.delegate = self
     }
 
-    func bindViewModel() {
+    override func bindViewModel() {
         fetchMoviesSubscription = viewModel.outputs.fetchMoviesAction()
             .filter({ !($0?.isEmpty ?? true) })
             .sink(receiveValue: { [weak self] (movies) in
-                guard let `self` = self, let movies = movies, !movies.isEmpty else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+                guard let movies = movies, !movies.isEmpty else { return }
+
+                DispatchQueue.main.async { [weak self] in
+                    self?.navigationController?.navigationItem.rightBarButtonItem?.isEnabled = true
                     self?.updateDataSource(movies: movies)
                 }
             })
@@ -140,10 +110,7 @@ final class MoviesVC: MoviesBaseCollectionView {
         finishedFetchingSubscription = viewModel.outputs.finishedFetchingAction()
             .sink(receiveValue: { [weak self] (finishedFetching) in
                 guard let `self` = self else { return }
-
-                if self.finishedFetching != finishedFetching {
-                    self.handleFetchingChange(finishedFetching: finishedFetching)
-                }
+                self.finishedFetching = finishedFetching
             })
 
         showErrorSubscription = viewModel.outputs.showError()
@@ -155,8 +122,27 @@ final class MoviesVC: MoviesBaseCollectionView {
 
         searchCriteriaSubscription = viewModel.outputs.searchCriteriaAction()
             .dropFirst()
-            .sink(receiveValue: { [weak self] _ in
+            .sink(receiveValue: { [weak self] searchCriteria in
+                self?.finishedFetching = false
                 self?.reloadDataSource()
+                self?.handleEmptyView()
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let `self` = self else { return }
+
+                    switch searchCriteria {
+                    case .nowPlaying:
+                        self.title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
+                    case .popular:
+                        self.title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
+                    case .topRated:
+                        self.title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
+                    case .upcomming:
+                        self.title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
+                    default:
+                        break
+                    }
+                }
             })
 
         viewtitleSubscription = viewModel.outputs.setViewTitle()
@@ -167,59 +153,30 @@ final class MoviesVC: MoviesBaseCollectionView {
 
     // MARK: - Collection View
     override func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
-        DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
-
-            if self.reloadingDataSource {
-                self.reloadDataSource()
-            }
-
             var snapshot = self.dataSource.snapshot()
+
             snapshot.appendItems(movies, toSection: .movies)
-
-            self.handleFetchingChange(finishedFetching: false)
-
             self.loadedCount = snapshot.numberOfItems
 
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let `self` = self else { return }
+
             self.collectionView.removeEmptyView()
+            self.setActivityIndicator(active: false)
             self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
         }
-    }
-
-    @objc
-    private func reloadCollectionView() {
-        reloadingDataSource = true
-        viewModel.inputs.pullToRefresh()
-    }
-
-    private func setCollectionViewLayout() {
-        switch collectionLayout {
-        case .columns:
-            self.collectionLayout = .list
-        case .list:
-            self.collectionLayout = .columns
-        }
-    }
-
-    /// Handle when all the information is fetched or is going to start fetching all over again to set on or off the loading animation.
-    /// Called in the subscription *finishedFetchingAction*
-    private func handleFetchingChange(finishedFetching: Bool) {
-        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard kind == UICollectionView.elementKindSectionFooter else { return nil }
-
-            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ActivityIndicatorFooterReusableView.reuseIdentifier, for: indexPath) as? ActivityIndicatorFooterReusableView
-            _ = finishedFetching ? footerView?.stopActivityIndicator() : footerView?.startActivityIndicator()
-            return footerView
-        }
-
-        self.finishedFetching = finishedFetching
     }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard loadedCount != 0 else { return }
 
+        self.footerContentView.isHidden = indexPath.row <= loadedCount - 6
+
         if indexPath.row == loadedCount - 1 {
-            self.viewModel.inputs.fetchMovies()
+            if !finishedFetching {
+                self.setActivityIndicator(active: true)
+                self.viewModel.inputs.fetchMovies()
+            }
         }
     }
 
@@ -248,25 +205,6 @@ final class MoviesVC: MoviesBaseCollectionView {
     @objc
     private func closeButtonPressed() {
         viewModel.inputs.closeButtonPressed()
-    }
-
-    private func filterButtonPressed() {
-        switch viewModel.searchCriteria {
-        case .nowPlaying:
-            viewModel.inputs.setSearchCriteria(searchCriteria: .popular)
-            title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
-        case .popular:
-            viewModel.inputs.setSearchCriteria(searchCriteria: .topRated)
-            title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
-        case .topRated:
-            viewModel.inputs.setSearchCriteria(searchCriteria: .upcomming)
-            title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
-        case .upcomming:
-            viewModel.inputs.setSearchCriteria(searchCriteria: .nowPlaying)
-            title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
-        default:
-            break
-        }
     }
 
     // MARK: - 🗑 Deinit

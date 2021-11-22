@@ -19,7 +19,7 @@ final class PersonMovieListVC: MoviesBaseCollectionView {
     // MARK: - UI Elements
     init(viewModel: PersonMovieListVM) {
         self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+        super.init()
     }
 
     required init?(coder: NSCoder) {
@@ -28,8 +28,8 @@ final class PersonMovieListVC: MoviesBaseCollectionView {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
+//        setupUI()
+//        bindViewModel()
         viewModel.inputs.viewDidLoad()
         setupNavigationBar()
     }
@@ -39,15 +39,11 @@ final class PersonMovieListVC: MoviesBaseCollectionView {
         view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
-    func setupUI() {
+    override func setupUI() {
         collectionView.delegate = self
     }
 
-    private func setupNavigationBar() {
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
-    }
-
-    func bindViewModel() {
+    override func bindViewModel() {
         moviesSubscription = viewModel.outputs.moviesAction()
             .sink(receiveValue: { [weak self] (movies) in
                 guard let `self` = self else { return }

@@ -66,9 +66,6 @@ final class SearchVC: BaseViewController {
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
-        view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
         collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
     }
 
@@ -81,11 +78,11 @@ final class SearchVC: BaseViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
-    private func setupNavigationBar() {
+    override func setupNavigationBar() {
+        super.setupNavigationBar()
         navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
 
         navigationItem.searchController = searchController
-        navigationController?.navigationBar.tintColor = UIColor(named: "PrimaryColor")
     }
 
     override func bindViewModel() {
@@ -187,7 +184,7 @@ final class SearchVC: BaseViewController {
     }
 
     private func genresSection() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
 
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -195,7 +192,7 @@ final class SearchVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 4.5 : 9)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2.5 : 4.5)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -243,7 +240,7 @@ final class SearchVC: BaseViewController {
 
             if let movies = movies, !movies.isEmpty {
                 snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .movies))
-                snapshot.appendItems(movies.map({ SearchObject(movie: Movie(id: $0.id, title: $0.title, overview: $0.overview, rating: $0.rating, posterPath: $0.posterPath, backdropPath: $0.backdropPath, releaseDate: $0.releaseDate)) }), toSection: .movies)
+                snapshot.appendItems(movies.map({ SearchObject(movie: Movie(movieId: $0.movieId, title: $0.title, overview: $0.overview, rating: $0.rating, posterPath: $0.posterPath, backdropPath: $0.backdropPath, releaseDate: $0.releaseDate)) }), toSection: .movies)
             }
 
             self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
@@ -312,6 +309,18 @@ extension SearchVC: UISearchResultsUpdating {
                 DispatchQueue.main.async { [weak self] in
                     self?.searchController.searchBar.isLoading = true
                 }
+            }
+        }
+    }
+}
+
+extension SearchVC: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if let cells = collectionView.visibleCells as? [GenreCollectionViewCell] {
+            let bounds = collectionView.bounds
+
+            cells.forEach { cell in
+                cell.updateParallaxOffset(collectionViewBounds: bounds)
             }
         }
     }

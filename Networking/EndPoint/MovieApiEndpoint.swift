@@ -126,12 +126,18 @@ extension MovieApiEndpoint: EndPointType {
                                                       "api_key": publicApiKey,
                                                       "include_adult": false,
                                                       "language": locale])
-        case .movieDetails, .movieImages, .movieExternalIds, .movieVideos, .movieCredits, .genreList, .person, .personMovieCredits, .personExternalIds, .personImages:
+        case .movieDetails, .movieExternalIds, .movieCredits, .genreList, .person, .personMovieCredits, .personExternalIds:
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,
                                       urlParameters: ["api_key": publicApiKey,
                                                       "include_adult": false,
                                                       "language": locale])
+        case .movieImages, .personImages, .movieVideos:
+            return .requestParameters(bodyParameters: nil,
+                                      bodyEncoding: .urlEncoding,
+                                      urlParameters: ["api_key": publicApiKey,
+                                                      "include_adult": false])
+
         case .discover(let genre, let page):
             return .requestParameters(bodyParameters: nil,
                                       bodyEncoding: .urlEncoding,

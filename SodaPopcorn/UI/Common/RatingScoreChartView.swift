@@ -11,6 +11,15 @@ import UIKit
 public final class RatingScoreChartView: UIView {
 
     // MARK: - UI Elements
+    private lazy var roundView: UIView = {
+        let roundView = UIView(frame: CGRect(x: .zero, y: .zero, width: self.bounds.width, height: self.bounds.width))
+        let roundViewBackgroundColor = self.traitCollection.userInterfaceStyle == .light ? UIColor.white : UIColor.black
+        roundView.backgroundColor = roundViewBackgroundColor
+        roundView.layer.cornerRadius = roundView.frame.size.width / 2
+        roundView.sizeToFit()
+        return roundView
+    }()
+
     private let ratingLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,6 +41,11 @@ public final class RatingScoreChartView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        roundView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .black
+    }
+
     // MARK: - Helpers
     private func getStrokeColor(percentage: Double) -> UIColor {
         switch percentage {
@@ -50,12 +64,6 @@ public final class RatingScoreChartView: UIView {
     }
 
     private func setupCircleShape(ratingValue: Double) {
-        let roundView = UIView(frame: CGRect(x: .zero, y: .zero, width: bounds.width, height: bounds.width))
-        let roundViewBackgroundColor = traitCollection.userInterfaceStyle == .light ? UIColor.white : UIColor.black
-        roundView.backgroundColor = roundViewBackgroundColor
-        roundView.layer.cornerRadius = roundView.frame.size.width / 2
-        roundView.sizeToFit()
-
         // Full circle
         let circlePath = UIBezierPath(arcCenter: CGPoint(x: roundView.frame.size.width / 2, y: roundView.frame.size.height / 2),
                                       radius: roundView.frame.size.width / 2,

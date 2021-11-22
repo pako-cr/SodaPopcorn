@@ -12,9 +12,6 @@ public protocol MoviesVMInputs: AnyObject {
 	/// Call to get the new movies.
 	func fetchMovies()
 
-	/// Call to pull to refresh.
-	func pullToRefresh()
-
 	/// Call when a movie is selected.
 	func movieSelected(movie: Movie)
 
@@ -93,7 +90,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
                 self?.fetchMoviesProperty.send()
             }.store(in: &cancellable)
 
-        let getMoviesEvent = Publishers.Merge(self.fetchMoviesProperty, self.pullToRefreshProperty)
+        let getMoviesEvent = self.fetchMoviesProperty
 			.flatMap({ [weak self] _ -> AnyPublisher<Movies, Never> in
 				guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
@@ -136,10 +133,13 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 				self.loadingProperty.value = false
 
 				if movies.numberOfResults != 0 {
-					print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
+                    print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), pageElementsCount: \(movies.movies?.count ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
 
-					self.finishedFetchingActionProperty.send(self.page >= movies.numberOfPages ?? 0)
-					self.fetchMoviesActionProperty.send(movies.movies)
+                    if let numberOfPages = movies.numberOfPages {
+                        self.finishedFetchingActionProperty.send(self.page >= numberOfPages)
+                    }
+
+                    self.fetchMoviesActionProperty.send(movies.movies)
 				}
 			}).store(in: &cancellable)
 	}
@@ -149,12 +149,6 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 	public func fetchMovies() {
         self.page += 1
 		fetchMoviesProperty.send(())
-	}
-
-	private let pullToRefreshProperty = PassthroughSubject<Void, Never>()
-	public func pullToRefresh() {
-		self.page = 1
-		pullToRefreshProperty.send(())
 	}
 
 	private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
@@ -169,6 +163,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
     private let setSearchCriteriaProperty = PassthroughSubject<SearchCriteria, Never>()
     public func setSearchCriteria(searchCriteria: SearchCriteria) {
+        self.page = 1
         setSearchCriteriaProperty.send(searchCriteria)
     }
 

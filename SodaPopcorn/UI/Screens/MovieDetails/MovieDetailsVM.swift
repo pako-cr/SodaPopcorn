@@ -133,7 +133,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
                 self.loadingProperty.value = true
 
-                return movieService.movieDetails(movieId: self.movie.id ?? "")
+                return movieService.movieDetails(movieId: self.movie.movieId ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
                         self?.loadingProperty.value = false
@@ -168,7 +168,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
             .flatMap { [weak self] _ -> AnyPublisher<SocialNetworks, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.movieExternalIds(movieId: self.movie.id ?? "")
+                return movieService.movieExternalIds(movieId: self.movie.movieId ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -199,7 +199,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
             .flatMap { [weak self] _ -> AnyPublisher<Credits, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.movieCredits(movieId: self.movie.id ?? "")
+                return movieService.movieCredits(movieId: self.movie.movieId ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
 
@@ -230,7 +230,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
             .flatMap { [weak self] _ -> AnyPublisher<Movies, Never> in
                 guard let `self` = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
 
-                return movieService.movieSimilarMovies(movieId: self.movie.id ?? "")
+                return movieService.movieSimilarMovies(movieId: self.movie.movieId ?? "")
                     .mapError({ [weak self] networkResponse -> NetworkResponse in
                         print("🔴 [MovieDetailsVM] [init] Received completion error. Error: \(networkResponse.localizedDescription)")
                         self?.loadingProperty.value = false

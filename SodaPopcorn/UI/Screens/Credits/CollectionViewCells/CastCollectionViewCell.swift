@@ -24,10 +24,12 @@ final class CastCollectionViewCell: UICollectionViewCell {
                         .withRenderingMode(.alwaysOriginal)
                         .withTintColor(UIColor(named: "PrimaryColor") ?? UIColor.systemOrange)
 
+                    self.profileImage.stopActivityIndicator()
                     self.profileImage.image = image
                     self.profileImage.contentMode = .scaleAspectFit
                     self.castName.isHidden = true
                     self.characterName.isHidden = true
+                    self.asPrefixName.isHidden = true
 
                 } else {
                     self.castName.isHidden = false
@@ -75,6 +77,19 @@ final class CastCollectionViewCell: UICollectionViewCell {
         return label
     }()
 
+    private let asPrefixName: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 1
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+        label.maximumContentSizeCategory = .accessibilityMedium
+        label.sizeToFit()
+        label.textColor = .systemGray
+        label.text = "as"
+        return label
+    }()
+
     private let characterName: UILabel = {
         let label = UILabel(frame: .zero)
         label.numberOfLines = 1
@@ -100,6 +115,7 @@ final class CastCollectionViewCell: UICollectionViewCell {
         addSubview(mainStack)
 
         mainStack.addArrangedSubview(castName)
+        mainStack.addArrangedSubview(asPrefixName)
         mainStack.addArrangedSubview(characterName)
 
         profileImage.topAnchor.constraint(equalTo: topAnchor).isActive = true
