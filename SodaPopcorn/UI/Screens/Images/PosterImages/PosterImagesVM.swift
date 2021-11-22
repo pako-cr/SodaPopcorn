@@ -1,27 +1,33 @@
 //
-//  BackdropImageVM.swift
+//  PosterImagesVM.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 5/11/21.
+//  Created by Francisco Cordoba on 9/11/21.
 //
 
 import Foundation
 import Combine
 
-public protocol BackdropImageVMInputs: AnyObject {
+public protocol PosterImagesVMInputs: AnyObject {
     /// Call when the view did load.
     func viewDidLoad()
 
     /// Call when the close button is pressed.
     func closeButtonPressed()
+
+    /// Call when the collection view was updated.
+    func collectionViewUpdated()
 }
 
-public protocol BackdropImageVMOutputs: AnyObject {
+public protocol PosterImagesVMOutputs: AnyObject {
     /// Emits to close the screen.
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
     /// Emits to get return the image information.
-    func imageURLAction() -> PassthroughSubject<String, Never>
+    func imagesAction() -> PassthroughSubject<[String], Never>
+
+    /// Emits to get return the selected image information.
+    func selectedImageAction() -> PassthroughSubject<String, Never>
 
     /// Emits when loading.
     func loading() -> CurrentValueSubject<Bool, Never>
@@ -30,30 +36,37 @@ public protocol BackdropImageVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 }
 
-public protocol BackdropImageVMTypes: AnyObject {
-    var inputs: BackdropImageVMInputs { get }
-    var outputs: BackdropImageVMOutputs { get }
+public protocol PosterImagesVMTypes: AnyObject {
+    var inputs: PosterImagesVMInputs { get }
+    var outputs: PosterImagesVMOutputs { get }
 }
 
-public final class BackdropImageVM: ObservableObject, Identifiable, BackdropImageVMInputs, BackdropImageVMOutputs, BackdropImageVMTypes {
+public final class PosterImagesVM: ObservableObject, Identifiable, PosterImagesVMInputs, PosterImagesVMOutputs, PosterImagesVMTypes {
     // MARK: Constants
-    let imageURL: String
+    private let selectedImage: String
+    private let images: [String]
 
     // MARK: Variables
-    public var inputs: BackdropImageVMInputs { return self }
-    public var outputs: BackdropImageVMOutputs { return self }
+    public var inputs: PosterImagesVMInputs { return self }
+    public var outputs: PosterImagesVMOutputs { return self }
 
     // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
-    private var page = 0
 
-    init(imageURL: String) {
-        self.imageURL = imageURL
+    init(selectedImage: String, images: [String]) {
+        self.selectedImage = selectedImage
+        self.images = images
 
         viewDidLoadProperty.sink { [weak self] _ in
             guard let `self` = self else { return }
-            self.imageURLActionProperty.send(self.imageURL)
+            self.imagesActionProperty.send(self.images)
         }.store(in: &cancellable)
+
+        collectionViewUpdatedProperty
+            .sink { [weak self] _ in
+                guard let `self` = self else { return }
+                self.selectedImageActionProperty.send(self.selectedImage)
+            }.store(in: &cancellable)
 
         closeButtonPressedProperty.sink { [weak self] _ in
             self?.closeButtonActionProperty.send(())
@@ -71,15 +84,20 @@ public final class BackdropImageVM: ObservableObject, Identifiable, BackdropImag
         closeButtonPressedProperty.send(())
     }
 
+    private let collectionViewUpdatedProperty = PassthroughSubject<Void, Never>()
+    public func collectionViewUpdated() {
+        collectionViewUpdatedProperty.send(())
+    }
+
     // MARK: - ⬆️ OUTPUTS Definition
     private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
     public func closeButtonAction() -> PassthroughSubject<Void, Never> {
         return closeButtonActionProperty
     }
 
-    private let imageURLActionProperty = PassthroughSubject<String, Never>()
-    public func imageURLAction() -> PassthroughSubject<String, Never> {
-        return imageURLActionProperty
+    private let imagesActionProperty = PassthroughSubject<[String], Never>()
+    public func imagesAction() -> PassthroughSubject<[String], Never> {
+        return imagesActionProperty
     }
 
     private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
@@ -92,10 +110,15 @@ public final class BackdropImageVM: ObservableObject, Identifiable, BackdropImag
         return showErrorProperty
     }
 
+    private let selectedImageActionProperty = PassthroughSubject<String, Never>()
+    public func selectedImageAction() -> PassthroughSubject<String, Never> {
+        return selectedImageActionProperty
+    }
+
     // MARK: - ⚙️ Helpers
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑", "BackdropImageVM deinit.")
+        print("🗑", "PosterImagesVM deinit.")
     }
 }

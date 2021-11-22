@@ -1,14 +1,14 @@
 //
-//  ProfileImageVC.swift
+//  BackdropImagesVC.swift
 //  SodaPopcorn
 //
-//  Created by Francisco Cordoba on 16/11/21.
+//  Created by Francisco Cordoba on 5/11/21.
 //
 
 import Combine
 import UIKit
 
-final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
+final class BackdropImagesVC: BaseViewController {
     enum Section: CaseIterable {
         case images
     }
@@ -18,7 +18,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, String>
 
     // MARK: Consts
-    private let viewModel: ProfileImageVM
+    private let viewModel: BackdropImagesVM
 
     // MARK: - Variables
     private var dataSource: DataSource!
@@ -41,7 +41,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
         return button
     }()
 
-    init(viewModel: ProfileImageVM) {
+    init(viewModel: BackdropImagesVM) {
         self.viewModel = viewModel
         super.init()
     }
@@ -99,7 +99,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
     // MARK: - Collection
     private func configureCollectionView() {
         customCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        customCollectionView.register(ProfileImageViewCell.self, forCellWithReuseIdentifier: ProfileImageViewCell.reuseIdentifier)
+        customCollectionView.register(BackdropImageViewCell.self, forCellWithReuseIdentifier: BackdropImageViewCell.reuseIdentifier)
         customCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCellId")
         customCollectionView.translatesAutoresizingMaskIntoConstraints = false
         customCollectionView.isScrollEnabled = true
@@ -112,7 +112,7 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
 
     private func configureDataSource() {
         self.dataSource = DataSource(collectionView: customCollectionView, cellProvider: { collectionView, indexPath, item in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileImageViewCell.reuseIdentifier, for: indexPath) as? ProfileImageViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BackdropImageViewCell.reuseIdentifier, for: indexPath) as? BackdropImageViewCell
             cell?.configure(with: item, parentViewController: self)
             return cell
         })
@@ -167,6 +167,6 @@ final class ProfileImageVC: BaseViewController, UIScrollViewDelegate {
 
     // MARK: - 🗑 Deinit
     deinit {
-        print("🗑 ProfileImageVC deinit.")
+        print("🗑 BackdropImagesVC deinit.")
     }
 }

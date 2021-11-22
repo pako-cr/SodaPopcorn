@@ -30,7 +30,7 @@ public protocol GalleryVMOutputs: AnyObject {
     func closeButtonAction() -> PassthroughSubject<Void, Never>
 
     /// Emits to return the gallery information.
-    func galleryAction() -> PassthroughSubject<Gallery, Never>
+    func galleryAction() -> CurrentValueSubject<Gallery?, Never>
 
     /// Emits when loading.
     func loading() -> CurrentValueSubject<Bool, Never>
@@ -39,10 +39,10 @@ public protocol GalleryVMOutputs: AnyObject {
     func showError() -> PassthroughSubject<String, Never>
 
     /// Emits when an backdrop image is selected.
-    func backdropImageAction() -> PassthroughSubject<String, Never>
+    func backdropImagesAction() -> PassthroughSubject<(String, [String]), Never>
 
     /// Emits when an poster image is selected.
-    func posterImageAction() -> PassthroughSubject<String, Never>
+    func posterImagesAction() -> PassthroughSubject<(String, [String]), Never>
 
     /// Emits when an video image is selected.
     func videoAction() -> PassthroughSubject<String, Never>
@@ -74,11 +74,15 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
         }.store(in: &cancellable)
 
         backdropImageSelectedProperty.sink { [weak self] imageUrl in
-            self?.backdropImageActionProperty.send(imageUrl)
+            if let images = self?.galleryActionProperty.value?.backdrops?.map({ $0.filePath ?? ""}), !images.isEmpty {
+                self?.backdropImagesActionProperty.send((imageUrl, images))
+            }
         }.store(in: &cancellable)
 
         posterImageSelectedProperty.sink { [weak self] imageUrl in
-            self?.posterImageActionProperty.send(imageUrl)
+            if let images = self?.galleryActionProperty.value?.posters?.map({ $0.filePath ?? ""}), !images.isEmpty {
+                self?.posterImagesActionProperty.send((imageUrl, images))
+            }
         }.store(in: &cancellable)
 
         videoSelectedProperty.sink { [weak self] imageUrl in
@@ -186,8 +190,8 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
         return closeButtonActionProperty
     }
 
-    private let galleryActionProperty = PassthroughSubject<Gallery, Never>()
-    public func galleryAction() -> PassthroughSubject<Gallery, Never> {
+    private let galleryActionProperty = CurrentValueSubject<Gallery?, Never>(nil)
+    public func galleryAction() -> CurrentValueSubject<Gallery?, Never> {
         return galleryActionProperty
     }
 
@@ -201,14 +205,14 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
         return showErrorProperty
     }
 
-    private let backdropImageActionProperty = PassthroughSubject<String, Never>()
-    public func backdropImageAction() -> PassthroughSubject<String, Never> {
-        return backdropImageActionProperty
+    private let backdropImagesActionProperty = PassthroughSubject<(String, [String]), Never>()
+    public func backdropImagesAction() -> PassthroughSubject<(String, [String]), Never> {
+        return backdropImagesActionProperty
     }
 
-    private let posterImageActionProperty = PassthroughSubject<String, Never>()
-    public func posterImageAction() -> PassthroughSubject<String, Never> {
-        return posterImageActionProperty
+    private let posterImagesActionProperty = PassthroughSubject<(String, [String]), Never>()
+    public func posterImagesAction() -> PassthroughSubject<(String, [String]), Never> {
+        return posterImagesActionProperty
     }
 
     private let videoActionProperty = PassthroughSubject<String, Never>()
