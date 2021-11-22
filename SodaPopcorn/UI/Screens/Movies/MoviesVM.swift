@@ -64,7 +64,7 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
 	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
-	private var page = 0
+	private var page = 1
     private (set) var searchCriteria: SearchCriteria
 
     public init(movieService: MovieService, searchCriteria: SearchCriteria, presentedViewController: Bool) {
@@ -132,8 +132,10 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 
 				self.loadingProperty.value = false
 
-				if movies.numberOfResults != 0 {
+				if let numberOfResults = movies.numberOfResults, numberOfResults != 0 {
                     print("🔸 MoviesApiResponse [page: \(movies.page ?? 0), pageElementsCount: \(movies.movies?.count ?? 0), numberOfPages: \(movies.numberOfPages ?? 0), numberOfResults: \(movies.numberOfResults ?? 0)]")
+
+                    self.page += 1
 
                     if let numberOfPages = movies.numberOfPages {
                         self.finishedFetchingActionProperty.send(self.page >= numberOfPages)
@@ -147,7 +149,6 @@ public final class MoviesVM: ObservableObject, Identifiable, MoviesVMInputs, Mov
 	// MARK: - ⬇️ INPUTS Definition
 	private let fetchMoviesProperty = PassthroughSubject<Void, Never>()
 	public func fetchMovies() {
-        self.page += 1
 		fetchMoviesProperty.send(())
 	}
 
