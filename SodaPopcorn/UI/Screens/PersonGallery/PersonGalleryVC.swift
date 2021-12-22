@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class PersonGalleryVC: BaseViewController {
@@ -115,7 +116,7 @@ final class PersonGalleryVC: BaseViewController {
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.75 : 3.75)))
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 1.75 : 3.75)))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 

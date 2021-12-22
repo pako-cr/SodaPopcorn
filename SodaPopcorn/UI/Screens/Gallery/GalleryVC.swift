@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class GalleryVC: BaseViewController {
@@ -162,7 +163,7 @@ final class GalleryVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2 : 6)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 2 : 6)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -171,7 +172,7 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
+            heightDimension: .absolute(UIScreen.main.bounds.height * (UIDevice.isLandscape ? 0.1 : 0.05)))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
@@ -194,7 +195,7 @@ final class GalleryVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1 : 3.5)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 1 : 3.5)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -203,7 +204,7 @@ final class GalleryVC: BaseViewController {
         // Supplementary header view setup
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
+            heightDimension: .absolute(UIScreen.main.bounds.height * (UIDevice.isLandscape ? 0.1 : 0.05)))
 
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,

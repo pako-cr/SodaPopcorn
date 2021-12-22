@@ -6,7 +6,11 @@
 //
 
 import Combine
+import CoreData
+import Domain
 import Foundation
+import Storage
+import UIKit
 
 public protocol MovieDetailsVMInputs: AnyObject {
 	/// Call when the view did load.
@@ -92,6 +96,27 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
     init(movieService: MovieService, movie: Movie) {
         self.movieService = movieService
 		self.movie = movie
+
+        // Core data tests!
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+
+            let context = appDelegate.persistentContainer.viewContext
+
+            let storageService = StorageService(managedObjectContext: context)
+
+            var storedMovies = storageService.fetch()
+            print("⭐️ Stored movies: \(storedMovies?.count ?? 0)")
+
+//            storageService.create(movie: self.movie)
+//            do {
+//                try storageService.deleteAll()
+//            } catch {
+//
+//                }
+
+            storedMovies = storageService.fetch()
+            print("⭐️ Stored movies: \(storedMovies?.count ?? 0)")
+        }
 
 		viewDidLoadProperty.sink { [weak self] _ in
 			guard let `self` = self else { return }
@@ -366,7 +391,7 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
 	// MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 

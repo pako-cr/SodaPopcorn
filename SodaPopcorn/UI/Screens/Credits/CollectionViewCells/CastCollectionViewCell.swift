@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 10/11/21.
 //
 
+import Domain
 import UIKit
 
 final class CastCollectionViewCell: UICollectionViewCell {

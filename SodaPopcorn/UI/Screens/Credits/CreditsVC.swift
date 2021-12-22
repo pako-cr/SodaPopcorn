@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 10/11/21.
 //
 
+import Domain
 import Combine
 import UIKit
 
@@ -141,7 +142,7 @@ final class CreditsVC: BaseViewController {
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1 : 3.5)))
+                heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 1 : 3.5)))
 
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -150,7 +151,7 @@ final class CreditsVC: BaseViewController {
             // Supplementary header view setup
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(UIScreen.main.bounds.height * (UIWindow.isLandscape ? 0.1 : 0.05)))
+                heightDimension: .absolute(UIScreen.main.bounds.height * (UIDevice.isLandscape ? 0.1 : 0.05)))
 
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,

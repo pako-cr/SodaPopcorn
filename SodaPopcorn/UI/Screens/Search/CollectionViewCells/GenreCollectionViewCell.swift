@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 16/11/21.
 //
 
+import Domain
 import UIKit
 
 final class GenreCollectionViewCell: UICollectionViewCell {

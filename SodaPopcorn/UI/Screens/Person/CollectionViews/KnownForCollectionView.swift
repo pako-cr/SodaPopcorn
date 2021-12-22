@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 11/11/21.
 //
 
+import Domain
 import UIKit
 
 public final class KnownForCollectionView: UICollectionViewController {
@@ -69,7 +70,7 @@ public final class KnownForCollectionView: UICollectionViewController {
 
     private func configureCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(UIWindow.isLandscape ? 0.25 : 0.3333), heightDimension: .fractionalHeight(1.0))
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(UIDevice.isLandscape ? 0.25 : 0.3333), heightDimension: .fractionalHeight(1.0))
 
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
             item.contentInsets = .small()

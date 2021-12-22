@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 10/11/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 
 public protocol CreditsVMInputs: AnyObject {
     /// Call when the view did load.

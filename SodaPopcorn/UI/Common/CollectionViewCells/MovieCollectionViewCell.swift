@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 13/9/21.
 //
 
+import Domain
 import UIKit
 
 final class MovieCollectionViewCell: UICollectionViewCell {

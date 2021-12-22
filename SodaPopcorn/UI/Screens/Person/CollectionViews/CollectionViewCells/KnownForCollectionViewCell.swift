@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 11/11/21.
 //
 
+import Domain
 import UIKit
 
 final class KnownForCollectionViewCell: UICollectionViewCell {

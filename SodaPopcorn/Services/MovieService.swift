@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 4/9/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 import UIKit
 
 public final class MovieService: MovieNetworkServiceProtocol {

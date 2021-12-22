@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import Foundation
 import UIKit
 
@@ -57,7 +58,14 @@ final class HomeCoordinator: Coordinator {
 
         searchVC.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
-		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController]
+        // Favorites
+        let favoritesVM = FavoritesVM(movieService: movieService)
+        let favoritesVC = FavoritesVC(viewModel: favoritesVM)
+        let favoritesNavigationController = NavigationController(rootViewController: favoritesVC)
+
+        favoritesVC.tabBarItem = UITabBarItem(title: NSLocalizedString("favorites", comment: "Favorites"), image: UIImage(systemName: "star.fill"), tag: 2)
+
+		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController, favoritesNavigationController]
 		homeVC?.selectedIndex = 0
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 

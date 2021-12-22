@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class MoviesVC: MoviesBaseCollectionView {

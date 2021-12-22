@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 13/11/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 
 public protocol SearchVMInputs: AnyObject {
     /// Call when a movie is selected.
@@ -229,7 +230,7 @@ public final class SearchVM: ObservableObject, Identifiable, SearchVMInputs, Sea
 
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 

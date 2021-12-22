@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class SearchVC: BaseViewController {
@@ -192,7 +193,7 @@ final class SearchVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 2.5 : 4.5)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 2.5 : 4.5)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -210,7 +211,7 @@ final class SearchVC: BaseViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(UIScreen.main.bounds.height / (UIWindow.isLandscape ? 1.5 : 3.75)))
+            heightDimension: .absolute(UIScreen.main.bounds.height / (UIDevice.isLandscape ? 1.5 : 3.75)))
 
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 

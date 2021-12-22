@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class MovieDetailsVC: BaseViewController {
@@ -235,9 +236,9 @@ final class MovieDetailsVC: BaseViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        castHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
-        similarMoviesHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.3)
-        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
+        castHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.6 : 0.3)
+        similarMoviesHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.8 : 0.3)
+        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.3 : 0.15)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -329,19 +330,19 @@ final class MovieDetailsVC: BaseViewController {
         castCollectionView.view.topAnchor.constraint(equalTo: budgetRevenueInformation.bottomAnchor, constant: 20).isActive = true
         castCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         castCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        castHeightAnchor = castCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3))
+        castHeightAnchor = castCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.6 : 0.3))
         castHeightAnchor?.isActive = true
 
         similarMoviesCollectionView.view.topAnchor.constraint(equalTo: castCollectionView.view.bottomAnchor, constant: 20).isActive = true
         similarMoviesCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         similarMoviesCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        similarMoviesHeightAnchor = similarMoviesCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.3))
+        similarMoviesHeightAnchor = similarMoviesCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.8 : 0.3))
         similarMoviesHeightAnchor?.isActive = true
 
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: similarMoviesCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15))
+        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.3 : 0.15))
         socialNetworksHeightAnchor?.isActive = true
 
         websiteInformation.topAnchor.constraint(equalTo: socialNetworksCollectionView.view.bottomAnchor, constant: 20).isActive = true

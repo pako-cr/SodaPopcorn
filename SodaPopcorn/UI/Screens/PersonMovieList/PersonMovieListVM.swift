@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 11/11/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 
 public protocol PersonMovieListVMInputs: AnyObject {
     /// Call when the view did load.

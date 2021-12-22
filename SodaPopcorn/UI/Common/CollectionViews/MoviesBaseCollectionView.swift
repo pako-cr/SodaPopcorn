@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 16/11/21.
 //
 
+import Domain
 import Foundation
 import UIKit
 
@@ -147,7 +148,7 @@ class MoviesBaseCollectionView: BaseViewController {
     }
 
     func createLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth((self.collectionLayout == .columns && UIWindow.isLandscape) ? 0.25 : self.collectionLayout.rawValue),
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth((self.collectionLayout == .columns && UIDevice.isLandscape) ? 0.25 : self.collectionLayout.rawValue),
                                               heightDimension: .fractionalHeight(1.0))
 
         let item = NSCollectionLayoutItem(layoutSize: itemSize)

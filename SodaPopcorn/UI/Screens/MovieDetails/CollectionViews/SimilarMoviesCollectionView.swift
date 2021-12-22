@@ -5,6 +5,7 @@
 //  Created by Francisco Cordoba on 13/11/21.
 //
 
+import Domain
 import UIKit
 
 public final class SimilarMoviesCollectionView: UICollectionViewController {

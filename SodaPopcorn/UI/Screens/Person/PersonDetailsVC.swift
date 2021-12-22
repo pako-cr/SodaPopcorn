@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import UIKit
 
 final class PersonDetailsVC: BaseViewController {
@@ -159,10 +160,10 @@ final class PersonDetailsVC: BaseViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        profileImageHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3)
-        galleryCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3)
-        knownForCollectionViewHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.35)
-        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15)
+        profileImageHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.65 : 0.3)
+        galleryCollectionViewHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.6 : 0.3)
+        knownForCollectionViewHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.8 : 0.35)
+        socialNetworksHeightAnchor?.constant = view.bounds.height * (UIDevice.isLandscape ? 0.3 : 0.15)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -201,7 +202,7 @@ final class PersonDetailsVC: BaseViewController {
         profileImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
         profileImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         profileImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.3333).isActive = true
-        profileImageHeightAnchor = profileImage.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.65 : 0.3))
+        profileImageHeightAnchor = profileImage.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.65 : 0.3))
         profileImageHeightAnchor?.isActive = true
 
         headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
@@ -221,19 +222,19 @@ final class PersonDetailsVC: BaseViewController {
         galleryCollectionView.view.topAnchor.constraint(equalTo: biographyValue.bottomAnchor, constant: 20).isActive = true
         galleryCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         galleryCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        galleryCollectionViewHeightAnchor = galleryCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.6 : 0.3))
+        galleryCollectionViewHeightAnchor = galleryCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.6 : 0.3))
         galleryCollectionViewHeightAnchor?.isActive = true
 
         knownForCollectionView.view.topAnchor.constraint(equalTo: galleryCollectionView.view.bottomAnchor, constant: 20).isActive = true
         knownForCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         knownForCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        knownForCollectionViewHeightAnchor = knownForCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.8 : 0.35))
+        knownForCollectionViewHeightAnchor = knownForCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.8 : 0.35))
         knownForCollectionViewHeightAnchor?.isActive = true
 
         socialNetworksCollectionView.view.topAnchor.constraint(equalTo: knownForCollectionView.view.bottomAnchor, constant: 20).isActive = true
         socialNetworksCollectionView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
         socialNetworksCollectionView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIWindow.isLandscape ? 0.3 : 0.15))
+        socialNetworksHeightAnchor = socialNetworksCollectionView.view.heightAnchor.constraint(equalToConstant: view.bounds.height * (UIDevice.isLandscape ? 0.3 : 0.15))
         socialNetworksHeightAnchor?.isActive = true
 
         websiteInformation.topAnchor.constraint(equalTo: socialNetworksCollectionView.view.bottomAnchor, constant: 20).isActive = true

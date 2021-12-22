@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 12/11/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 
 public protocol PersonGalleryVMInputs: AnyObject {
     /// Call when the view did load.

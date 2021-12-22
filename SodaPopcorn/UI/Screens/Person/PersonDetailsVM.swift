@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Domain
 import Foundation
 
 public protocol PersonDetailsVMInputs: AnyObject {
@@ -357,7 +358,7 @@ public final class PersonDetailsVM: ObservableObject, Identifiable, PersonDetail
 
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 

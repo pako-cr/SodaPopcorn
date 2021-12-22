@@ -5,8 +5,9 @@
 //  Created by Francisco Cordoba on 9/11/21.
 //
 
-import Foundation
 import Combine
+import Domain
+import Foundation
 
 public protocol GalleryVMInputs: AnyObject {
     /// Call when the view did load.
@@ -222,7 +223,7 @@ public final class GalleryVM: ObservableObject, Identifiable, GalleryVMInputs, G
 
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
-        print("❌ Networkd response error: \(networkResponse.localizedDescription)")
+        print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
     }
 
