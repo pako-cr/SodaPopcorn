@@ -20,6 +20,7 @@ final class MovieDetailsVC: BaseViewController {
     private var socialNetworksSubscription: Cancellable!
     private var castSubscription: Cancellable!
     private var similarMoviesSubscription: Cancellable!
+    private var isFavoriteSubscription: Cancellable!
 
     // MARK: Constraints
     private var backdropImageHeightAnchor: NSLayoutConstraint?
@@ -358,6 +359,9 @@ final class MovieDetailsVC: BaseViewController {
             let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
         }
+
+        let rightBarButtonItemImage = UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: rightBarButtonItemImage, style: .done, target: self, action: #selector(favoriteButtonPressed))
     }
 
     private func handleGestureRecongnizers() {
@@ -406,6 +410,18 @@ final class MovieDetailsVC: BaseViewController {
                     self?.similarMoviesCollectionView.setupEmptyView()
                 }
             })
+
+        isFavoriteSubscription = viewModel.outputs.favoriteChanged()
+            .dropFirst()
+            .sink(receiveValue: { [weak self] isFavorite in
+                DispatchQueue.main.async { [weak self] in
+                    let image = isFavorite ?
+                    UIImage(systemName: "star.fill")?.withRenderingMode(.alwaysTemplate) :
+                    UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
+
+                    self?.navigationItem.rightBarButtonItem?.image = image
+                }
+            })
     }
 
     // MARK: - ⚙️ Helpers
@@ -437,6 +453,11 @@ final class MovieDetailsVC: BaseViewController {
         if !overviewValue.text.isEmpty {
             viewModel.inputs.overviewTextPressed()
         }
+    }
+
+    @objc
+    private func favoriteButtonPressed() {
+        viewModel.inputs.favoriteButtonPressed()
     }
 
     // MARK: - 🗑 Deinit

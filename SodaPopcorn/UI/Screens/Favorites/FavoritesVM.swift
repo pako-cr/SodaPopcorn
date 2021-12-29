@@ -8,6 +8,7 @@
 import Combine
 import Domain
 import Foundation
+import Storage
 
 public protocol FavoritesVMInputs: AnyObject {
     /// Call when a movie is selected.
@@ -44,22 +45,38 @@ public protocol FavoritesVMTypes: AnyObject {
 
 public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInputs, FavoritesVMOutputs, FavoritesVMTypes {
     // MARK: Constants
-    let movieService: MovieService
+    private let movieService: MovieService
+    private let storageService: StorageService
 
     // MARK: Variables
     public var inputs: FavoritesVMInputs { return self }
     public var outputs: FavoritesVMOutputs { return self }
 
-    // MARK: Variables
     private var cancellable = Set<AnyCancellable>()
+    private var currentFavorites: [Movie]?
 
-    public init(movieService: MovieService) {
+    public init(movieService: MovieService, storageService: StorageService) {
         self.movieService = movieService
+        self.storageService = storageService
 
         self.movieSelectedProperty
             .sink { [weak self] movie in
                 self?.movieSelectedActionProperty.send(movie)
             }.store(in: &cancellable)
+
+        self.fetchMoviesProperty
+            .sink(receiveValue: { _ in
+                let movies = storageService.fetch()
+
+                if movies == self.currentFavorites {
+                    print("Do not reload")
+                } else {
+                    print("Do Reload")
+
+                    print("🔸 StorageService Favorites Movies count: \(movies?.count ?? 0)]")
+                    self.fetchMoviesActionProperty.send(movies)
+                }
+            }).store(in: &cancellable)
     }
 
     // MARK: - ⬇️ INPUTS Definition

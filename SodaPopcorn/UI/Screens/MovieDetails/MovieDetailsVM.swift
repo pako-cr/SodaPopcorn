@@ -36,6 +36,9 @@ public protocol MovieDetailsVMInputs: AnyObject {
 
     /// Call when a movie is selected from the movie details.
     func movieSelected(movie: Movie)
+
+    /// Call when a favorite button is pressed.
+    func favoriteButtonPressed()
 }
 
 public protocol MovieDetailsVMOutputs: AnyObject {
@@ -74,6 +77,9 @@ public protocol MovieDetailsVMOutputs: AnyObject {
 
     /// Emits when a movie is selected.
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
+
+    /// Emits when a favorite button is pressed.
+    func favoriteChanged() -> CurrentValueSubject<Bool, Never>
 }
 
 public protocol MovieDetailsVMTypes: AnyObject {
@@ -85,42 +91,23 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 	// MARK: Constants
     private let movieService: MovieService
     private let movie: Movie
+    private let storageService: StorageService
 
 	// MARK: Variables
 	public var inputs: MovieDetailsVMInputs { return self }
 	public var outputs: MovieDetailsVMOutputs { return self }
 
-	// MARK: Variables
 	private var cancellable = Set<AnyCancellable>()
 
-    init(movieService: MovieService, movie: Movie) {
+    init(movieService: MovieService, storageService: StorageService, movie: Movie) {
         self.movieService = movieService
+        self.storageService = storageService
 		self.movie = movie
-
-        // Core data tests!
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-
-            let context = appDelegate.persistentContainer.viewContext
-
-            let storageService = StorageService(managedObjectContext: context)
-
-            var storedMovies = storageService.fetch()
-            print("⭐️ Stored movies: \(storedMovies?.count ?? 0)")
-
-//            storageService.create(movie: self.movie)
-//            do {
-//                try storageService.deleteAll()
-//            } catch {
-//
-//                }
-
-            storedMovies = storageService.fetch()
-            print("⭐️ Stored movies: \(storedMovies?.count ?? 0)")
-        }
 
 		viewDidLoadProperty.sink { [weak self] _ in
 			guard let `self` = self else { return }
             self.movieInfoActionProperty.send(self.movie)
+            self.favoriteChangedProperty.send(self.handleIsFavorite(movie: self.movie))
 		}.store(in: &cancellable)
 
 		closeButtonPressedProperty.sink { [weak self] _ in
@@ -150,6 +137,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
 
         movieSelectedProperty.sink { [weak self] (movie) in
             self?.movieSelectedActionProperty.send(movie)
+        }.store(in: &cancellable)
+
+        favoriteButtonPressedProperty.sink { [weak self] _ in
+            guard let `self` = self else { return }
+            self.favoriteChangedProperty.send(self.handleFavoriteChange())
         }.store(in: &cancellable)
 
         let movieDetailsEvent = viewDidLoadProperty
@@ -328,6 +320,11 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         movieSelectedProperty.send(movie)
     }
 
+    private let favoriteButtonPressedProperty = PassthroughSubject<Void, Never>()
+    public func favoriteButtonPressed() {
+        favoriteButtonPressedProperty.send()
+    }
+
 	// MARK: - ⬆️ OUTPUTS Definition
 	private let closeButtonActionProperty = PassthroughSubject<Void, Never>()
 	public func closeButtonAction() -> PassthroughSubject<Void, Never> {
@@ -389,10 +386,38 @@ public final class MovieDetailsVM: ObservableObject, Identifiable, MovieDetailsV
         return similarMoviesActionProperty
     }
 
+    private let favoriteChangedProperty = CurrentValueSubject<Bool, Never>(false)
+    public func favoriteChanged() -> CurrentValueSubject<Bool, Never> {
+        return favoriteChangedProperty
+    }
+
 	// MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
         print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
+    }
+
+    private func handleIsFavorite(movie: Movie) -> Bool {
+        return storageService.find(movie: movie)
+    }
+
+    private func handleFavoriteChange() -> Bool {
+        do {
+            let isFavorite = storageService.find(movie: self.movie)
+
+            if !isFavorite {
+                storageService.create(movie: self.movie)
+                return true
+
+            } else {
+                try storageService.delete(movie: self.movie)
+                return false
+            }
+
+        } catch let error as NSError {
+            print("❌ [UI] [Screens] [MovieDetailsVM] [handleFavoriteChange] An error occurred. \(error.localizedDescription)")
+            return false
+        }
     }
 
 	// MARK: - 🗑 Deinit

@@ -49,20 +49,13 @@ final class FavoritesVC: MoviesBaseCollectionView {
         viewModel.inputs.viewDidLoad()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.inputs.fetchMovies()
+    }
+
     override func setupNavigationBar() {
         navigationItem.title = NSLocalizedString("app_name_with_icon", comment: "App name")
-
-//        if viewModel.presentedViewController {
-//            let leftBarButtonItemImage = UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate)
-//            navigationItem.leftBarButtonItem = UIBarButtonItem(image: leftBarButtonItemImage, style: .done, target: self, action: #selector(closeButtonPressed))
-//
-//        } else {
-//            let leftBarButtonImage = UIImage(systemName: "square.fill.text.grid.1x2")
-//            navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Set collection layout"), image: leftBarButtonImage, primaryAction: nil, menu: sizeMenu)
-//
-//            let rightBarButtonImage = UIImage(systemName: "line.3.horizontal.decrease.circle")
-//            navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("collection_view_set_layout_button_title", comment: "Filter movies"), image: rightBarButtonImage, primaryAction: nil, menu: moviesFilterMenu)
-//        }
     }
 
     override func bindViewModel() {
@@ -99,10 +92,14 @@ final class FavoritesVC: MoviesBaseCollectionView {
 
     // MARK: - Collection View
     override func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
-            var snapshot = self.dataSource.snapshot()
+        var snapshot = self.dataSource.snapshot()
 
-            snapshot.appendItems(movies, toSection: .movies)
-            self.loadedCount = snapshot.numberOfItems
+//        if snapshot.deleteAllItems() > 0 {
+//            snapshot.deleteAllItems()
+//        }
+
+        snapshot.appendItems(movies, toSection: .movies)
+        self.loadedCount = snapshot.numberOfItems
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let `self` = self else { return }
@@ -114,16 +111,16 @@ final class FavoritesVC: MoviesBaseCollectionView {
     }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard loadedCount != 0 else { return }
+//        guard loadedCount != 0 else { return }
 
-        self.footerContentView.isHidden = indexPath.row <= loadedCount - 6
+//        self.footerContentView.isHidden = indexPath.row <= loadedCount - 6
 
-        if indexPath.row == loadedCount - 1 {
-            if !finishedFetching {
-                self.setActivityIndicator(active: true)
-                self.viewModel.inputs.fetchMovies()
-            }
-        }
+//        if indexPath.row == loadedCount - 1 {
+//            if !finishedFetching {
+//                self.setActivityIndicator(active: true)
+//                self.viewModel.inputs.fetchMovies()
+//            }
+//        }
     }
 
     override func handleEmptyView() {

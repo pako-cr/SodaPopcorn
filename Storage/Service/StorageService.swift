@@ -52,6 +52,19 @@ public final class StorageService: StorageContext {
         return movies
     }
 
+    public func find(movie: Movie) -> Bool {
+        do {
+            let result = try managedObjectContext.fetch(MovieStorageEntity.fetchRequest())
+
+            return result.contains(where: { $0.movieId == movie.movieId })
+
+        } catch let error as NSError {
+            print("❌ [Storage] [CoreData] [DBManager] [find] An error occurred. \(error.localizedDescription)")
+        }
+
+        return false
+    }
+
     public func delete(movie: Movie) throws {
         do {
             let result = try managedObjectContext.fetch(MovieStorageEntity.fetchRequest())

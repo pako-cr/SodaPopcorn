@@ -12,6 +12,7 @@ import Foundation
 protocol StorageContext {
     func create(movie: Movie)
     func fetch() -> [Movie]?
+    func find(movie: Movie) -> Bool
     func update(movie: Movie) throws
     func delete(movie: Movie) throws
     func deleteAll() throws
