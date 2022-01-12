@@ -13,24 +13,24 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-default_platform(:ios)
+# default_platform(:ios)
 
-lane :beta do
-  increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
-  build_app(scheme: "SodaPopcorn")
-  upload_to_testflight
-end
+# lane :beta do
+#   increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
+#   build_app(scheme: "SodaPopcorn")
+#   upload_to_testflight
+# end
 
-lane :build do
-  build_app(scheme: "SodaPopcorn")
-  increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
-end
+# lane :build do
+#   build_app(scheme: "SodaPopcorn")
+#   increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
+# end
 
-platform :ios do
-  desc "Push a new beta build to TestFlight"
-  lane :beta do
-    increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
-    build_app(scheme: "SodaPopcorn")
-    upload_to_testflight
-  end
-end
+# platform :ios do
+#   desc "Push a new beta build to TestFlight"
+#   lane :beta do
+#     increment_build_number(xcodeproj: "SodaPopcorn.xcodeproj")
+#     build_app(scheme: "SodaPopcorn")
+#     upload_to_testflight
+#   end
+# end
