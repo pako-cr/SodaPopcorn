@@ -23,8 +23,8 @@ final class BackdropImagesVC: BaseViewController {
     // MARK: - Variables
     private var dataSource: DataSource!
 
-    private var selectedImageSubscription: Cancellable!
-    private var imagesSubscription: Cancellable!
+    private var selectedImageSubscription: Cancellable?
+    private var imagesSubscription: Cancellable?
 
     // MARK: UI Elements
     private var customCollectionView: UICollectionView!

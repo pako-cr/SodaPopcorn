@@ -9,10 +9,10 @@ public struct Cast: Hashable {
     public let adult: Bool?
     public let popularity: Double?
     public let gender, id, order, castID: Int?
-    public let knownForDepartment, department: Department?
+    public let knownForDepartment, department: String?
     public let name, originalName, profilePath, character, creditID, job: String?
 
-    public init(adult: Bool? = nil, gender: Int? = nil, id: Int? = nil, knownForDepartment: Department? = nil, name: String? = nil, originalName: String? = nil, popularity: Double? = nil, profilePath: String? = nil, castID: Int? = nil, character: String? = nil, creditID: String? = nil, order: Int? = nil, department: Department? = nil, job: String? = nil) {
+    public init(adult: Bool? = nil, gender: Int? = nil, id: Int? = nil, knownForDepartment: String? = nil, name: String? = nil, originalName: String? = nil, popularity: Double? = nil, profilePath: String? = nil, castID: Int? = nil, character: String? = nil, creditID: String? = nil, order: Int? = nil, department: String? = nil, job: String? = nil) {
         self.adult = adult
         self.gender = gender
         self.id = id

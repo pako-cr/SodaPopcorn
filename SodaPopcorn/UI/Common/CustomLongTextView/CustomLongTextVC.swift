@@ -13,7 +13,7 @@ final class CustomLongTextVC: BaseViewController {
     private let viewModel: CustomLongTextVM
 
     // MARK: - Variables
-    private var textSubscription: Cancellable!
+    private var textSubscription: Cancellable?
 
     // MARK: UI Elements
     private lazy var closeButton: UIButton = {

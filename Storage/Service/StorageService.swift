@@ -13,7 +13,6 @@ public final class StorageService: StorageContext {
     // MARK: - Private properties
     private let managedObjectContext: NSManagedObjectContext
 
-    // MARK: - Public properties
     public init(managedObjectContext: NSManagedObjectContext) {
         self.managedObjectContext = managedObjectContext
     }
@@ -28,6 +27,8 @@ public final class StorageService: StorageContext {
                 _ = MovieStorageEntity(with: movie, and: managedObjectContext)
 
                 try managedObjectContext.save()
+
+                NotificationCenter.default.post(Notification(name: Notification.Name("storage-service-notification"), object: movie, userInfo: ["storageContextType": StorageContextType.create]))
             }
 
         } catch let error as NSError {
@@ -73,6 +74,7 @@ public final class StorageService: StorageContext {
                 managedObjectContext.delete(objectToDelete)
 
                 try managedObjectContext.save()
+                NotificationCenter.default.post(Notification(name: Notification.Name("storage-service-notification"), object: movie, userInfo: ["storageContextType": StorageContextType.delete]))
             }
 
         } catch let error as NSError {

@@ -14,12 +14,12 @@ final class MoviesVC: MoviesBaseCollectionView {
     private let viewModel: MoviesVM
 
     // MARK: Subscriptions
-    private var finishedFetchingSubscription: Cancellable!
-    private var fetchMoviesSubscription: Cancellable!
-    private var searchCriteriaSubscription: Cancellable!
-    private var loadingSubscription: Cancellable!
-    private var showErrorSubscription: Cancellable!
-    private var viewtitleSubscription: Cancellable!
+    private var finishedFetchingSubscription: Cancellable?
+    private var fetchMoviesSubscription: Cancellable?
+    private var searchCriteriaSubscription: Cancellable?
+    private var loadingSubscription: Cancellable?
+    private var showErrorSubscription: Cancellable?
+    private var viewtitleSubscription: Cancellable?
 
     // MARK: - UI Elements
     private lazy var sizeMenu: UIMenu = { [unowned self] in

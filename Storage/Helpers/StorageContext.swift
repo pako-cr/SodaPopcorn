@@ -9,6 +9,10 @@ import CoreData
 import Domain
 import Foundation
 
+public enum StorageContextType {
+    case create, delete
+}
+
 protocol StorageContext {
     func create(movie: Movie)
     func fetch() -> [Movie]?

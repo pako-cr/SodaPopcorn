@@ -24,10 +24,10 @@ final class CreditsVC: BaseViewController {
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var creditsSubscription: Cancellable!
-    private var movieSubscription: Cancellable!
-    private var loadingSubscription: Cancellable!
-    private var showErrorSubscription: Cancellable!
+    private var creditsSubscription: Cancellable?
+    private var movieSubscription: Cancellable?
+    private var loadingSubscription: Cancellable?
+    private var showErrorSubscription: Cancellable?
 
     // MARK: UI Elements
     private var customCollectionView: UICollectionView!

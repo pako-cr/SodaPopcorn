@@ -14,10 +14,12 @@ final class FavoritesVC: MoviesBaseCollectionView {
     private let viewModel: FavoritesVM
 
     // MARK: Subscriptions
-    private var finishedFetchingSubscription: Cancellable!
-    private var fetchMoviesSubscription: Cancellable!
-    private var loadingSubscription: Cancellable!
-    private var showErrorSubscription: Cancellable!
+    private var finishedFetchingSubscription: Cancellable?
+    private var fetchMoviesSubscription: Cancellable?
+    private var movieIncludedSubscription: Cancellable?
+    private var movieRemovedSubscription: Cancellable?
+    private var loadingSubscription: Cancellable?
+    private var showErrorSubscription: Cancellable?
 
     // MARK: - UI Elements
     private lazy var sizeMenu: UIMenu = { [unowned self] in
@@ -46,11 +48,7 @@ final class FavoritesVC: MoviesBaseCollectionView {
         super.viewDidLoad()
         setupNavigationBar()
         collectionView.delegate = self
-        viewModel.inputs.viewDidLoad()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        loading = true
         viewModel.inputs.fetchMovies()
     }
 
@@ -60,20 +58,13 @@ final class FavoritesVC: MoviesBaseCollectionView {
 
     override func bindViewModel() {
         fetchMoviesSubscription = viewModel.outputs.fetchMoviesAction()
-            .filter({ !($0?.isEmpty ?? true) })
             .sink(receiveValue: { [weak self] (movies) in
-                guard let movies = movies, !movies.isEmpty else { return }
+                guard let movies = movies else { return }
 
                 DispatchQueue.main.async { [weak self] in
                     self?.navigationController?.navigationItem.rightBarButtonItem?.isEnabled = true
                     self?.updateDataSource(movies: movies)
                 }
-            })
-
-        loadingSubscription = viewModel.outputs.loading()
-            .sink(receiveValue: { [weak self] (loading) in
-                guard let `self` = self else { return }
-                self.loading = loading
             })
 
         finishedFetchingSubscription = viewModel.outputs.finishedFetchingAction()
@@ -88,18 +79,33 @@ final class FavoritesVC: MoviesBaseCollectionView {
                 self.handleEmptyView()
                 Alert.showAlert(on: self, title: NSLocalizedString("alert", comment: "Alert title"), message: errorMessage)
             })
+
+        movieIncludedSubscription = viewModel.outputs.movieIncludedAction()
+            .sink(receiveValue: { [weak self] movie in
+                guard let `self` = self else { return }
+
+                var snapshot = self.dataSource.snapshot()
+                snapshot.appendItems([movie], toSection: .movies)
+                self.dataSource.apply(snapshot, animatingDifferences: true)
+                self.handleEmptyView()
+            })
+
+        movieRemovedSubscription = viewModel.outputs.movieRemovedAction()
+            .sink(receiveValue: { [weak self] movie in
+                guard let `self` = self else { return }
+
+                var snapshot = self.dataSource.snapshot()
+                snapshot.deleteItems([movie])
+                self.dataSource.apply(snapshot, animatingDifferences: true)
+                self.handleEmptyView()
+            })
     }
 
     // MARK: - Collection View
     override func updateDataSource(movies: [Movie], animatingDifferences: Bool = true) {
         var snapshot = self.dataSource.snapshot()
 
-//        if snapshot.deleteAllItems() > 0 {
-//            snapshot.deleteAllItems()
-//        }
-
         snapshot.appendItems(movies, toSection: .movies)
-        self.loadedCount = snapshot.numberOfItems
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let `self` = self else { return }
@@ -107,20 +113,13 @@ final class FavoritesVC: MoviesBaseCollectionView {
             self.collectionView.removeEmptyView()
             self.setActivityIndicator(active: false)
             self.dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+            self.loading = false
+            self.handleEmptyView()
         }
     }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard loadedCount != 0 else { return }
 
-//        self.footerContentView.isHidden = indexPath.row <= loadedCount - 6
-
-//        if indexPath.row == loadedCount - 1 {
-//            if !finishedFetching {
-//                self.setActivityIndicator(active: true)
-//                self.viewModel.inputs.fetchMovies()
-//            }
-//        }
     }
 
     override func handleEmptyView() {
@@ -134,17 +133,9 @@ final class FavoritesVC: MoviesBaseCollectionView {
                                                  centeredY: true)
 
             } else if !self.loading && dataSourceItems < 1 {
-                self.collectionView.setEmptyView(title: NSLocalizedString("empty_movies_title_label", comment: "Empty list title"),
-                                                 message: NSLocalizedString("empty_movies_description_label", comment: "Empty list message"),
+                self.collectionView.setEmptyView(title: NSLocalizedString("empty_favorite_movies_title_label", comment: "Empty favorite movie list title"),
+                                                 message: NSLocalizedString("empty_favorite_movies_description_label", comment: "Empty favorite movie list message"),
                                                  centeredY: true)
-
-                let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.reloadCollectionView))
-                tapGestureRecognizer.numberOfTapsRequired = 1
-
-                self.collectionView.backgroundView?.isUserInteractionEnabled = true
-
-                self.collectionView.backgroundView?.addGestureRecognizer(tapGestureRecognizer)
-
             } else {
                 self.collectionView.removeEmptyView()
             }
@@ -152,11 +143,6 @@ final class FavoritesVC: MoviesBaseCollectionView {
     }
 
     // MARK: - ⚙️ Helpers
-    @objc
-    private func reloadCollectionView() {
-        viewModel.inputs.fetchMovies()
-        handleEmptyView()
-    }
 
     // MARK: - 🗑 Deinit
     deinit {

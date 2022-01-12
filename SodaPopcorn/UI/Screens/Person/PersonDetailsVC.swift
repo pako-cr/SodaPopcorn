@@ -14,10 +14,10 @@ final class PersonDetailsVC: BaseViewController {
     private let viewModel: PersonDetailsVM
 
     // MARK: - Variables
-    private var personInfoSubscription: Cancellable!
-    private var moviesSubscription: Cancellable!
-    private var imagesSubscription: Cancellable!
-    private var socialNetworksSubscription: Cancellable!
+    private var personInfoSubscription: Cancellable?
+    private var moviesSubscription: Cancellable?
+    private var imagesSubscription: Cancellable?
+    private var socialNetworksSubscription: Cancellable?
 
     // MARK: Constraints
     private var profileImageHeightAnchor: NSLayoutConstraint?

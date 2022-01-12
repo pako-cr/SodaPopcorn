@@ -34,6 +34,8 @@
 "gallery_view_videos_header" = "Videos: Trailers, Teasers";
 "empty_movies_title_label" = "No movies 😞";
 "empty_movies_description_label" = "No movies to display here 🎬\n Tap to reload 🔄";
+"empty_favorite_movies_title_label" = "No favorite movies 😞";
+"empty_favorite_movies_description_label" = "Tap ⭐️ on a movie to add it to \nyour the favorites list";
 "cast_collection_view_title" = "Cast";
 "more" = "More";
 "credits_vc_cast_header" = "Cast";

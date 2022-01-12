@@ -14,9 +14,6 @@ public protocol FavoritesVMInputs: AnyObject {
     /// Call when a movie is selected.
     func movieSelected(movie: Movie)
 
-    /// Call when view did load.
-    func viewDidLoad()
-
     /// Call to get the new movies.
     func fetchMovies()
 }
@@ -25,8 +22,11 @@ public protocol FavoritesVMOutputs: AnyObject {
     /// Emits to get the movies.
     func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never>
 
-    /// Emits when loading.
-    func loading() -> CurrentValueSubject<Bool, Never>
+    /// Emits when a movie is included to the favorites list.
+    func movieIncludedAction() -> PassthroughSubject<Movie, Never>
+
+    /// Emits when a movie is removed from the favorites list.
+    func movieRemovedAction() -> PassthroughSubject<Movie, Never>
 
     /// Emits when a movie is selected.
     func movieSelectedAction() -> PassthroughSubject<Movie, Never>
@@ -53,11 +53,12 @@ public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInput
     public var outputs: FavoritesVMOutputs { return self }
 
     private var cancellable = Set<AnyCancellable>()
-    private var currentFavorites: [Movie]?
 
     public init(movieService: MovieService, storageService: StorageService) {
         self.movieService = movieService
         self.storageService = storageService
+
+        NotificationCenter.default.addObserver(self, selector: #selector(self.managedObjectContextObjectsDidChange(notification:)), name: Notification.Name("storage-service-notification"), object: nil)
 
         self.movieSelectedProperty
             .sink { [weak self] movie in
@@ -66,16 +67,10 @@ public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInput
 
         self.fetchMoviesProperty
             .sink(receiveValue: { _ in
-                let movies = storageService.fetch()
+                guard let movies = storageService.fetch() else { return }
+                print("🔸 StorageService Favorites Movies count: \(movies.count)")
+                self.fetchMoviesActionProperty.send(movies)
 
-                if movies == self.currentFavorites {
-                    print("Do not reload")
-                } else {
-                    print("Do Reload")
-
-                    print("🔸 StorageService Favorites Movies count: \(movies?.count ?? 0)]")
-                    self.fetchMoviesActionProperty.send(movies)
-                }
             }).store(in: &cancellable)
     }
 
@@ -83,11 +78,6 @@ public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInput
     private let movieSelectedProperty = PassthroughSubject<Movie, Never>()
     public func movieSelected(movie: Movie) {
         movieSelectedProperty.send(movie)
-    }
-
-    private let viewDidLoadProperty = PassthroughSubject<Void, Never>()
-    public func viewDidLoad() {
-        viewDidLoadProperty.send(())
     }
 
     private let fetchMoviesProperty = PassthroughSubject<Void, Never>()
@@ -99,11 +89,6 @@ public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInput
     private let fetchMoviesActionProperty = CurrentValueSubject<[Movie]?, Never>([])
     public func fetchMoviesAction() -> CurrentValueSubject<[Movie]?, Never> {
         return fetchMoviesActionProperty
-    }
-
-    private let loadingProperty = CurrentValueSubject<Bool, Never>(false)
-    public func loading() -> CurrentValueSubject<Bool, Never> {
-        return loadingProperty
     }
 
     private let movieSelectedActionProperty = PassthroughSubject<Movie, Never>()
@@ -121,10 +106,34 @@ public final class FavoritesVM: ObservableObject, Identifiable, FavoritesVMInput
         return showErrorProperty
     }
 
+    private let movieIncludedActionProperty = PassthroughSubject<Movie, Never>()
+    public func movieIncludedAction() -> PassthroughSubject<Movie, Never> {
+        return movieIncludedActionProperty
+    }
+
+    private let movieRemovedActionProperty = PassthroughSubject<Movie, Never>()
+    public func movieRemovedAction() -> PassthroughSubject<Movie, Never> {
+        return movieRemovedActionProperty
+    }
+
     // MARK: - ⚙️ Helpers
     private func handleNetworkResponseError(_ networkResponse: NetworkResponse) {
         print("❌ Network response error: \(networkResponse.localizedDescription)")
         self.showErrorProperty.send(NSLocalizedString("network_response_error", comment: "Network response error"))
+    }
+
+    @objc
+    private func managedObjectContextObjectsDidChange(notification: NSNotification) {
+        guard let movie = notification.object as? Movie,
+              let storageContextType = notification.userInfo?.first?.value as? StorageContextType else { return }
+
+        switch storageContextType {
+        case .create:
+            self.movieIncludedActionProperty.send(movie)
+
+        case .delete:
+            self.movieRemovedActionProperty.send(movie)
+        }
     }
 
     // MARK: - 🗑 Deinit

@@ -23,8 +23,8 @@ final class PersonGalleryVC: BaseViewController {
 
     // MARK: - Variables
     private var dataSource: DataSource!
-    private var imagesSubscription: Cancellable!
-    private var personSubscription: Cancellable!
+    private var imagesSubscription: Cancellable?
+    private var personSubscription: Cancellable?
 
     // MARK: UI Elements
     private var customCollectionView: UICollectionView!

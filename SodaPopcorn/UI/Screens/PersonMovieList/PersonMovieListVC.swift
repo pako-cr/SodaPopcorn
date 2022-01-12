@@ -14,8 +14,8 @@ final class PersonMovieListVC: MoviesBaseCollectionView {
     private let viewModel: PersonMovieListVM
 
     // MARK: - Variables
-    private var moviesSubscription: Cancellable!
-    private var personSubscription: Cancellable!
+    private var moviesSubscription: Cancellable?
+    private var personSubscription: Cancellable?
 
     // MARK: - UI Elements
     init(viewModel: PersonMovieListVM) {

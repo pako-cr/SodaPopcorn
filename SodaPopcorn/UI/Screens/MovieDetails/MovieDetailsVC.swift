@@ -15,12 +15,12 @@ final class MovieDetailsVC: BaseViewController {
     private let pushedViewController: Bool
 
     // MARK: - Variables
-    private var movieInfoSubscription: Cancellable!
-    private var imagesSubscription: Cancellable!
-    private var socialNetworksSubscription: Cancellable!
-    private var castSubscription: Cancellable!
-    private var similarMoviesSubscription: Cancellable!
-    private var isFavoriteSubscription: Cancellable!
+    private var movieInfoSubscription: Cancellable?
+    private var imagesSubscription: Cancellable?
+    private var socialNetworksSubscription: Cancellable?
+    private var castSubscription: Cancellable?
+    private var similarMoviesSubscription: Cancellable?
+    private var isFavoriteSubscription: Cancellable?
 
     // MARK: Constraints
     private var backdropImageHeightAnchor: NSLayoutConstraint?

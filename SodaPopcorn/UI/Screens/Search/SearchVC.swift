@@ -26,15 +26,15 @@ final class SearchVC: BaseViewController {
     private var currentSearchControllerStatus = false
 
     // MARK: - Variables
-    private var finishedFetchingSubscription: Cancellable!
+    private var finishedFetchingSubscription: Cancellable?
     private var finishedFetching = false
 
     private var dataSource: DataSource!
-    private var genresSubscription: Cancellable!
-    private var moviesSubscription: Cancellable!
-    private var loadingSubscription: Cancellable!
-    private var showErrorSubscription: Cancellable!
-    private var searchControllerDidChangeSubscription: Cancellable!
+    private var genresSubscription: Cancellable?
+    private var moviesSubscription: Cancellable?
+    private var loadingSubscription: Cancellable?
+    private var showErrorSubscription: Cancellable?
+    private var searchControllerDidChangeSubscription: Cancellable?
     private var loading = false
 
     // MARK: UI Elements

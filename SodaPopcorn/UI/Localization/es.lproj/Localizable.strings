@@ -34,6 +34,8 @@
 "gallery_view_videos_header" = "Videos y Trailers";
 "empty_movies_title_label" = "Sin películas 😞";
 "empty_movies_description_label" = "No hay películas para mostrar 🎬\n Presiona para recargar 🔄";
+"empty_favorite_movies_title_label" = "Sin películas favoritas 😞";
+"empty_favorite_movies_description_label" = "Presiona ⭐️ en una película para \nagregarla a tú lista de favoritas";
 "cast_collection_view_title" = "Elenco";
 "more" = "Más";
 "credits_vc_cast_header" = "Elenco";
