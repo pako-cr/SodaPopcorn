@@ -8,14 +8,18 @@
 import Foundation
 
 public protocol ImageNetworkServiceProtocol {
-    func getImage(imagePath: String, imageSize: ImageSize, completion: @escaping (_ imageData: Data?, _ error: NetworkResponse?) -> Void)
-    func getVideoThumbnail(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponse?) -> Void)
+    func getImageApi(imagePath: String, imageSize: ImageSizeApi, completion: @escaping (_ imageData: Data?, _ error: NetworkResponseApi?) -> Void)
+    func getVideoThumbnailApi(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponseApi?) -> Void)
 }
 
-final class ImageNetworkService: ImageNetworkServiceProtocol {
+public final class ImageNetworkService: ImageNetworkServiceProtocol {
 	private let networkManager = NetworkManager<ImageApiEndpoint>()
 
-	func getImage(imagePath: String, imageSize: ImageSize, completion: @escaping (_ imageData: Data?, _ error: NetworkResponse?) -> Void) {
+    public init() {
+        
+    }
+
+	public func getImageApi(imagePath: String, imageSize: ImageSizeApi, completion: @escaping (_ imageData: Data?, _ error: NetworkResponseApi?) -> Void) {
         var imageSizeRaw: String
 
         switch imageSize {
@@ -35,7 +39,7 @@ final class ImageNetworkService: ImageNetworkServiceProtocol {
 			if error != nil {
 				let errorMessage = error?.localizedDescription ?? ""
 				print("🔴 [ImageNetworkService] [getImage] An error occurred: \(errorMessage)")
-				completion(nil, NetworkResponse.failed(errorMessage))
+				completion(nil, NetworkResponseApi.failed(errorMessage))
 			}
 
 			if let response = response as? HTTPURLResponse {
@@ -43,26 +47,26 @@ final class ImageNetworkService: ImageNetworkServiceProtocol {
 				switch result {
 					case .success:
 						guard let responseData = data else {
-							completion(nil, NetworkResponse.noData)
+							completion(nil, NetworkResponseApi.noData)
 							return
 						}
 						completion(responseData, nil)
 					case .failure(let networkFailureError):
-						print("🔴 [ImageNetworkService] [getImage] An error occurred: \(networkFailureError)")
-						completion(nil, NetworkResponse.failed(networkFailureError.localizedDescription))
+						print("🔴 [ImageNetworkService] [getImageApi] An error occurred: \(networkFailureError)")
+						completion(nil, NetworkResponseApi.failed(networkFailureError.localizedDescription))
 				}
 			}
         }
 	}
 
-    func getVideoThumbnail(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponse?) -> Void) {
+    public func getVideoThumbnailApi(videoUrl: String, completion: @escaping(_ imageData: Data?, _ error: NetworkResponseApi?) -> Void) {
         networkManager.request(.videoThumbnail(videoUrl: videoUrl)) { [weak self] data, response, error in
             guard let `self` = self else { return }
 
             if error != nil {
                 let errorMessage = error?.localizedDescription ?? ""
                 print("🔴 [ImageNetworkService] [getVideoThumbnail] An error occurred: \(errorMessage)")
-                completion(nil, NetworkResponse.failed(errorMessage))
+                completion(nil, NetworkResponseApi.failed(errorMessage))
             }
 
             if let response = response as? HTTPURLResponse {
@@ -70,14 +74,14 @@ final class ImageNetworkService: ImageNetworkServiceProtocol {
                 switch result {
                     case .success:
                         guard let responseData = data else {
-                            completion(nil, NetworkResponse.noData)
+                            completion(nil, NetworkResponseApi.noData)
                             return
                         }
                         completion(responseData, nil)
 
                     case .failure(let networkFailureError):
                         print("🔴 [ImageNetworkService] [getVideoThumbnail] An error occurred: \(networkFailureError)")
-                        completion(nil, NetworkResponse.failed(networkFailureError.localizedDescription))
+                        completion(nil, NetworkResponseApi.failed(networkFailureError.localizedDescription))
                 }
             }
         }

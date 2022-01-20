@@ -6,21 +6,19 @@
 //
 
 import Combine
-import Domain
 import Foundation
-import Storage
 import UIKit
 
 final class HomeCoordinator: Coordinator {
 	// MARK: - Const
 	private let parentViewController: BaseViewController
 	private let movieService = MovieService.shared()
+    private let storageService = StorageService.shared()
 
 	// MARK: - Vars
 	var childCoordinators = [Coordinator]()
 	private var homeVC: HomeVC?
 	private var window: UIWindow
-    private var storageService: StorageService?
 
 	private var cancellable = Set<AnyCancellable>()
 
@@ -30,10 +28,6 @@ final class HomeCoordinator: Coordinator {
 		self.window = window
 		self.window.rootViewController = parentViewController
 		self.window.makeKeyAndVisible()
-
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            self.storageService = StorageService(managedObjectContext: appDelegate.persistentContainer.viewContext)
-        }
 
 		_ = Reachability.signalProducer.sink { reachability in
 			switch reachability {
@@ -65,7 +59,6 @@ final class HomeCoordinator: Coordinator {
         searchVC.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
         // Favorites
-        guard let storageService = storageService else { return }
         let favoritesVM = FavoritesVM(movieService: movieService, storageService: storageService)
         let favoritesVC = FavoritesVC(viewModel: favoritesVM)
         let favoritesNavigationController = NavigationController(rootViewController: favoritesVC)
@@ -102,8 +95,6 @@ final class HomeCoordinator: Coordinator {
 	}
 
 	private func showMovieDetails(movie: Movie, on baseViewController: UINavigationController) {
-        guard let storageService = storageService else { return }
-
         let viewModel = MovieDetailsVM(movieService: movieService, storageService: storageService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
@@ -285,8 +276,6 @@ final class HomeCoordinator: Coordinator {
     }
 
     private func showMovieDetails(movie: Movie, with navigationController: NavigationController) {
-        guard let storageService = storageService else { return }
-
         let viewModel = MovieDetailsVM(movieService: movieService, storageService: storageService, movie: movie)
         let viewController = MovieDetailsVC(viewModel: viewModel, pushedViewController: true)
 

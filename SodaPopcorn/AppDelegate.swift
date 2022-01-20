@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		application to it. This property is optional since there are legitimate
 		error conditions that could cause the creation of the store to fail.
 		*/
-		let container = NSPersistentContainer(name: "SodaPopcorn")
+        let container = NSPersistentContainer(name: "SodaPopcorn")
 		container.loadPersistentStores(completionHandler: { (_ storeDescription, error) in
 			if let error = error as NSError? {
 				// Replace this implementation with code to handle the error appropriately.
@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}()
 
 	// MARK: - Core Data Saving support
-	func saveContext () {
+	func saveContext() {
 		let context = persistentContainer.viewContext
 		if context.hasChanges {
 			do {
