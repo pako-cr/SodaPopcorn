@@ -51,6 +51,7 @@ playground.xcworkspace
 
 .build/
 *.DS_Store
+.DS_Store
 
 # CocoaPods
 #

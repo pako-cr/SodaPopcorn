@@ -13,6 +13,7 @@ final class HomeCoordinator: Coordinator {
 	// MARK: - Const
 	private let parentViewController: BaseViewController
 	private let movieService = MovieService.shared()
+    private let storageService = StorageService.shared()
 
 	// MARK: - Vars
 	var childCoordinators = [Coordinator]()
@@ -57,7 +58,14 @@ final class HomeCoordinator: Coordinator {
 
         searchVC.tabBarItem = UITabBarItem(title: NSLocalizedString("search", comment: "Search"), image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
-		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController]
+        // Favorites
+        let favoritesVM = FavoritesVM(movieService: movieService, storageService: storageService)
+        let favoritesVC = FavoritesVC(viewModel: favoritesVM)
+        let favoritesNavigationController = NavigationController(rootViewController: favoritesVC)
+
+        favoritesVC.tabBarItem = UITabBarItem(title: NSLocalizedString("favorites", comment: "Favorites"), image: UIImage(systemName: "star.fill"), tag: 2)
+
+		homeVC?.viewControllers = [moviesNavigationController, searchNavigationController, favoritesNavigationController]
 		homeVC?.selectedIndex = 0
         homeVC?.tabBar.tintColor = UIColor(named: "PrimaryColor")
 
@@ -79,10 +87,15 @@ final class HomeCoordinator: Coordinator {
             .sink { [weak self] movie in
                 self?.showMovieDetails(movie: movie, on: searchNavigationController)
             }.store(in: &cancellable)
+
+        favoritesVM.outputs.movieSelectedAction()
+            .sink { [weak self] movie in
+                self?.showMovieDetails(movie: movie, on: favoritesNavigationController)
+            }.store(in: &cancellable)
 	}
 
 	private func showMovieDetails(movie: Movie, on baseViewController: UINavigationController) {
-        let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
+        let viewModel = MovieDetailsVM(movieService: movieService, storageService: storageService, movie: movie)
 		let viewController = MovieDetailsVC(viewModel: viewModel)
 
         let navigationController = NavigationController(rootViewController: viewController)
@@ -263,7 +276,7 @@ final class HomeCoordinator: Coordinator {
     }
 
     private func showMovieDetails(movie: Movie, with navigationController: NavigationController) {
-        let viewModel = MovieDetailsVM(movieService: movieService, movie: movie)
+        let viewModel = MovieDetailsVM(movieService: movieService, storageService: storageService, movie: movie)
         let viewController = MovieDetailsVC(viewModel: viewModel, pushedViewController: true)
 
         navigationController.pushViewController(viewController, animated: true)
