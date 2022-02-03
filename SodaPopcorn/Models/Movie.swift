@@ -17,7 +17,6 @@ public struct Movie: Identifiable, Hashable {
     public let adult: Bool?
 
     public init(id: String, movieTitle: String? = nil, overview: String? = nil, rating: Double? = nil, posterPath: String? = nil, backdropPath: String? = nil, releaseDate: String? = nil, genres: [Genre]? = nil, homepage: String? = nil, runtime: Int? = nil, voteCount: Int? = nil, budget: Int? = nil, revenue: Int? = nil, tagline: String? = nil, productionCompanies: [ProductionCompany]? = nil, character: String? = nil, adult: Bool? = false) {
-//        self.id = id
         self.id = id
         self.movieTitle = movieTitle
         self.overview = overview
