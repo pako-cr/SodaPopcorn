@@ -57,6 +57,8 @@ jobs:
           chmod a+x .github/scripts/*.sh
 
       - name: Set environment variables from project settings
+        shell: bash
+        working-directory: build
         run: |
           exec .github/scripts/set-env-from-xcodeproj.sh
       
