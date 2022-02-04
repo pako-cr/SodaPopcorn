@@ -57,7 +57,7 @@ jobs:
         run: |
           echo START
           chmod +x .github/scripts/*.sh
-          exec .github/scripts/set-env-from-xcodeproj.sh
+          bash .github/scripts/set-env-from-xcodeproj.sh
           echo END
       
       - name: Import signing certificate
