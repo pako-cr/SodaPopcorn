@@ -52,14 +52,13 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v2
 
-      - name: Make executables
-        run: |
-          chmod a+x .github/scripts/*.sh
-
       - name: Set environment variables from project settings
         shell: bash
         run: |
+          echo START
+          chmod +x .github/scripts/*.sh
           exec .github/scripts/set-env-from-xcodeproj.sh
+          echo END
       
       - name: Import signing certificate
         env:
