@@ -58,7 +58,6 @@ jobs:
 
       - name: Set environment variables from project settings
         shell: bash
-        working-directory: build
         run: |
           exec .github/scripts/set-env-from-xcodeproj.sh
       
