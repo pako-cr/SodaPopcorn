@@ -37,20 +37,20 @@ final class MoviesVC: MoviesBaseCollectionView {
     private lazy var moviesFilterMenu: UIMenu = { [unowned self] in
         let menu = UIMenu(title: NSLocalizedString("movie_lists", comment: "Filter movies by list"), image: nil, identifier: nil, options: [.displayInline], children: [
             UIAction(title: NSLocalizedString("now_playing_movies", comment: "Now playing movies filter"), image: UIImage(systemName: "clock"), handler: { (_) in
-                viewModel.inputs.setSearchCriteria(searchCriteria: .nowPlaying)
-                title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
+                self.viewModel.inputs.setSearchCriteria(searchCriteria: .nowPlaying)
+                self.title = NSLocalizedString("now_playing_movies", comment: "Now playing movies filter")
             }),
             UIAction(title: NSLocalizedString("popular_movies", comment: "Popular movies filter"), image: UIImage(systemName: "person.2.wave.2"), handler: { (_) in
-                viewModel.inputs.setSearchCriteria(searchCriteria: .popular)
-                title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
+                self.viewModel.inputs.setSearchCriteria(searchCriteria: .popular)
+                self.title = NSLocalizedString("popular_movies", comment: "Popular movies filter")
             }),
             UIAction(title: NSLocalizedString("top_rated_movies", comment: "Top rated movies filter"), image: UIImage(systemName: "10.square.fill"), handler: { (_) in
-                viewModel.inputs.setSearchCriteria(searchCriteria: .topRated)
-                title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
+                self.viewModel.inputs.setSearchCriteria(searchCriteria: .topRated)
+                self.title = NSLocalizedString("top_rated_movies", comment: "Top rated movies filter")
             }),
             UIAction(title: NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter"), image: UIImage(systemName: "sparkles.tv"), handler: { (_) in
-                viewModel.inputs.setSearchCriteria(searchCriteria: .upcomming)
-                title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
+                self.viewModel.inputs.setSearchCriteria(searchCriteria: .upcomming)
+                self.title = NSLocalizedString("upcoming_movies", comment: "Upcoming movies filter")
             })
         ])
 

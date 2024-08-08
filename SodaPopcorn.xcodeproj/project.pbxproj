@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1206,6 +1206,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		8A8B72B3275AAFC30012DED0 /* Swiftlint Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1224,6 +1225,7 @@
 		};
 		D941ACEA26E27B6B00018E57 /* Swiftlint Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
